@@ -1,0 +1,1133 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='1. 前言 这一章主要讲解目标文件(Object File)的格式。目标文件是指经过编译后但未经链接的的.o（linux）和.obj（win）的文件。
+1.1 目标文件与可执行文件的区别 从结构上来讲，目标文件按照可执行文件格式存储 相比于可执行文件，没有经过链接过程，有些符号和地址没有被调整 1.2 可执行文件格式存储的文件 按照可执行文件格式存储的文件有：
+ELF文件类型 说明 实例 可重定位文件(relocatable file) 包含代码和数据，可以被链接成可执行文件或共享目标文件 目标文件：linux下.o文件，windows下的.obj文件静态链接库文件：linux下的.a，windows下的.lib 可执行文件(executable file) 包含了可直接执行的程序 linux下的可执行文件，通常没有扩展名，如/bin/bash文件；windows下的.exe文件 共享目标文件(shared object file) 包含了代码和数据，两种情况使用：1. 与其他可重定位文件和共享目标文件链接成新的目标文件；2. 动态连接器将多个共享目标文件与可执行文件结合，作为进程映像的一部分来运行 linux下的.so文件；windows下的.dll文件 核心转储文件core dump file 当进程意外终止时，可以将该进程的地址空间的内容及终止时的一些其他信息转储到核心转储文件 linux下的core dump 可以通过file命令查看文件类型
+1 2 3 4 5 6 7 8 [root@bogon 01_hello_world]# file hello.o hello.o: ELF 64-bit LSB relocatable, x86-64, version 1 (SYSV), not stripped [root@bogon 01_hello_world]# file hello2 hello2: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.'>
+<title>03_目标文件里有什么</title>
+
+<link rel='canonical' href='https://frozen531.github.io.git/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/03_%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E9%87%8C%E6%9C%89%E4%BB%80%E4%B9%88/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='03_目标文件里有什么'>
+<meta property='og:description' content='1. 前言 这一章主要讲解目标文件(Object File)的格式。目标文件是指经过编译后但未经链接的的.o（linux）和.obj（win）的文件。
+1.1 目标文件与可执行文件的区别 从结构上来讲，目标文件按照可执行文件格式存储 相比于可执行文件，没有经过链接过程，有些符号和地址没有被调整 1.2 可执行文件格式存储的文件 按照可执行文件格式存储的文件有：
+ELF文件类型 说明 实例 可重定位文件(relocatable file) 包含代码和数据，可以被链接成可执行文件或共享目标文件 目标文件：linux下.o文件，windows下的.obj文件静态链接库文件：linux下的.a，windows下的.lib 可执行文件(executable file) 包含了可直接执行的程序 linux下的可执行文件，通常没有扩展名，如/bin/bash文件；windows下的.exe文件 共享目标文件(shared object file) 包含了代码和数据，两种情况使用：1. 与其他可重定位文件和共享目标文件链接成新的目标文件；2. 动态连接器将多个共享目标文件与可执行文件结合，作为进程映像的一部分来运行 linux下的.so文件；windows下的.dll文件 核心转储文件core dump file 当进程意外终止时，可以将该进程的地址空间的内容及终止时的一些其他信息转储到核心转储文件 linux下的core dump 可以通过file命令查看文件类型
+1 2 3 4 5 6 7 8 [root@bogon 01_hello_world]# file hello.o hello.o: ELF 64-bit LSB relocatable, x86-64, version 1 (SYSV), not stripped [root@bogon 01_hello_world]# file hello2 hello2: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.'>
+<meta property='og:url' content='https://frozen531.github.io.git/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/03_%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E9%87%8C%E6%9C%89%E4%BB%80%E4%B9%88/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='程序员的自我修养' /><meta property='article:published_time' content='2023-02-05T10:47:08&#43;08:00'/><meta property='article:modified_time' content='2023-02-05T10:47:08&#43;08:00'/>
+<meta name="twitter:title" content="03_目标文件里有什么">
+<meta name="twitter:description" content="1. 前言 这一章主要讲解目标文件(Object File)的格式。目标文件是指经过编译后但未经链接的的.o（linux）和.obj（win）的文件。
+1.1 目标文件与可执行文件的区别 从结构上来讲，目标文件按照可执行文件格式存储 相比于可执行文件，没有经过链接过程，有些符号和地址没有被调整 1.2 可执行文件格式存储的文件 按照可执行文件格式存储的文件有：
+ELF文件类型 说明 实例 可重定位文件(relocatable file) 包含代码和数据，可以被链接成可执行文件或共享目标文件 目标文件：linux下.o文件，windows下的.obj文件静态链接库文件：linux下的.a，windows下的.lib 可执行文件(executable file) 包含了可直接执行的程序 linux下的可执行文件，通常没有扩展名，如/bin/bash文件；windows下的.exe文件 共享目标文件(shared object file) 包含了代码和数据，两种情况使用：1. 与其他可重定位文件和共享目标文件链接成新的目标文件；2. 动态连接器将多个共享目标文件与可执行文件结合，作为进程映像的一部分来运行 linux下的.so文件；windows下的.dll文件 核心转储文件core dump file 当进程意外终止时，可以将该进程的地址空间的内容及终止时的一些其他信息转储到核心转储文件 linux下的core dump 可以通过file命令查看文件类型
+1 2 3 4 5 6 7 8 [root@bogon 01_hello_world]# file hello.o hello.o: ELF 64-bit LSB relocatable, x86-64, version 1 (SYSV), not stripped [root@bogon 01_hello_world]# file hello2 hello2: ELF 64-bit LSB executable, x86-64, version 1 (SYSV), dynamically linked (uses shared libs), for GNU/Linux 2.">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#11-目标文件与可执行文件的区别">1.1 目标文件与可执行文件的区别</a></li>
+    <li><a href="#12-可执行文件格式存储的文件">1.2 可执行文件格式存储的文件</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#21-目标文件的组成">2.1 目标文件的组成</a></li>
+    <li><a href="#22-代码">2.2 代码</a></li>
+    <li><a href="#23-查看文件相应的文件格式">2.3 查看文件相应的文件格式</a></li>
+    <li><a href="#24-查看目标文件各个段的长度">2.4 查看目标文件各个段的长度</a></li>
+    <li><a href="#25-查看目标文件各个段的基本信息">2.5 查看目标文件各个段的基本信息</a></li>
+  </ul>
+
+  <ul>
+    <li><a href="#链接与符号">链接与符号</a></li>
+    <li><a href="#符号修饰和函数签名">符号修饰和函数签名</a></li>
+    <li><a href="#extern-c">extern &ldquo;C&rdquo;</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="background-color: #c1c1f6; color: #fff;">
+                读书笔记
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/03_%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E9%87%8C%E6%9C%89%E4%BB%80%E4%B9%88/">03_目标文件里有什么</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Feb 05, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    6 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="1-前言">1. 前言</h1>
+<p>这一章主要讲解目标文件(Object File)的格式。目标文件是指经过编译后但未经链接的的<code>.o</code>（linux）和<code>.obj</code>（win）的文件。</p>
+<h2 id="11-目标文件与可执行文件的区别">1.1 目标文件与可执行文件的区别</h2>
+<ul>
+<li>从结构上来讲，目标文件按照可执行文件格式存储</li>
+<li>相比于可执行文件，没有经过链接过程，有些符号和地址没有被调整</li>
+</ul>
+<h2 id="12-可执行文件格式存储的文件">1.2 可执行文件格式存储的文件</h2>
+<p>按照可执行文件格式存储的文件有：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>ELF文件类型</th>
+<th>说明</th>
+<th>实例</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>可重定位文件<!-- raw HTML omitted -->(relocatable file)</td>
+<td>包含代码和数据，可以被链接成可执行文件或共享目标文件</td>
+<td>目标文件：linux下.o文件，windows下的.obj文件<!-- raw HTML omitted -->静态链接库文件：linux下的.a，windows下的.lib</td>
+</tr>
+<tr>
+<td>可执行文件<!-- raw HTML omitted -->(executable file)</td>
+<td>包含了可直接执行的程序</td>
+<td>linux下的可执行文件，通常没有扩展名，如/bin/bash文件；<!-- raw HTML omitted -->windows下的.exe文件</td>
+</tr>
+<tr>
+<td>共享目标文件<!-- raw HTML omitted -->(shared object file)</td>
+<td>包含了代码和数据，两种情况使用：<!-- raw HTML omitted -->1. 与其他可重定位文件和共享目标文件链接成新的目标文件；<!-- raw HTML omitted -->2. 动态连接器将多个共享目标文件与可执行文件结合，作为进程映像的一部分来运行</td>
+<td>linux下的.so文件；<!-- raw HTML omitted -->windows下的.dll文件</td>
+</tr>
+<tr>
+<td>核心转储文件<!-- raw HTML omitted -->core dump file</td>
+<td>当进程意外终止时，可以将该进程的地址空间的内容及终止时的一些其他信息转储到核心转储文件</td>
+<td>linux下的core dump</td>
+</tr>
+</tbody>
+</table></div>
+<p>可以通过<code>file</code>命令查看文件类型</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon 01_hello_world<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># file hello.o </span>
+</span></span><span style="display:flex;"><span>hello.o: ELF 64-bit LSB relocatable, x86-64, version <span style="color:#099">1</span> <span style="color:#000;font-weight:bold">(</span>SYSV<span style="color:#000;font-weight:bold">)</span>, not stripped
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon 01_hello_world<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># file hello2</span>
+</span></span><span style="display:flex;"><span>hello2: ELF 64-bit LSB executable, x86-64, version <span style="color:#099">1</span> <span style="color:#000;font-weight:bold">(</span>SYSV<span style="color:#000;font-weight:bold">)</span>, dynamically linked <span style="color:#000;font-weight:bold">(</span>uses shared libs<span style="color:#000;font-weight:bold">)</span>, <span style="color:#000;font-weight:bold">for</span> GNU/Linux 2.6.18, not stripped
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon human<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># file libhuman.a </span>
+</span></span><span style="display:flex;"><span>libhuman.a: current ar archive
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>注意：</p>
+<blockquote>
+<ol>
+<li><code>.a</code>文件为多个<code>.o</code>文件打包到一起的，所有也算relocatable可重定位文件</li>
+<li>可执行文件格式与编译器和操作系统密切相关，不同格式间大同小异。PE（win）和ELF（linux）都是COFF的变种格式</li>
+</ol>
+</blockquote>
+<h1 id="2-目标文件内容">2. 目标文件内容</h1>
+<h2 id="21-目标文件的组成">2.1 目标文件的组成</h2>
+<p>![目标文件中的段](<a class="link" href="https://img-blog.csdnimg.cn/e6c1ad7a324e41c682bc2235edd5352b.png#pic_center"  target="_blank" rel="noopener"
+    >https://img-blog.csdnimg.cn/e6c1ad7a324e41c682bc2235edd5352b.png#pic_center</a> =300x)</p>
+<p>目标文件中将信息按不同的属性分“段”：</p>
+<ul>
+<li>文件属性：通过<code>file</code>命令查看，包括：文件类型、目标硬件、目标操作系统等信息，还包括段表，描述各个段在文件中的偏移位置和段属性等</li>
+<li>.text段：源代码编译后的机器指令</li>
+<li>.data段：已初始化的全局变量和局部静态变量</li>
+<li>.bss段：未初始化的全局变量和局部静态变量</li>
+<li>链接时所需的信息，如：符号表、调试信息、字符串等</li>
+</ul>
+<p>为什么将程序代码和数据分隔开来：</p>
+<ul>
+<li>两者属性不同，代码为只读，数据为可读写，当程序装载后，两者会被映射到不同的虚存区域</li>
+<li>指令和数据的分离有利于提高程序的局部性，对CPU的缓存（cache）命中率有好处</li>
+<li>当系统中运行多个该程序副本时，内存中只需要保留一份该程序的指令部分，称为<strong>共享指令</strong>，而数据是各个进程私有的</li>
+</ul>
+<h2 id="22-代码">2.2 代码</h2>
+<ul>
+<li><code>simpleSection.c</code></li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> <span style="color:#900;font-weight:bold">printf</span>(<span style="color:#000;font-weight:bold">const</span> <span style="color:#458;font-weight:bold">char</span><span style="color:#000;font-weight:bold">*</span> format, ...);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> global_init_var <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">84</span>;
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> global_uninit_var;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">func1</span>(<span style="color:#458;font-weight:bold">int</span> i)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>	<span style="color:#900;font-weight:bold">printf</span>(<span style="color:#d14">&#34;%d</span><span style="color:#d14">\n</span><span style="color:#d14">&#34;</span>, i);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> <span style="color:#900;font-weight:bold">main</span>(<span style="color:#458;font-weight:bold">void</span>)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">static</span> <span style="color:#458;font-weight:bold">int</span> static_var <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">85</span>;
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">static</span> <span style="color:#458;font-weight:bold">int</span> static_var2;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#458;font-weight:bold">int</span> a <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#458;font-weight:bold">int</span> b;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#900;font-weight:bold">func1</span>(static_var <span style="color:#000;font-weight:bold">+</span> static_var2 <span style="color:#000;font-weight:bold">+</span> a <span style="color:#000;font-weight:bold">+</span> b);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>	<span style="color:#000;font-weight:bold">return</span> a;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>编译：</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>gcc -c simpleSection.c -o app.o
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="23-查看文件相应的文件格式">2.3 查看文件相应的文件格式</h2>
+<p>查看文件相应的文件格式的命令：<code>file</code>，可以看出文件是可重定位文件。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Y400:~/practice/02目标文件格式$ file app.o 
+</span></span><span style="display:flex;"><span>app.o: ELF 64-bit LSB relocatable, x86-64, version <span style="color:#099">1</span> <span style="color:#000;font-weight:bold">(</span>SYSV<span style="color:#000;font-weight:bold">)</span>, not stripped
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="24-查看目标文件各个段的长度">2.4 查看目标文件各个段的长度</h2>
+<ul>
+<li><code>size</code>指令，查看ELF文件的代码段、数据段和BSS段的长度</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Y400:~/practice/02目标文件格式$ size app.o 
+</span></span><span style="display:flex;"><span>   text	   data	    bss	    dec	    hex	filename
+</span></span><span style="display:flex;"><span>    177	      8	      4	    189	     bd	app.o
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="25-查看目标文件各个段的基本信息">2.5 查看目标文件各个段的基本信息</h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>-h</code></td>
+<td>打印关键段的基本信息</td>
+</tr>
+<tr>
+<td><code>-x</code></td>
+<td>打印段的更多信息（<code>extend</code>）</td>
+</tr>
+<tr>
+<td><code>-s</code></td>
+<td>将各段以十六进制的方式打印</td>
+</tr>
+<tr>
+<td><code>-d</code></td>
+<td>将包含指令的段反汇编</td>
+</tr>
+</tbody>
+</table></div>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Y400:~/practice/02目标文件格式$ objdump -h app.o 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>app.o:     file format elf64-x86-64
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Sections:
+</span></span><span style="display:flex;"><span>Idx Name          Size      VMA               LMA               File off  Algn
+</span></span><span style="display:flex;"><span>  <span style="color:#099">0</span> .text         <span style="color:#099">00000055</span>  <span style="color:#099">0000000000000000</span>  <span style="color:#099">0000000000000000</span>  <span style="color:#099">00000040</span>  2**0
+</span></span><span style="display:flex;"><span>                  CONTENTS, ALLOC, LOAD, RELOC, READONLY, CODE
+</span></span><span style="display:flex;"><span>  <span style="color:#099">1</span> .data         <span style="color:#099">00000008</span>  <span style="color:#099">0000000000000000</span>  <span style="color:#099">0000000000000000</span>  <span style="color:#099">00000098</span>  2**2
+</span></span><span style="display:flex;"><span>                  CONTENTS, ALLOC, LOAD, DATA
+</span></span><span style="display:flex;"><span>  <span style="color:#099">2</span> .bss          <span style="color:#099">00000004</span>  <span style="color:#099">0000000000000000</span>  <span style="color:#099">0000000000000000</span>  000000a0  2**2
+</span></span><span style="display:flex;"><span>                  ALLOC
+</span></span><span style="display:flex;"><span>  <span style="color:#099">3</span> .rodata       <span style="color:#099">00000004</span>  <span style="color:#099">0000000000000000</span>  <span style="color:#099">0000000000000000</span>  000000a0  2**0
+</span></span><span style="display:flex;"><span>                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+</span></span><span style="display:flex;"><span>  <span style="color:#099">4</span> .comment      <span style="color:#099">00000035</span>  <span style="color:#099">0000000000000000</span>  <span style="color:#099">0000000000000000</span>  000000a4  2**0
+</span></span><span style="display:flex;"><span>                  CONTENTS, READONLY
+</span></span><span style="display:flex;"><span>  <span style="color:#099">5</span> .note.GNU-stack <span style="color:#099">00000000</span>  <span style="color:#099">0000000000000000</span>  <span style="color:#099">0000000000000000</span>  000000d9  2**0
+</span></span><span style="display:flex;"><span>                  CONTENTS, READONLY
+</span></span><span style="display:flex;"><span>  <span style="color:#099">6</span> .eh_frame     <span style="color:#099">00000058</span>  <span style="color:#099">0000000000000000</span>  <span style="color:#099">0000000000000000</span>  000000e0  2**3
+</span></span><span style="display:flex;"><span>                  CONTENTS, ALLOC, LOAD, RELOC, READONLY, DATA
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>每个段的第二行标识该段的属性：CONTENTS, ALLOC, LOAD, RELOC, READONLY, CODE</p>
+<ul>
+<li>.text</li>
+</ul>
+<blockquote>
+<p>代码段，程序编译成机器代码后存放在代码段</p>
+</blockquote>
+<ul>
+<li>.data，.bss，.rodata</li>
+</ul>
+<blockquote>
+<p>数据段</p>
+<ul>
+<li><code>data</code>:已初始化的全局变量和局部静态变量</li>
+<li><code>bss</code>:未初始化的全局变量和局部静态变量。因为未初始化默认为0，所以<code>.bss</code>只是为这些变量预留位置，记录这些变量所占空间大小的总和，这样可以节省内存，所以<code>.bss</code>不占空间</li>
+<li>.<code>rodata</code>:只读数据，例如字符串常量、被<code>const</code>修饰的变量</li>
+</ul>
+</blockquote>
+<ul>
+<li>.comment</li>
+</ul>
+<blockquote>
+<p>注释段，编译器版本信息</p>
+</blockquote>
+<p><img src="https://img-blog.csdnimg.cn/2020102222082882.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MzE3MDA5,size_16,color_FFFFFF,t_70#pic_center"
+	
+	
+	
+	loading="lazy"
+	
+		alt="内存图"
+	
+	
+></p>
+<p><code>-s</code> 将所有段的内容以十六进制方式打印出来（<code>assembly</code>）</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Y400:~/practice/02目标文件格式$ objdump -s app.o 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>app.o:     file format elf64-x86-64
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Contents of section .text:
+</span></span><span style="display:flex;"><span> <span style="color:#099">0000</span> 554889e5 4883ec10 897dfc8b 45fc89c6  UH..H....<span style="color:#000;font-weight:bold">}</span>..E...
+</span></span><span style="display:flex;"><span> <span style="color:#099">0010</span> bf000000 00b80000 0000e800 <span style="color:#099">00000090</span>  ................
+</span></span><span style="display:flex;"><span> <span style="color:#099">0020</span> c9c35548 89e54883 ec10c745 f8010000  ..UH..H....E....
+</span></span><span style="display:flex;"><span> <span style="color:#099">0030</span> 008b1500 0000008b <span style="color:#099">05000000</span> 0001c28b  ................
+</span></span><span style="display:flex;"><span> <span style="color:#099">0040</span> 45f801c2 8b45fc01 d089c7e8 <span style="color:#099">00000000</span>  E....E..........
+</span></span><span style="display:flex;"><span> <span style="color:#099">0050</span> 8b45f8c9 c3                          .E...           
+</span></span><span style="display:flex;"><span>Contents of section .data:
+</span></span><span style="display:flex;"><span> <span style="color:#099">0000</span> <span style="color:#099">54000000</span> <span style="color:#099">55000000</span>                    T...U...        
+</span></span><span style="display:flex;"><span>Contents of section .rodata:
+</span></span><span style="display:flex;"><span> <span style="color:#099">0000</span> 25640a00                             %d..            
+</span></span><span style="display:flex;"><span>Contents of section .comment:
+</span></span><span style="display:flex;"><span> <span style="color:#099">0000</span> <span style="color:#099">00474343</span> 3a202855 62756e74 7520352e  .GCC: <span style="color:#000;font-weight:bold">(</span>Ubuntu 5.
+</span></span><span style="display:flex;"><span> <span style="color:#099">0010</span> 342e302d <span style="color:#099">36756275</span> 6e747531 7e31362e  4.0-6ubuntu1~16.
+</span></span><span style="display:flex;"><span> <span style="color:#099">0020</span> 30342e39 2920352e 342e3020 <span style="color:#099">32303136</span>  04.9<span style="color:#000;font-weight:bold">)</span> 5.4.0 <span style="color:#099">2016</span>
+</span></span><span style="display:flex;"><span> <span style="color:#099">0030</span> <span style="color:#099">30363039</span> <span style="color:#099">00</span>                          0609.           
+</span></span><span style="display:flex;"><span>Contents of section .eh_frame:
+</span></span><span style="display:flex;"><span> <span style="color:#099">0000</span> <span style="color:#099">14000000</span> <span style="color:#099">00000000</span> 017a5200 <span style="color:#099">01781001</span>  .........zR..x..
+</span></span><span style="display:flex;"><span> <span style="color:#099">0010</span> 1b0c0708 <span style="color:#099">90010000</span> 1c000000 1c000000  ................
+</span></span><span style="display:flex;"><span> <span style="color:#099">0020</span> <span style="color:#099">00000000</span> <span style="color:#099">22000000</span> 00410e10 8602430d  ....<span style="color:#d14">&#34;....A....C.
+</span></span></span><span style="display:flex;"><span><span style="color:#d14"> 0030 065d0c07 08000000 1c000000 3c000000  .]..........&lt;...
+</span></span></span><span style="display:flex;"><span><span style="color:#d14"> 0040 00000000 33000000 00410e10 8602430d  ....3....A....C.
+</span></span></span><span style="display:flex;"><span><span style="color:#d14"> 0050 066e0c07 08000000                    .n......
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>.data：</p>
+<ul>
+<li>54000000 -》 84（global_init_var ）；</li>
+<li>55000000 -》 85（static_var ）</li>
+</ul>
+</blockquote>
+<blockquote>
+<p>.rodata</p>
+<ul>
+<li>25640a00 -》 “% d \n \0”</li>
+</ul>
+</blockquote>
+<p><code>-d</code> 所有指令的段反汇编（<code>Disassembly</code>）</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">38
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Y400:~/practice/02目标文件格式$ objdump -d app.o 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>app.o:     file format elf64-x86-64
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Disassembly of section .text:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#099">0000000000000000</span> &lt;func1&gt;:
+</span></span><span style="display:flex;"><span>   0:	<span style="color:#099">55</span>                   	push   %rbp
+</span></span><span style="display:flex;"><span>   1:	<span style="color:#099">48</span> <span style="color:#099">89</span> e5             	mov    %rsp,%rbp
+</span></span><span style="display:flex;"><span>   4:	<span style="color:#099">48</span> <span style="color:#099">83</span> ec <span style="color:#099">10</span>          	sub    <span style="color:#008080">$0</span>x10,%rsp
+</span></span><span style="display:flex;"><span>   8:	<span style="color:#099">89</span> 7d <span style="color:#0086b3">fc</span>             	mov    %edi,-0x4<span style="color:#000;font-weight:bold">(</span>%rbp<span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>   b:	8b <span style="color:#099">45</span> <span style="color:#0086b3">fc</span>             	mov    -0x4<span style="color:#000;font-weight:bold">(</span>%rbp<span style="color:#000;font-weight:bold">)</span>,%eax
+</span></span><span style="display:flex;"><span>   e:	<span style="color:#099">89</span> c6                	mov    %eax,%esi
+</span></span><span style="display:flex;"><span>  10:	bf <span style="color:#099">00</span> <span style="color:#099">00</span> <span style="color:#099">00</span> <span style="color:#099">00</span>       	mov    <span style="color:#008080">$0</span>x0,%edi
+</span></span><span style="display:flex;"><span>  15:	b8 <span style="color:#099">00</span> <span style="color:#099">00</span> <span style="color:#099">00</span> <span style="color:#099">00</span>       	mov    <span style="color:#008080">$0</span>x0,%eax
+</span></span><span style="display:flex;"><span>  1a:	e8 <span style="color:#099">00</span> <span style="color:#099">00</span> <span style="color:#099">00</span> <span style="color:#099">00</span>       	callq  1f &lt;func1+0x1f&gt;
+</span></span><span style="display:flex;"><span>  1f:	<span style="color:#099">90</span>                   	nop
+</span></span><span style="display:flex;"><span>  20:	c9                   	leaveq 
+</span></span><span style="display:flex;"><span>  21:	c3                   	retq   
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#099">0000000000000022</span> &lt;main&gt;:
+</span></span><span style="display:flex;"><span>  22:	<span style="color:#099">55</span>                   	push   %rbp
+</span></span><span style="display:flex;"><span>  23:	<span style="color:#099">48</span> <span style="color:#099">89</span> e5             	mov    %rsp,%rbp
+</span></span><span style="display:flex;"><span>  26:	<span style="color:#099">48</span> <span style="color:#099">83</span> ec <span style="color:#099">10</span>          	sub    <span style="color:#008080">$0</span>x10,%rsp
+</span></span><span style="display:flex;"><span>  2a:	c7 <span style="color:#099">45</span> f8 <span style="color:#099">01</span> <span style="color:#099">00</span> <span style="color:#099">00</span> <span style="color:#099">00</span> 	movl   <span style="color:#008080">$0</span>x1,-0x8<span style="color:#000;font-weight:bold">(</span>%rbp<span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>  31:	8b <span style="color:#099">15</span> <span style="color:#099">00</span> <span style="color:#099">00</span> <span style="color:#099">00</span> <span style="color:#099">00</span>    	mov    0x0<span style="color:#000;font-weight:bold">(</span>%rip<span style="color:#000;font-weight:bold">)</span>,%edx        <span style="color:#998;font-style:italic"># 37 &lt;main+0x15&gt;</span>
+</span></span><span style="display:flex;"><span>  37:	8b <span style="color:#099">05</span> <span style="color:#099">00</span> <span style="color:#099">00</span> <span style="color:#099">00</span> <span style="color:#099">00</span>    	mov    0x0<span style="color:#000;font-weight:bold">(</span>%rip<span style="color:#000;font-weight:bold">)</span>,%eax        <span style="color:#998;font-style:italic"># 3d &lt;main+0x1b&gt;</span>
+</span></span><span style="display:flex;"><span>  3d:	<span style="color:#099">01</span> c2                	add    %eax,%edx
+</span></span><span style="display:flex;"><span>  3f:	8b <span style="color:#099">45</span> f8             	mov    -0x8<span style="color:#000;font-weight:bold">(</span>%rbp<span style="color:#000;font-weight:bold">)</span>,%eax
+</span></span><span style="display:flex;"><span>  42:	<span style="color:#099">01</span> c2                	add    %eax,%edx
+</span></span><span style="display:flex;"><span>  44:	8b <span style="color:#099">45</span> <span style="color:#0086b3">fc</span>             	mov    -0x4<span style="color:#000;font-weight:bold">(</span>%rbp<span style="color:#000;font-weight:bold">)</span>,%eax
+</span></span><span style="display:flex;"><span>  47:	<span style="color:#099">01</span> d0                	add    %edx,%eax
+</span></span><span style="display:flex;"><span>  49:	<span style="color:#099">89</span> c7                	mov    %eax,%edi
+</span></span><span style="display:flex;"><span>  4b:	e8 <span style="color:#099">00</span> <span style="color:#099">00</span> <span style="color:#099">00</span> <span style="color:#099">00</span>       	callq  <span style="color:#099">50</span> &lt;main+0x2e&gt;
+</span></span><span style="display:flex;"><span>  50:	8b <span style="color:#099">45</span> f8             	mov    -0x8<span style="color:#000;font-weight:bold">(</span>%rbp<span style="color:#000;font-weight:bold">)</span>,%eax
+</span></span><span style="display:flex;"><span>  53:	c9                   	leaveq 
+</span></span><span style="display:flex;"><span>  54:	c3                   	retq   
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h1 id="elf文件头">ELF文件头</h1>
+<p><code>ELF header</code>位于目标文件格式的最前部分，描述整个文件的基本属性。</p>
+<p>打印<code>ELF</code>所有段的内容：<code>readelf -S app.o</code></p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Y400:~/practice/02目标文件格式$ readelf -S app.o 
+</span></span><span style="display:flex;"><span>There are <span style="color:#099">13</span> section headers, starting at offset 0x430:
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Section Headers:
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">[</span>Nr<span style="color:#000;font-weight:bold">]</span> Name              Type             Address           Offset
+</span></span><span style="display:flex;"><span>       Size              EntSize          Flags  Link  Info  Align
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">[</span> 0<span style="color:#000;font-weight:bold">]</span>                   NULL             <span style="color:#099">0000000000000000</span>  <span style="color:#099">00000000</span>
+</span></span><span style="display:flex;"><span>       <span style="color:#099">0000000000000000</span>  <span style="color:#099">0000000000000000</span>           <span style="color:#099">0</span>     <span style="color:#099">0</span>     <span style="color:#099">0</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">[</span> 1<span style="color:#000;font-weight:bold">]</span> .text             PROGBITS         <span style="color:#099">0000000000000000</span>  <span style="color:#099">00000040</span>
+</span></span><span style="display:flex;"><span>       <span style="color:#099">0000000000000055</span>  <span style="color:#099">0000000000000000</span>  AX       <span style="color:#099">0</span>     <span style="color:#099">0</span>     <span style="color:#099">1</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">[</span> 2<span style="color:#000;font-weight:bold">]</span> .rela.text        RELA             <span style="color:#099">0000000000000000</span>  <span style="color:#099">00000320</span>
+</span></span><span style="display:flex;"><span>       <span style="color:#099">0000000000000078</span>  <span style="color:#099">0000000000000018</span>   I      <span style="color:#099">11</span>     <span style="color:#099">1</span>     <span style="color:#099">8</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">[</span> 3<span style="color:#000;font-weight:bold">]</span> .data             PROGBITS         <span style="color:#099">0000000000000000</span>  <span style="color:#099">00000098</span>
+</span></span><span style="display:flex;"><span>       <span style="color:#099">0000000000000008</span>  <span style="color:#099">0000000000000000</span>  WA       <span style="color:#099">0</span>     <span style="color:#099">0</span>     <span style="color:#099">4</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">[</span> 4<span style="color:#000;font-weight:bold">]</span> .bss              NOBITS           <span style="color:#099">0000000000000000</span>  000000a0
+</span></span><span style="display:flex;"><span>       <span style="color:#099">0000000000000004</span>  <span style="color:#099">0000000000000000</span>  WA       <span style="color:#099">0</span>     <span style="color:#099">0</span>     <span style="color:#099">4</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">[</span> 5<span style="color:#000;font-weight:bold">]</span> .rodata           PROGBITS         <span style="color:#099">0000000000000000</span>  000000a0
+</span></span><span style="display:flex;"><span>       <span style="color:#099">0000000000000004</span>  <span style="color:#099">0000000000000000</span>   A       <span style="color:#099">0</span>     <span style="color:#099">0</span>     <span style="color:#099">1</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">[</span> 6<span style="color:#000;font-weight:bold">]</span> .comment          PROGBITS         <span style="color:#099">0000000000000000</span>  000000a4
+</span></span><span style="display:flex;"><span>       <span style="color:#099">0000000000000035</span>  <span style="color:#099">0000000000000001</span>  MS       <span style="color:#099">0</span>     <span style="color:#099">0</span>     <span style="color:#099">1</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">[</span> 7<span style="color:#000;font-weight:bold">]</span> .note.GNU-stack   PROGBITS         <span style="color:#099">0000000000000000</span>  000000d9
+</span></span><span style="display:flex;"><span>       <span style="color:#099">0000000000000000</span>  <span style="color:#099">0000000000000000</span>           <span style="color:#099">0</span>     <span style="color:#099">0</span>     <span style="color:#099">1</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">[</span> 8<span style="color:#000;font-weight:bold">]</span> .eh_frame         PROGBITS         <span style="color:#099">0000000000000000</span>  000000e0
+</span></span><span style="display:flex;"><span>       <span style="color:#099">0000000000000058</span>  <span style="color:#099">0000000000000000</span>   A       <span style="color:#099">0</span>     <span style="color:#099">0</span>     <span style="color:#099">8</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">[</span> 9<span style="color:#000;font-weight:bold">]</span> .rela.eh_frame    RELA             <span style="color:#099">0000000000000000</span>  <span style="color:#099">00000398</span>
+</span></span><span style="display:flex;"><span>       <span style="color:#099">0000000000000030</span>  <span style="color:#099">0000000000000018</span>   I      <span style="color:#099">11</span>     <span style="color:#099">8</span>     <span style="color:#099">8</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">[</span>10<span style="color:#000;font-weight:bold">]</span> .shstrtab         STRTAB           <span style="color:#099">0000000000000000</span>  000003c8
+</span></span><span style="display:flex;"><span>       <span style="color:#099">0000000000000061</span>  <span style="color:#099">0000000000000000</span>           <span style="color:#099">0</span>     <span style="color:#099">0</span>     <span style="color:#099">1</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">[</span>11<span style="color:#000;font-weight:bold">]</span> .symtab           SYMTAB           <span style="color:#099">0000000000000000</span>  <span style="color:#099">00000138</span>
+</span></span><span style="display:flex;"><span>       <span style="color:#099">0000000000000180</span>  <span style="color:#099">0000000000000018</span>          <span style="color:#099">12</span>    <span style="color:#099">11</span>     <span style="color:#099">8</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#000;font-weight:bold">[</span>12<span style="color:#000;font-weight:bold">]</span> .strtab           STRTAB           <span style="color:#099">0000000000000000</span>  000002b8
+</span></span><span style="display:flex;"><span>       <span style="color:#099">0000000000000066</span>  <span style="color:#099">0000000000000000</span>           <span style="color:#099">0</span>     <span style="color:#099">0</span>     <span style="color:#099">1</span>
+</span></span><span style="display:flex;"><span>Key to Flags:
+</span></span><span style="display:flex;"><span>  W <span style="color:#000;font-weight:bold">(</span>write<span style="color:#000;font-weight:bold">)</span>, A <span style="color:#000;font-weight:bold">(</span>alloc<span style="color:#000;font-weight:bold">)</span>, X <span style="color:#000;font-weight:bold">(</span>execute<span style="color:#000;font-weight:bold">)</span>, M <span style="color:#000;font-weight:bold">(</span>merge<span style="color:#000;font-weight:bold">)</span>, S <span style="color:#000;font-weight:bold">(</span>strings<span style="color:#000;font-weight:bold">)</span>, l <span style="color:#000;font-weight:bold">(</span>large<span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>  I <span style="color:#000;font-weight:bold">(</span>info<span style="color:#000;font-weight:bold">)</span>, L <span style="color:#000;font-weight:bold">(</span>link order<span style="color:#000;font-weight:bold">)</span>, G <span style="color:#000;font-weight:bold">(</span>group<span style="color:#000;font-weight:bold">)</span>, T <span style="color:#000;font-weight:bold">(</span>TLS<span style="color:#000;font-weight:bold">)</span>, E <span style="color:#000;font-weight:bold">(</span>exclude<span style="color:#000;font-weight:bold">)</span>, x <span style="color:#000;font-weight:bold">(</span>unknown<span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>  O <span style="color:#000;font-weight:bold">(</span>extra OS processing required<span style="color:#000;font-weight:bold">)</span> o <span style="color:#000;font-weight:bold">(</span>OS specific<span style="color:#000;font-weight:bold">)</span>, p <span style="color:#000;font-weight:bold">(</span>processor specific<span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>该<code>ELF</code>文件一共有上述有<code>13</code>个表项，第一个为无效的段描述符，故有效段为<code>12</code>个。</p>
+<h1 id="链接的接口-符号">链接的接口-符号</h1>
+<h2 id="链接与符号">链接与符号</h2>
+<ul>
+<li>
+<p>链接的过程是通过将目标文件之间地址的引用（对函数和变量的地址的引用），将多个不同的目标文件拼接成一个整体。</p>
+</li>
+<li>
+<p>符号：函数和变量统称为符号</p>
+</li>
+</ul>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>全局符号</th>
+<th>局部符号</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>定义在本文件中的全局符号，可以被其他文件引用<!-- raw HTML omitted -->本目标文件中引用的全局符号，却没有定义在本目标文件中</td>
+<td>static修饰的变量</td>
+</tr>
+</tbody>
+</table></div>
+<p>查看符号类型：<code>readelf -s app.o </code></p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>Y400:~/practice/02目标文件格式$ readelf -s app.o 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Symbol table <span style="color:#d14">&#39;.symtab&#39;</span> contains <span style="color:#099">16</span> entries:
+</span></span><span style="display:flex;"><span>   Num:    Value          Size Type    Bind   Vis      Ndx Name
+</span></span><span style="display:flex;"><span>     0: <span style="color:#099">0000000000000000</span>     <span style="color:#099">0</span> NOTYPE  LOCAL  DEFAULT  UND 
+</span></span><span style="display:flex;"><span>     1: <span style="color:#099">0000000000000000</span>     <span style="color:#099">0</span> FILE    LOCAL  DEFAULT  ABS simpleSection.c
+</span></span><span style="display:flex;"><span>     2: <span style="color:#099">0000000000000000</span>     <span style="color:#099">0</span> SECTION LOCAL  DEFAULT    <span style="color:#099">1</span> 
+</span></span><span style="display:flex;"><span>     3: <span style="color:#099">0000000000000000</span>     <span style="color:#099">0</span> SECTION LOCAL  DEFAULT    <span style="color:#099">3</span> 
+</span></span><span style="display:flex;"><span>     4: <span style="color:#099">0000000000000000</span>     <span style="color:#099">0</span> SECTION LOCAL  DEFAULT    <span style="color:#099">4</span> 
+</span></span><span style="display:flex;"><span>     5: <span style="color:#099">0000000000000000</span>     <span style="color:#099">0</span> SECTION LOCAL  DEFAULT    <span style="color:#099">5</span> 
+</span></span><span style="display:flex;"><span>     6: <span style="color:#099">0000000000000004</span>     <span style="color:#099">4</span> OBJECT  LOCAL  DEFAULT    <span style="color:#099">3</span> static_var.1840
+</span></span><span style="display:flex;"><span>     7: <span style="color:#099">0000000000000000</span>     <span style="color:#099">4</span> OBJECT  LOCAL  DEFAULT    <span style="color:#099">4</span> static_var2.1841
+</span></span><span style="display:flex;"><span>     8: <span style="color:#099">0000000000000000</span>     <span style="color:#099">0</span> SECTION LOCAL  DEFAULT    <span style="color:#099">7</span> 
+</span></span><span style="display:flex;"><span>     9: <span style="color:#099">0000000000000000</span>     <span style="color:#099">0</span> SECTION LOCAL  DEFAULT    <span style="color:#099">8</span> 
+</span></span><span style="display:flex;"><span>    10: <span style="color:#099">0000000000000000</span>     <span style="color:#099">0</span> SECTION LOCAL  DEFAULT    <span style="color:#099">6</span> 
+</span></span><span style="display:flex;"><span>    11: <span style="color:#099">0000000000000000</span>     <span style="color:#099">4</span> OBJECT  GLOBAL DEFAULT    <span style="color:#099">3</span> global_init_var
+</span></span><span style="display:flex;"><span>    12: <span style="color:#099">0000000000000004</span>     <span style="color:#099">4</span> OBJECT  GLOBAL DEFAULT  COM global_uninit_var
+</span></span><span style="display:flex;"><span>    13: <span style="color:#099">0000000000000000</span>    <span style="color:#099">34</span> FUNC    GLOBAL DEFAULT    <span style="color:#099">1</span> func1
+</span></span><span style="display:flex;"><span>    14: <span style="color:#099">0000000000000000</span>     <span style="color:#099">0</span> NOTYPE  GLOBAL DEFAULT  UND <span style="color:#0086b3">printf</span>
+</span></span><span style="display:flex;"><span>    15: <span style="color:#099">0000000000000022</span>    <span style="color:#099">51</span> FUNC    GLOBAL DEFAULT    <span style="color:#099">1</span> main
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="符号修饰和函数签名">符号修饰和函数签名</h2>
+<ul>
+<li>函数签名</li>
+</ul>
+<blockquote>
+<p>包含函数名、参数类型、所在类、名称空间及其他信息</p>
+</blockquote>
+<ul>
+<li>符号修饰</li>
+</ul>
+<blockquote>
+<p>某种名称修饰的方法，使得函数签名可以一一对应一个修饰后的名称，如下表</p>
+</blockquote>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>函数签名</th>
+<th>符号修饰</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>int func(int)</code></td>
+<td><code>_Z4funci</code></td>
+</tr>
+<tr>
+<td><code>int N::func(int)</code></td>
+<td><code>_ZN1N4funcEi</code></td>
+</tr>
+</tbody>
+</table></div>
+<p>上面两个是为了解决同名的函数和变量导致的符号冲突问题。不同的编译器厂商对符号的修饰方法可能不同，所以函数签名也回不一样。</p>
+<h2 id="extern-c">extern &ldquo;C&rdquo;</h2>
+<p>由于<code>C</code>语言和<code>C++</code>在符号修饰上有不同的规则，为了<code>C++</code>与<code>C</code>兼容，提出<code>extern &quot;C&quot;</code>关键字。下面代码段中编译器会将大括号内部的代码当作<code>C</code>语言处理，以<code>C</code>语言的符号修饰规则进行修饰。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">extern</span> <span style="color:#d14">&#34;C&#34;</span> {
+</span></span><span style="display:flex;"><span>	<span style="color:#458;font-weight:bold">int</span> <span style="color:#900;font-weight:bold">func</span>(<span style="color:#458;font-weight:bold">int</span>);
+</span></span><span style="display:flex;"><span>	<span style="color:#458;font-weight:bold">int</span> var;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 或
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">extern</span> <span style="color:#d14">&#34;C&#34;</span> <span style="color:#458;font-weight:bold">int</span> <span style="color:#900;font-weight:bold">func</span>(<span style="color:#458;font-weight:bold">int</span>);
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">extern</span> <span style="color:#d14">&#34;C&#34;</span> <span style="color:#458;font-weight:bold">int</span> var;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>有些头文件中会声明一些<code>C</code>语言的函数和变量，而这个头文件可能被<code>C</code>语言或<code>C++</code>所包含，所以采用宏<code>__cplusplus</code>。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#ifdef __cplusplus
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span><span style="color:#000;font-weight:bold">extern</span> <span style="color:#d14">&#34;C&#34;</span> {
+</span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#endif
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> <span style="color:#000;font-weight:bold">*</span><span style="color:#900;font-weight:bold">memset</span>(<span style="color:#458;font-weight:bold">void</span> <span style="color:#000;font-weight:bold">*</span>, <span style="color:#458;font-weight:bold">int</span>, <span style="color:#458;font-weight:bold">size_t</span>);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#ifdef __cplusplus
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>}
+</span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#endif
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/">程序员的自我修养</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

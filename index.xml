@@ -1,0 +1,900 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>浅浅的行迹</title>
+        <link>https://frozen531.github.io.git/</link>
+        <description>Recent content on 浅浅的行迹</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Sun, 05 Feb 2023 22:26:47 +0800</lastBuildDate><atom:link href="https://frozen531.github.io.git/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>02_编译和链接</title>
+        <link>https://frozen531.github.io.git/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/02_%E7%BC%96%E8%AF%91%E5%92%8C%E9%93%BE%E6%8E%A5/</link>
+        <pubDate>Sun, 05 Feb 2023 22:26:47 +0800</pubDate>
+        
+        <guid>https://frozen531.github.io.git/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/02_%E7%BC%96%E8%AF%91%E5%92%8C%E9%93%BE%E6%8E%A5/</guid>
+        <description>&lt;h2 id=&#34;第二章编译和链接&#34;&gt;第二章：编译和链接&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://img-blog.csdnimg.cn/2020091218042853.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MzE3MDA5,size_16,color_FFFFFF,t_70#pic_center&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;编译和链接过程&#34;
+	
+	
+&gt;&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>Hugo搭建及基本使用</title>
+        <link>https://frozen531.github.io.git/post/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/hugo%E6%90%AD%E5%BB%BA%E5%8F%8A%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/</link>
+        <pubDate>Sun, 05 Feb 2023 10:57:37 +0800</pubDate>
+        
+        <guid>https://frozen531.github.io.git/post/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/hugo%E6%90%AD%E5%BB%BA%E5%8F%8A%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/</guid>
+        <description>&lt;p&gt;记录hugo在win11上的搭建和主题自定义。所有操作使用git bash。&lt;/p&gt;
+&lt;h2 id=&#34;1-环境搭建&#34;&gt;1. 环境搭建&lt;/h2&gt;
+&lt;h3 id=&#34;11-git&#34;&gt;1.1 git&lt;/h3&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://git-scm.com/downloads&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;git&lt;/a&gt;，global配置username和email&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;// &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;username是自己的账户名&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git config --global user.name &lt;span style=&#34;color:#d14&#34;&gt;&amp;#34;username&amp;#34;&lt;/span&gt;   
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;// &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;useremail注册账号时用的邮箱&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git config --global user.email &lt;span style=&#34;color:#d14&#34;&gt;&amp;#34;useremail&amp;#34;&lt;/span&gt;     
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;// 查看配置
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git config --global --list
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;12-hugo&#34;&gt;1.2 hugo&lt;/h3&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/gohugoio/hugo/releases&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;hugo&lt;/a&gt;，使用当前最新0.110.0版本，需要下载extend版本，我选的是hugo_extended_0.110.0_windows-amd64.zip。否则下载的主题无法渲染，提示&lt;code&gt;is not compatible with this Hugo version; run &amp;quot;hugo mod graph&amp;quot; for more info&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;压缩包解压缩后将hugo.exe文件添加到系统环境变量中，cmd中hugo version可查看版本说明添加成功。&lt;/p&gt;
+&lt;p&gt;在想要写博客的位置创建04_hugo_blog文件夹生成站点，运行后会在04_hugo_blog生成相应的文件结构。基本操作如下：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;// 创建04_hugo_blog
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hugo new site 04_hugo_blog
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;文件结构如下，content中放自己记录的blog，themes中放下载的主题，config.toml为配置文件，static放blog中用到的图片（直接放，不需要写路径，&lt;code&gt;![hugo目录结构](hugo_tree.bmp)&lt;/code&gt;）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io.git/hugo_tree.bmp&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;hugo目录结构&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;13-主题下载&#34;&gt;1.3 主题下载&lt;/h3&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://themes.gohugo.io/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;主题下载&lt;/a&gt;，需要下载你想要的主题到04_hugo_blog/themes/文件夹下，我选用的主题是&lt;a class=&#34;link&#34; href=&#34;https://github.com/CaiJimmy/hugo-theme-stack&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;hugo-theme-stack&lt;/a&gt;。主题直接clone下来后，有&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;// 下载主题到themes
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git clone https://github.com/CaiJimmy/hugo-theme-stack.git themes/hugo-theme-stack
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;// 根文件04_hugo_blog下预览博客
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hugo server --theme=hugo-theme-stack --buildDrafts
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;2-主题配置&#34;&gt;2. 主题配置&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;借鉴04_hugo_blog/theme/hugo-theme-stack/exampleSite修改主题。
+&lt;img src=&#34;https://frozen531.github.io.git/hugo_content.bmp&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;content内容&#34;
+	
+	
+&gt;&lt;/li&gt;
+&lt;li&gt;主题中代码块相关的配置添加到04_hugo_blog/config.toml，预览可简化为&lt;code&gt;hugo server --buildDrafts&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;11
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;12
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;13
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;theme = &amp;#34;hugo-theme-stack&amp;#34;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;[markup]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  [markup.highlight]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    codeFences = true   #代码围栏功能
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    guessSyntax = true  #猜测语法，没有设置的话true会自动匹配语言
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    hl_Lines = &amp;#34;&amp;#34;       #高亮行号，一般不设置
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    lineNoStart = 1     #行号从1开始
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    lineNos = true      #是否显示行号
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    lineNumbersInTable = true  #使用表格式化行号和代码，一般置true
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    noClasses = true    
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    style = &amp;#34;github&amp;#34;    #主题风格
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    tabWidth = 4
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;3-部署到github&#34;&gt;3. 部署到github&lt;/h2&gt;
+&lt;p&gt;hugo是将编译后的文件上传到github上，并不需要上传源文件，所以需要将源文件和编译后的均上传。&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.bilibili.com/video/BV1q4411i7gL/?spm_id_from=333.1007.top_right_bar_window_history.content.click&amp;amp;vd_source=b6daecdfe358d06b1107a6d13e19fe3f&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;部署到github&lt;/a&gt;，github上新建仓库，命名需要注意usrname.github.io&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;仓库地址
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hugo --baseUrl=&amp;#34;https://frozen531.github.io.git&amp;#34; --buildDraft
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;参考文章：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/shuang_waiwai/article/details/121108964&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Git的环境配置（超详细）&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://www.manongjc.com/detail/60-ldtkuvvzfmljerl.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Windows安装Hugo&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://zhongyang.wang/post/1662875174/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;使用Hugo和stack 主题建立建静态网站&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.codenong.com/53464336/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;关于Hugo：Hugo-页面包中的相对路径&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.cnblogs.com/brady-wang/p/13830095.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;置Hugo的代码高亮&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>03_目标文件里有什么</title>
+        <link>https://frozen531.github.io.git/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/03_%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E9%87%8C%E6%9C%89%E4%BB%80%E4%B9%88/</link>
+        <pubDate>Sun, 05 Feb 2023 10:47:08 +0800</pubDate>
+        
+        <guid>https://frozen531.github.io.git/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/03_%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E9%87%8C%E6%9C%89%E4%BB%80%E4%B9%88/</guid>
+        <description>&lt;h1 id=&#34;1-前言&#34;&gt;1. 前言&lt;/h1&gt;
+&lt;p&gt;这一章主要讲解目标文件(Object File)的格式。目标文件是指经过编译后但未经链接的的&lt;code&gt;.o&lt;/code&gt;（linux）和&lt;code&gt;.obj&lt;/code&gt;（win）的文件。&lt;/p&gt;
+&lt;h2 id=&#34;11-目标文件与可执行文件的区别&#34;&gt;1.1 目标文件与可执行文件的区别&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;从结构上来讲，目标文件按照可执行文件格式存储&lt;/li&gt;
+&lt;li&gt;相比于可执行文件，没有经过链接过程，有些符号和地址没有被调整&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;12-可执行文件格式存储的文件&#34;&gt;1.2 可执行文件格式存储的文件&lt;/h2&gt;
+&lt;p&gt;按照可执行文件格式存储的文件有：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;ELF文件类型&lt;/th&gt;
+&lt;th&gt;说明&lt;/th&gt;
+&lt;th&gt;实例&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;可重定位文件&lt;!-- raw HTML omitted --&gt;(relocatable file)&lt;/td&gt;
+&lt;td&gt;包含代码和数据，可以被链接成可执行文件或共享目标文件&lt;/td&gt;
+&lt;td&gt;目标文件：linux下.o文件，windows下的.obj文件&lt;!-- raw HTML omitted --&gt;静态链接库文件：linux下的.a，windows下的.lib&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;可执行文件&lt;!-- raw HTML omitted --&gt;(executable file)&lt;/td&gt;
+&lt;td&gt;包含了可直接执行的程序&lt;/td&gt;
+&lt;td&gt;linux下的可执行文件，通常没有扩展名，如/bin/bash文件；&lt;!-- raw HTML omitted --&gt;windows下的.exe文件&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;共享目标文件&lt;!-- raw HTML omitted --&gt;(shared object file)&lt;/td&gt;
+&lt;td&gt;包含了代码和数据，两种情况使用：&lt;!-- raw HTML omitted --&gt;1. 与其他可重定位文件和共享目标文件链接成新的目标文件；&lt;!-- raw HTML omitted --&gt;2. 动态连接器将多个共享目标文件与可执行文件结合，作为进程映像的一部分来运行&lt;/td&gt;
+&lt;td&gt;linux下的.so文件；&lt;!-- raw HTML omitted --&gt;windows下的.dll文件&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;核心转储文件&lt;!-- raw HTML omitted --&gt;core dump file&lt;/td&gt;
+&lt;td&gt;当进程意外终止时，可以将该进程的地址空间的内容及终止时的一些其他信息转储到核心转储文件&lt;/td&gt;
+&lt;td&gt;linux下的core dump&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;可以通过&lt;code&gt;file&lt;/code&gt;命令查看文件类型&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;root@bogon 01_hello_world&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;# file hello.o &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hello.o: ELF 64-bit LSB relocatable, x86-64, version &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;SYSV&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;, not stripped
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;root@bogon 01_hello_world&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;# file hello2&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;hello2: ELF 64-bit LSB executable, x86-64, version &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;SYSV&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;, dynamically linked &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;uses shared libs&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;, &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;for&lt;/span&gt; GNU/Linux 2.6.18, not stripped
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;root@bogon human&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;# file libhuman.a &lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;libhuman.a: current ar archive
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;注意：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;.a&lt;/code&gt;文件为多个&lt;code&gt;.o&lt;/code&gt;文件打包到一起的，所有也算relocatable可重定位文件&lt;/li&gt;
+&lt;li&gt;可执行文件格式与编译器和操作系统密切相关，不同格式间大同小异。PE（win）和ELF（linux）都是COFF的变种格式&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;h1 id=&#34;2-目标文件内容&#34;&gt;2. 目标文件内容&lt;/h1&gt;
+&lt;h2 id=&#34;21-目标文件的组成&#34;&gt;2.1 目标文件的组成&lt;/h2&gt;
+&lt;p&gt;![目标文件中的段](&lt;a class=&#34;link&#34; href=&#34;https://img-blog.csdnimg.cn/e6c1ad7a324e41c682bc2235edd5352b.png#pic_center&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;https://img-blog.csdnimg.cn/e6c1ad7a324e41c682bc2235edd5352b.png#pic_center&lt;/a&gt; =300x)&lt;/p&gt;
+&lt;p&gt;目标文件中将信息按不同的属性分“段”：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;文件属性：通过&lt;code&gt;file&lt;/code&gt;命令查看，包括：文件类型、目标硬件、目标操作系统等信息，还包括段表，描述各个段在文件中的偏移位置和段属性等&lt;/li&gt;
+&lt;li&gt;.text段：源代码编译后的机器指令&lt;/li&gt;
+&lt;li&gt;.data段：已初始化的全局变量和局部静态变量&lt;/li&gt;
+&lt;li&gt;.bss段：未初始化的全局变量和局部静态变量&lt;/li&gt;
+&lt;li&gt;链接时所需的信息，如：符号表、调试信息、字符串等&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;为什么将程序代码和数据分隔开来：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;两者属性不同，代码为只读，数据为可读写，当程序装载后，两者会被映射到不同的虚存区域&lt;/li&gt;
+&lt;li&gt;指令和数据的分离有利于提高程序的局部性，对CPU的缓存（cache）命中率有好处&lt;/li&gt;
+&lt;li&gt;当系统中运行多个该程序副本时，内存中只需要保留一份该程序的指令部分，称为&lt;strong&gt;共享指令&lt;/strong&gt;，而数据是各个进程私有的&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;22-代码&#34;&gt;2.2 代码&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;simpleSection.c&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;11
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;12
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;13
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;14
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;15
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;16
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;17
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;18
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;19
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;20
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;21
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;22
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;23
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;printf&lt;/span&gt;(&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;const&lt;/span&gt; &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;char&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;*&lt;/span&gt; format, ...);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; global_init_var &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;84&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; global_uninit_var;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;func1&lt;/span&gt;(&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; i)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;printf&lt;/span&gt;(&lt;span style=&#34;color:#d14&#34;&gt;&amp;#34;%d&lt;/span&gt;&lt;span style=&#34;color:#d14&#34;&gt;\n&lt;/span&gt;&lt;span style=&#34;color:#d14&#34;&gt;&amp;#34;&lt;/span&gt;, i);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;main&lt;/span&gt;(&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;void&lt;/span&gt;)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; static_var &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;85&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; static_var2;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; a &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; b;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;func1&lt;/span&gt;(static_var &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;+&lt;/span&gt; static_var2 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;+&lt;/span&gt; a &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;+&lt;/span&gt; b);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;return&lt;/span&gt; a;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;编译：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gcc -c simpleSection.c -o app.o
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;23-查看文件相应的文件格式&#34;&gt;2.3 查看文件相应的文件格式&lt;/h2&gt;
+&lt;p&gt;查看文件相应的文件格式的命令：&lt;code&gt;file&lt;/code&gt;，可以看出文件是可重定位文件。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Y400:~/practice/02目标文件格式$ file app.o 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;app.o: ELF 64-bit LSB relocatable, x86-64, version &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;SYSV&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;, not stripped
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;24-查看目标文件各个段的长度&#34;&gt;2.4 查看目标文件各个段的长度&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;size&lt;/code&gt;指令，查看ELF文件的代码段、数据段和BSS段的长度&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Y400:~/practice/02目标文件格式$ size app.o 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   text	   data	    bss	    dec	    hex	filename
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    177	      8	      4	    189	     bd	app.o
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;25-查看目标文件各个段的基本信息&#34;&gt;2.5 查看目标文件各个段的基本信息&lt;/h2&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;选项&lt;/th&gt;
+&lt;th&gt;说明&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;-h&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;打印关键段的基本信息&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;-x&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;打印段的更多信息（&lt;code&gt;extend&lt;/code&gt;）&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;-s&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;将各段以十六进制的方式打印&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;-d&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;将包含指令的段反汇编&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;11
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;12
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;13
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;14
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;15
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;16
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;17
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;18
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;19
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;20
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Y400:~/practice/02目标文件格式$ objdump -h app.o 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;app.o:     file format elf64-x86-64
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Sections:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Idx Name          Size      VMA               LMA               File off  Algn
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt; .text         &lt;span style=&#34;color:#099&#34;&gt;00000055&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000040&lt;/span&gt;  2**0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, RELOC, READONLY, CODE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt; .data         &lt;span style=&#34;color:#099&#34;&gt;00000008&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000098&lt;/span&gt;  2**2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;2&lt;/span&gt; .bss          &lt;span style=&#34;color:#099&#34;&gt;00000004&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  000000a0  2**2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  ALLOC
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;3&lt;/span&gt; .rodata       &lt;span style=&#34;color:#099&#34;&gt;00000004&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  000000a0  2**0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;4&lt;/span&gt; .comment      &lt;span style=&#34;color:#099&#34;&gt;00000035&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  000000a4  2**0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, READONLY
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;5&lt;/span&gt; .note.GNU-stack &lt;span style=&#34;color:#099&#34;&gt;00000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  000000d9  2**0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, READONLY
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;6&lt;/span&gt; .eh_frame     &lt;span style=&#34;color:#099&#34;&gt;00000058&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  000000e0  2**3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, RELOC, READONLY, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;每个段的第二行标识该段的属性：CONTENTS, ALLOC, LOAD, RELOC, READONLY, CODE&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;.text&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;代码段，程序编译成机器代码后存放在代码段&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;.data，.bss，.rodata&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;数据段&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;data&lt;/code&gt;:已初始化的全局变量和局部静态变量&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;bss&lt;/code&gt;:未初始化的全局变量和局部静态变量。因为未初始化默认为0，所以&lt;code&gt;.bss&lt;/code&gt;只是为这些变量预留位置，记录这些变量所占空间大小的总和，这样可以节省内存，所以&lt;code&gt;.bss&lt;/code&gt;不占空间&lt;/li&gt;
+&lt;li&gt;.&lt;code&gt;rodata&lt;/code&gt;:只读数据，例如字符串常量、被&lt;code&gt;const&lt;/code&gt;修饰的变量&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;.comment&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;注释段，编译器版本信息&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img src=&#34;https://img-blog.csdnimg.cn/2020102222082882.jpg?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MzE3MDA5,size_16,color_FFFFFF,t_70#pic_center&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;内存图&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;-s&lt;/code&gt; 将所有段的内容以十六进制方式打印出来（&lt;code&gt;assembly&lt;/code&gt;）&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;11
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;12
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;13
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;14
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;15
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;16
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;17
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;18
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;19
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;20
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;21
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;22
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;23
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;24
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;25
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;26
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;27
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Y400:~/practice/02目标文件格式$ objdump -s app.o 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;app.o:     file format elf64-x86-64
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Contents of section .text:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;0000&lt;/span&gt; 554889e5 4883ec10 897dfc8b 45fc89c6  UH..H....&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;}&lt;/span&gt;..E...
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;0010&lt;/span&gt; bf000000 00b80000 0000e800 &lt;span style=&#34;color:#099&#34;&gt;00000090&lt;/span&gt;  ................
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;0020&lt;/span&gt; c9c35548 89e54883 ec10c745 f8010000  ..UH..H....E....
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;0030&lt;/span&gt; 008b1500 0000008b &lt;span style=&#34;color:#099&#34;&gt;05000000&lt;/span&gt; 0001c28b  ................
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;0040&lt;/span&gt; 45f801c2 8b45fc01 d089c7e8 &lt;span style=&#34;color:#099&#34;&gt;00000000&lt;/span&gt;  E....E..........
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;0050&lt;/span&gt; 8b45f8c9 c3                          .E...           
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Contents of section .data:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;0000&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;54000000&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;55000000&lt;/span&gt;                    T...U...        
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Contents of section .rodata:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;0000&lt;/span&gt; 25640a00                             %d..            
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Contents of section .comment:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;0000&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00474343&lt;/span&gt; 3a202855 62756e74 7520352e  .GCC: &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;Ubuntu 5.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;0010&lt;/span&gt; 342e302d &lt;span style=&#34;color:#099&#34;&gt;36756275&lt;/span&gt; 6e747531 7e31362e  4.0-6ubuntu1~16.
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;0020&lt;/span&gt; 30342e39 2920352e 342e3020 &lt;span style=&#34;color:#099&#34;&gt;32303136&lt;/span&gt;  04.9&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; 5.4.0 &lt;span style=&#34;color:#099&#34;&gt;2016&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;0030&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;30363039&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt;                          0609.           
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Contents of section .eh_frame:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;0000&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;14000000&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00000000&lt;/span&gt; 017a5200 &lt;span style=&#34;color:#099&#34;&gt;01781001&lt;/span&gt;  .........zR..x..
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;0010&lt;/span&gt; 1b0c0708 &lt;span style=&#34;color:#099&#34;&gt;90010000&lt;/span&gt; 1c000000 1c000000  ................
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;0020&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00000000&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;22000000&lt;/span&gt; 00410e10 8602430d  ....&lt;span style=&#34;color:#d14&#34;&gt;&amp;#34;....A....C.
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#d14&#34;&gt; 0030 065d0c07 08000000 1c000000 3c000000  .]..........&amp;lt;...
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#d14&#34;&gt; 0040 00000000 33000000 00410e10 8602430d  ....3....A....C.
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#d14&#34;&gt; 0050 066e0c07 08000000                    .n......
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;blockquote&gt;
+&lt;p&gt;.data：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;54000000 -》 84（global_init_var ）；&lt;/li&gt;
+&lt;li&gt;55000000 -》 85（static_var ）&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;.rodata&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;25640a00 -》 “% d \n \0”&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;code&gt;-d&lt;/code&gt; 所有指令的段反汇编（&lt;code&gt;Disassembly&lt;/code&gt;）&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;11
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;12
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;13
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;14
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;15
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;16
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;17
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;18
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;19
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;20
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;21
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;22
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;23
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;24
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;25
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;26
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;27
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;28
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;29
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;30
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;31
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;32
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;33
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;34
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;35
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;36
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;37
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;38
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Y400:~/practice/02目标文件格式$ objdump -d app.o 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;app.o:     file format elf64-x86-64
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Disassembly of section .text:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt; &amp;lt;func1&amp;gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   0:	&lt;span style=&#34;color:#099&#34;&gt;55&lt;/span&gt;                   	push   %rbp
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   1:	&lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;89&lt;/span&gt; e5             	mov    %rsp,%rbp
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   4:	&lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;83&lt;/span&gt; ec &lt;span style=&#34;color:#099&#34;&gt;10&lt;/span&gt;          	sub    &lt;span style=&#34;color:#008080&#34;&gt;$0&lt;/span&gt;x10,%rsp
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   8:	&lt;span style=&#34;color:#099&#34;&gt;89&lt;/span&gt; 7d &lt;span style=&#34;color:#0086b3&#34;&gt;fc&lt;/span&gt;             	mov    %edi,-0x4&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   b:	8b &lt;span style=&#34;color:#099&#34;&gt;45&lt;/span&gt; &lt;span style=&#34;color:#0086b3&#34;&gt;fc&lt;/span&gt;             	mov    -0x4&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%eax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   e:	&lt;span style=&#34;color:#099&#34;&gt;89&lt;/span&gt; c6                	mov    %eax,%esi
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  10:	bf &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt;       	mov    &lt;span style=&#34;color:#008080&#34;&gt;$0&lt;/span&gt;x0,%edi
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  15:	b8 &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt;       	mov    &lt;span style=&#34;color:#008080&#34;&gt;$0&lt;/span&gt;x0,%eax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  1a:	e8 &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt;       	callq  1f &amp;lt;func1+0x1f&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  1f:	&lt;span style=&#34;color:#099&#34;&gt;90&lt;/span&gt;                   	nop
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  20:	c9                   	leaveq 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  21:	c3                   	retq   
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#099&#34;&gt;0000000000000022&lt;/span&gt; &amp;lt;main&amp;gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  22:	&lt;span style=&#34;color:#099&#34;&gt;55&lt;/span&gt;                   	push   %rbp
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  23:	&lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;89&lt;/span&gt; e5             	mov    %rsp,%rbp
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  26:	&lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;83&lt;/span&gt; ec &lt;span style=&#34;color:#099&#34;&gt;10&lt;/span&gt;          	sub    &lt;span style=&#34;color:#008080&#34;&gt;$0&lt;/span&gt;x10,%rsp
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  2a:	c7 &lt;span style=&#34;color:#099&#34;&gt;45&lt;/span&gt; f8 &lt;span style=&#34;color:#099&#34;&gt;01&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; 	movl   &lt;span style=&#34;color:#008080&#34;&gt;$0&lt;/span&gt;x1,-0x8&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  31:	8b &lt;span style=&#34;color:#099&#34;&gt;15&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt;    	mov    0x0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rip&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%edx        &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;# 37 &amp;lt;main+0x15&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  37:	8b &lt;span style=&#34;color:#099&#34;&gt;05&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt;    	mov    0x0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rip&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%eax        &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;# 3d &amp;lt;main+0x1b&amp;gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  3d:	&lt;span style=&#34;color:#099&#34;&gt;01&lt;/span&gt; c2                	add    %eax,%edx
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  3f:	8b &lt;span style=&#34;color:#099&#34;&gt;45&lt;/span&gt; f8             	mov    -0x8&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%eax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  42:	&lt;span style=&#34;color:#099&#34;&gt;01&lt;/span&gt; c2                	add    %eax,%edx
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  44:	8b &lt;span style=&#34;color:#099&#34;&gt;45&lt;/span&gt; &lt;span style=&#34;color:#0086b3&#34;&gt;fc&lt;/span&gt;             	mov    -0x4&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%eax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  47:	&lt;span style=&#34;color:#099&#34;&gt;01&lt;/span&gt; d0                	add    %edx,%eax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  49:	&lt;span style=&#34;color:#099&#34;&gt;89&lt;/span&gt; c7                	mov    %eax,%edi
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4b:	e8 &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt;       	callq  &lt;span style=&#34;color:#099&#34;&gt;50&lt;/span&gt; &amp;lt;main+0x2e&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  50:	8b &lt;span style=&#34;color:#099&#34;&gt;45&lt;/span&gt; f8             	mov    -0x8&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%eax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  53:	c9                   	leaveq 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  54:	c3                   	retq   
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h1 id=&#34;elf文件头&#34;&gt;ELF文件头&lt;/h1&gt;
+&lt;p&gt;&lt;code&gt;ELF header&lt;/code&gt;位于目标文件格式的最前部分，描述整个文件的基本属性。&lt;/p&gt;
+&lt;p&gt;打印&lt;code&gt;ELF&lt;/code&gt;所有段的内容：&lt;code&gt;readelf -S app.o&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;11
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;12
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;13
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;14
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;15
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;16
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;17
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;18
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;19
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;20
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;21
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;22
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;23
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;24
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;25
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;26
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;27
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;28
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;29
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;30
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;31
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;32
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;33
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;34
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;35
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;36
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Y400:~/practice/02目标文件格式$ readelf -S app.o 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;There are &lt;span style=&#34;color:#099&#34;&gt;13&lt;/span&gt; section headers, starting at offset 0x430:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Section Headers:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;Nr&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; Name              Type             Address           Offset
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;       Size              EntSize          Flags  Link  Info  Align
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt; 0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;                   NULL             &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000000&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;       &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;           &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt; 1&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; .text             PROGBITS         &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000040&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;       &lt;span style=&#34;color:#099&#34;&gt;0000000000000055&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  AX       &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt; 2&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; .rela.text        RELA             &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000320&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;       &lt;span style=&#34;color:#099&#34;&gt;0000000000000078&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000018&lt;/span&gt;   I      &lt;span style=&#34;color:#099&#34;&gt;11&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;8&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt; 3&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; .data             PROGBITS         &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000098&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;       &lt;span style=&#34;color:#099&#34;&gt;0000000000000008&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  WA       &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;4&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt; 4&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; .bss              NOBITS           &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  000000a0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;       &lt;span style=&#34;color:#099&#34;&gt;0000000000000004&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  WA       &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;4&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt; 5&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; .rodata           PROGBITS         &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  000000a0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;       &lt;span style=&#34;color:#099&#34;&gt;0000000000000004&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;   A       &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt; 6&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; .comment          PROGBITS         &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  000000a4
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;       &lt;span style=&#34;color:#099&#34;&gt;0000000000000035&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000001&lt;/span&gt;  MS       &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt; 7&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; .note.GNU-stack   PROGBITS         &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  000000d9
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;       &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;           &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt; 8&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; .eh_frame         PROGBITS         &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  000000e0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;       &lt;span style=&#34;color:#099&#34;&gt;0000000000000058&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;   A       &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;8&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt; 9&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; .rela.eh_frame    RELA             &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000398&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;       &lt;span style=&#34;color:#099&#34;&gt;0000000000000030&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000018&lt;/span&gt;   I      &lt;span style=&#34;color:#099&#34;&gt;11&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;8&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;8&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;10&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; .shstrtab         STRTAB           &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  000003c8
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;       &lt;span style=&#34;color:#099&#34;&gt;0000000000000061&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;           &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;11&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; .symtab           SYMTAB           &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000138&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;       &lt;span style=&#34;color:#099&#34;&gt;0000000000000180&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000018&lt;/span&gt;          &lt;span style=&#34;color:#099&#34;&gt;12&lt;/span&gt;    &lt;span style=&#34;color:#099&#34;&gt;11&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;8&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;12&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt; .strtab           STRTAB           &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  000002b8
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;       &lt;span style=&#34;color:#099&#34;&gt;0000000000000066&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;           &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Key to Flags:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  W &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;write&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;, A &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;alloc&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;, X &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;execute&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;, M &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;merge&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;, S &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;strings&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;, l &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;large&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  I &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;info&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;, L &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;link order&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;, G &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;group&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;, T &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;TLS&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;, E &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;exclude&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;, x &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;unknown&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  O &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;extra OS processing required&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; o &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;OS specific&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;, p &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;processor specific&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;该&lt;code&gt;ELF&lt;/code&gt;文件一共有上述有&lt;code&gt;13&lt;/code&gt;个表项，第一个为无效的段描述符，故有效段为&lt;code&gt;12&lt;/code&gt;个。&lt;/p&gt;
+&lt;h1 id=&#34;链接的接口-符号&#34;&gt;链接的接口-符号&lt;/h1&gt;
+&lt;h2 id=&#34;链接与符号&#34;&gt;链接与符号&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;链接的过程是通过将目标文件之间地址的引用（对函数和变量的地址的引用），将多个不同的目标文件拼接成一个整体。&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;符号：函数和变量统称为符号&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;全局符号&lt;/th&gt;
+&lt;th&gt;局部符号&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;定义在本文件中的全局符号，可以被其他文件引用&lt;!-- raw HTML omitted --&gt;本目标文件中引用的全局符号，却没有定义在本目标文件中&lt;/td&gt;
+&lt;td&gt;static修饰的变量&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;查看符号类型：&lt;code&gt;readelf -s app.o &lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;11
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;12
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;13
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;14
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;15
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;16
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;17
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;18
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;19
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;20
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Y400:~/practice/02目标文件格式$ readelf -s app.o 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Symbol table &lt;span style=&#34;color:#d14&#34;&gt;&amp;#39;.symtab&amp;#39;&lt;/span&gt; contains &lt;span style=&#34;color:#099&#34;&gt;16&lt;/span&gt; entries:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   Num:    Value          Size Type    Bind   Vis      Ndx Name
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     0: &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt; NOTYPE  LOCAL  DEFAULT  UND 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     1: &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt; FILE    LOCAL  DEFAULT  ABS simpleSection.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     2: &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt; SECTION LOCAL  DEFAULT    &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     3: &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt; SECTION LOCAL  DEFAULT    &lt;span style=&#34;color:#099&#34;&gt;3&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     4: &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt; SECTION LOCAL  DEFAULT    &lt;span style=&#34;color:#099&#34;&gt;4&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     5: &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt; SECTION LOCAL  DEFAULT    &lt;span style=&#34;color:#099&#34;&gt;5&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     6: &lt;span style=&#34;color:#099&#34;&gt;0000000000000004&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;4&lt;/span&gt; OBJECT  LOCAL  DEFAULT    &lt;span style=&#34;color:#099&#34;&gt;3&lt;/span&gt; static_var.1840
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     7: &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;4&lt;/span&gt; OBJECT  LOCAL  DEFAULT    &lt;span style=&#34;color:#099&#34;&gt;4&lt;/span&gt; static_var2.1841
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     8: &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt; SECTION LOCAL  DEFAULT    &lt;span style=&#34;color:#099&#34;&gt;7&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;     9: &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt; SECTION LOCAL  DEFAULT    &lt;span style=&#34;color:#099&#34;&gt;8&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    10: &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt; SECTION LOCAL  DEFAULT    &lt;span style=&#34;color:#099&#34;&gt;6&lt;/span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    11: &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;4&lt;/span&gt; OBJECT  GLOBAL DEFAULT    &lt;span style=&#34;color:#099&#34;&gt;3&lt;/span&gt; global_init_var
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    12: &lt;span style=&#34;color:#099&#34;&gt;0000000000000004&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;4&lt;/span&gt; OBJECT  GLOBAL DEFAULT  COM global_uninit_var
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    13: &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;    &lt;span style=&#34;color:#099&#34;&gt;34&lt;/span&gt; FUNC    GLOBAL DEFAULT    &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt; func1
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    14: &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;     &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt; NOTYPE  GLOBAL DEFAULT  UND &lt;span style=&#34;color:#0086b3&#34;&gt;printf&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    15: &lt;span style=&#34;color:#099&#34;&gt;0000000000000022&lt;/span&gt;    &lt;span style=&#34;color:#099&#34;&gt;51&lt;/span&gt; FUNC    GLOBAL DEFAULT    &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt; main
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;符号修饰和函数签名&#34;&gt;符号修饰和函数签名&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;函数签名&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;包含函数名、参数类型、所在类、名称空间及其他信息&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;符号修饰&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;某种名称修饰的方法，使得函数签名可以一一对应一个修饰后的名称，如下表&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;函数签名&lt;/th&gt;
+&lt;th&gt;符号修饰&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;int func(int)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;_Z4funci&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&lt;code&gt;int N::func(int)&lt;/code&gt;&lt;/td&gt;
+&lt;td&gt;&lt;code&gt;_ZN1N4funcEi&lt;/code&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;上面两个是为了解决同名的函数和变量导致的符号冲突问题。不同的编译器厂商对符号的修饰方法可能不同，所以函数签名也回不一样。&lt;/p&gt;
+&lt;h2 id=&#34;extern-c&#34;&gt;extern &amp;ldquo;C&amp;rdquo;&lt;/h2&gt;
+&lt;p&gt;由于&lt;code&gt;C&lt;/code&gt;语言和&lt;code&gt;C++&lt;/code&gt;在符号修饰上有不同的规则，为了&lt;code&gt;C++&lt;/code&gt;与&lt;code&gt;C&lt;/code&gt;兼容，提出&lt;code&gt;extern &amp;quot;C&amp;quot;&lt;/code&gt;关键字。下面代码段中编译器会将大括号内部的代码当作&lt;code&gt;C&lt;/code&gt;语言处理，以&lt;code&gt;C&lt;/code&gt;语言的符号修饰规则进行修饰。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;extern&lt;/span&gt; &lt;span style=&#34;color:#d14&#34;&gt;&amp;#34;C&amp;#34;&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;func&lt;/span&gt;(&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;	&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; var;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// 或
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;extern&lt;/span&gt; &lt;span style=&#34;color:#d14&#34;&gt;&amp;#34;C&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;func&lt;/span&gt;(&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;extern&lt;/span&gt; &lt;span style=&#34;color:#d14&#34;&gt;&amp;#34;C&amp;#34;&lt;/span&gt; &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; var;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;有些头文件中会声明一些&lt;code&gt;C&lt;/code&gt;语言的函数和变量，而这个头文件可能被&lt;code&gt;C&lt;/code&gt;语言或&lt;code&gt;C++&lt;/code&gt;所包含，所以采用宏&lt;code&gt;__cplusplus&lt;/code&gt;。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#999;font-weight:bold;font-style:italic&#34;&gt;#ifdef __cplusplus
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#999;font-weight:bold;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;extern&lt;/span&gt; &lt;span style=&#34;color:#d14&#34;&gt;&amp;#34;C&amp;#34;&lt;/span&gt; {
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#999;font-weight:bold;font-style:italic&#34;&gt;#endif
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#999;font-weight:bold;font-style:italic&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;*&lt;/span&gt;&lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;memset&lt;/span&gt;(&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;*&lt;/span&gt;, &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt;, &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;size_t&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#999;font-weight:bold;font-style:italic&#34;&gt;#ifdef __cplusplus
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#999;font-weight:bold;font-style:italic&#34;&gt;&lt;/span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#999;font-weight:bold;font-style:italic&#34;&gt;#endif
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        </item>
+        <item>
+        <title>Archives</title>
+        <link>https://frozen531.github.io.git/page/archives/</link>
+        <pubDate>Tue, 28 May 2019 00:00:00 +0000</pubDate>
+        
+        <guid>https://frozen531.github.io.git/page/archives/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>Links</title>
+        <link>https://frozen531.github.io.git/page/links/</link>
+        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+        
+        <guid>https://frozen531.github.io.git/page/links/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>搜索</title>
+        <link>https://frozen531.github.io.git/page/search/</link>
+        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+        
+        <guid>https://frozen531.github.io.git/page/search/</guid>
+        <description></description>
+        </item>
+        
+    </channel>
+</rss>

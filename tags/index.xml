@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Tags on 浅浅的行迹</title>
+        <link>https://frozen531.github.io.git/tags/</link>
+        <description>Recent content in Tags on 浅浅的行迹</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Sun, 05 Feb 2023 22:26:47 +0800</lastBuildDate><atom:link href="https://frozen531.github.io.git/tags/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>程序员的自我修养</title>
+        <link>https://frozen531.github.io.git/tags/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/</link>
+        <pubDate>Sun, 05 Feb 2023 22:26:47 +0800</pubDate>
+        
+        <guid>https://frozen531.github.io.git/tags/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/</guid>
+        <description></description>
+        </item>
+        <item>
+        <title>hugo</title>
+        <link>https://frozen531.github.io.git/tags/hugo/</link>
+        <pubDate>Sun, 05 Feb 2023 10:57:37 +0800</pubDate>
+        
+        <guid>https://frozen531.github.io.git/tags/hugo/</guid>
+        <description></description>
+        </item>
+        
+    </channel>
+</rss>
