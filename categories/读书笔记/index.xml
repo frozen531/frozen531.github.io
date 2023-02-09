@@ -2,16 +2,16 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>读书笔记 on 浅浅的行迹</title>
-        <link>https://frozen531.github.io.git/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</link>
+        <link>https://frozen531.github.io/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</link>
         <description>Recent content in 读书笔记 on 浅浅的行迹</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
-        <lastBuildDate>Sun, 05 Feb 2023 22:26:47 +0800</lastBuildDate><atom:link href="https://frozen531.github.io.git/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Sun, 05 Feb 2023 22:26:47 +0800</lastBuildDate><atom:link href="https://frozen531.github.io/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>02_编译和链接</title>
-        <link>https://frozen531.github.io.git/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/02_%E7%BC%96%E8%AF%91%E5%92%8C%E9%93%BE%E6%8E%A5/</link>
+        <link>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/02_%E7%BC%96%E8%AF%91%E5%92%8C%E9%93%BE%E6%8E%A5/</link>
         <pubDate>Sun, 05 Feb 2023 22:26:47 +0800</pubDate>
         
-        <guid>https://frozen531.github.io.git/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/02_%E7%BC%96%E8%AF%91%E5%92%8C%E9%93%BE%E6%8E%A5/</guid>
+        <guid>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/02_%E7%BC%96%E8%AF%91%E5%92%8C%E9%93%BE%E6%8E%A5/</guid>
         <description>&lt;h2 id=&#34;第二章编译和链接&#34;&gt;第二章：编译和链接&lt;/h2&gt;
 &lt;p&gt;&lt;img src=&#34;https://img-blog.csdnimg.cn/2020091218042853.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MzE3MDA5,size_16,color_FFFFFF,t_70#pic_center&#34;
 	
@@ -27,10 +27,10 @@
         </item>
         <item>
         <title>03_目标文件里有什么</title>
-        <link>https://frozen531.github.io.git/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/03_%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E9%87%8C%E6%9C%89%E4%BB%80%E4%B9%88/</link>
+        <link>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/03_%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E9%87%8C%E6%9C%89%E4%BB%80%E4%B9%88/</link>
         <pubDate>Sun, 05 Feb 2023 10:47:08 +0800</pubDate>
         
-        <guid>https://frozen531.github.io.git/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/03_%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E9%87%8C%E6%9C%89%E4%BB%80%E4%B9%88/</guid>
+        <guid>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/03_%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E9%87%8C%E6%9C%89%E4%BB%80%E4%B9%88/</guid>
         <description>&lt;h1 id=&#34;1-前言&#34;&gt;1. 前言&lt;/h1&gt;
 &lt;p&gt;这一章主要讲解目标文件(Object File)的格式。目标文件是指经过编译后但未经链接的的&lt;code&gt;.o&lt;/code&gt;（linux）和&lt;code&gt;.obj&lt;/code&gt;（win）的文件。&lt;/p&gt;
 &lt;h2 id=&#34;11-目标文件与可执行文件的区别&#34;&gt;1.1 目标文件与可执行文件的区别&lt;/h2&gt;

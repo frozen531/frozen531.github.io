@@ -2,32 +2,32 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
         <title>Pages on 浅浅的行迹</title>
-        <link>https://frozen531.github.io.git/page/</link>
+        <link>https://frozen531.github.io/page/</link>
         <description>Recent content in Pages on 浅浅的行迹</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
-        <lastBuildDate>Tue, 28 May 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://frozen531.github.io.git/page/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Tue, 28 May 2019 00:00:00 +0000</lastBuildDate><atom:link href="https://frozen531.github.io/page/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>Archives</title>
-        <link>https://frozen531.github.io.git/page/archives/</link>
+        <link>https://frozen531.github.io/page/archives/</link>
         <pubDate>Tue, 28 May 2019 00:00:00 +0000</pubDate>
         
-        <guid>https://frozen531.github.io.git/page/archives/</guid>
+        <guid>https://frozen531.github.io/page/archives/</guid>
         <description></description>
         </item>
         <item>
         <title>Links</title>
-        <link>https://frozen531.github.io.git/page/links/</link>
+        <link>https://frozen531.github.io/page/links/</link>
         <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
         
-        <guid>https://frozen531.github.io.git/page/links/</guid>
+        <guid>https://frozen531.github.io/page/links/</guid>
         <description></description>
         </item>
         <item>
         <title>搜索</title>
-        <link>https://frozen531.github.io.git/page/search/</link>
+        <link>https://frozen531.github.io/page/search/</link>
         <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
         
-        <guid>https://frozen531.github.io.git/page/search/</guid>
+        <guid>https://frozen531.github.io/page/search/</guid>
         <description></description>
         </item>
         
