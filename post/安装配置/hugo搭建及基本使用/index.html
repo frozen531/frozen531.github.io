@@ -226,7 +226,13 @@
       </ul>
     </li>
     <li><a href="#2-主题配置">2. 主题配置</a></li>
-    <li><a href="#3-部署到github">3. 部署到github</a></li>
+    <li><a href="#3-部署到github">3. 部署到github</a>
+      <ul>
+        <li><a href="#31-html部署">3.1 html部署</a></li>
+        <li><a href="#32-源文件备份">3.2 源文件备份</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-参考文章">4. 参考文章</a></li>
   </ul>
 </nav>
         </div>
@@ -435,8 +441,8 @@
 </div>
 </div><h2 id="3-部署到github">3. 部署到github</h2>
 <p>hugo是将编译后的文件上传到github上，并不需要上传源文件，所以需要将源文件和编译后的均上传。</p>
-<p><a class="link" href="https://www.bilibili.com/video/BV1q4411i7gL/?spm_id_from=333.1007.top_right_bar_window_history.content.click&amp;vd_source=b6daecdfe358d06b1107a6d13e19fe3f"  target="_blank" rel="noopener"
-    >部署到github</a>，github上新建仓库，命名需要注意usrname.github.io</p>
+<h3 id="31-html部署">3.1 html部署</h3>
+<p>github上新建仓库，命名需要注意usrname.github.io</p>
 <div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
 <table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
 <pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
@@ -479,7 +485,9 @@
 </div>
 </div><p>访问远端博客地址：<a class="link" href="https://frozen531.github.io/"  target="_blank" rel="noopener"
     >https://frozen531.github.io/</a></p>
-<p>参考文章：</p>
+<h3 id="32-源文件备份">3.2 源文件备份</h3>
+<p>源文件备份到github，创建新的仓库。04_hugo_blog文件夹下<code>git init</code>，因为.git仓库不能嵌套，themes主题中的.git需要删除，pulbic中的.git可以通过创建.gitignore文件忽略。</p>
+<h2 id="4-参考文章">4. 参考文章</h2>
 <ol>
 <li><a class="link" href="https://blog.csdn.net/shuang_waiwai/article/details/121108964"  target="_blank" rel="noopener"
     >Git的环境配置（超详细）</a></li>
@@ -491,6 +499,10 @@
     >关于Hugo：Hugo-页面包中的相对路径</a></li>
 <li><a class="link" href="https://www.cnblogs.com/brady-wang/p/13830095.html"  target="_blank" rel="noopener"
     >置Hugo的代码高亮</a></li>
+<li><a class="link" href="https://www.bilibili.com/video/BV1q4411i7gL/?spm_id_from=333.1007.top_right_bar_window_history.content.click&amp;vd_source=b6daecdfe358d06b1107a6d13e19fe3f"  target="_blank" rel="noopener"
+    >手把手教你从0开始搭建自己的个人博客 |第二种姿势 | hugo</a></li>
+<li><a class="link" href="https://www.dandelioncloud.cn/article/details/1586880018842374146"  target="_blank" rel="noopener"
+    >Hexo博客的备份与恢复</a></li>
 </ol>
 
 </section>

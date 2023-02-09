@@ -160,8 +160,8 @@
 &lt;/div&gt;
 &lt;/div&gt;&lt;h2 id=&#34;3-部署到github&#34;&gt;3. 部署到github&lt;/h2&gt;
 &lt;p&gt;hugo是将编译后的文件上传到github上，并不需要上传源文件，所以需要将源文件和编译后的均上传。&lt;/p&gt;
-&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.bilibili.com/video/BV1q4411i7gL/?spm_id_from=333.1007.top_right_bar_window_history.content.click&amp;amp;vd_source=b6daecdfe358d06b1107a6d13e19fe3f&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;部署到github&lt;/a&gt;，github上新建仓库，命名需要注意usrname.github.io&lt;/p&gt;
+&lt;h3 id=&#34;31-html部署&#34;&gt;3.1 html部署&lt;/h3&gt;
+&lt;p&gt;github上新建仓库，命名需要注意usrname.github.io&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
 &lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
 &lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
@@ -204,7 +204,9 @@
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;访问远端博客地址：&lt;a class=&#34;link&#34; href=&#34;https://frozen531.github.io/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;https://frozen531.github.io/&lt;/a&gt;&lt;/p&gt;
-&lt;p&gt;参考文章：&lt;/p&gt;
+&lt;h3 id=&#34;32-源文件备份&#34;&gt;3.2 源文件备份&lt;/h3&gt;
+&lt;p&gt;源文件备份到github，创建新的仓库。04_hugo_blog文件夹下&lt;code&gt;git init&lt;/code&gt;，因为.git仓库不能嵌套，themes主题中的.git需要删除，pulbic中的.git可以通过创建.gitignore文件忽略。&lt;/p&gt;
+&lt;h2 id=&#34;4-参考文章&#34;&gt;4. 参考文章&lt;/h2&gt;
 &lt;ol&gt;
 &lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/shuang_waiwai/article/details/121108964&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;Git的环境配置（超详细）&lt;/a&gt;&lt;/li&gt;
@@ -216,6 +218,10 @@
     &gt;关于Hugo：Hugo-页面包中的相对路径&lt;/a&gt;&lt;/li&gt;
 &lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.cnblogs.com/brady-wang/p/13830095.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;置Hugo的代码高亮&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.bilibili.com/video/BV1q4411i7gL/?spm_id_from=333.1007.top_right_bar_window_history.content.click&amp;amp;vd_source=b6daecdfe358d06b1107a6d13e19fe3f&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;手把手教你从0开始搭建自己的个人博客 |第二种姿势 | hugo&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.dandelioncloud.cn/article/details/1586880018842374146&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Hexo博客的备份与恢复&lt;/a&gt;&lt;/li&gt;
 &lt;/ol&gt;
 </description>
         </item>
