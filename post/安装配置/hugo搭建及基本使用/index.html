@@ -6,7 +6,7 @@
 1 2 3 4 5 6 7 8 9 10 11 // (username是自己的账户名) git config --global user.name &amp;#34;username&amp;#34; // (useremail注册账号时用的邮箱) git config --global user.email &amp;#34;useremail&amp;#34; // 查看配置 git config --global --list // 生成ssh ssh-keygen -t rsa 将C:\Users\usrname\.ssh\id_rsa.pub中内容复制到github中setting-&amp;gt;SSH and GPG keys-&amp;gt;New SSH key-&amp;gt;key栏-&amp;gt;Add SSH key。
 1.2 hugo hugo，使用当前最新0.110.0版本，需要下载extend版本，我选的是hugo_extended_0.110.0_windows-amd64.zip。否则下载的主题无法渲染，提示is not compatible with this Hugo version; run &amp;quot;hugo mod graph&amp;quot; for more info。
 压缩包解压缩后将hugo.exe文件添加到系统环境变量中，cmd中hugo version可查看版本说明添加成功。
-在想要写博客的位置创建04_hugo_blog文件夹生成站点，运行后会在04_hugo_blog生成相应的文件结构。基本操作如下：'>
+在想要写博客的位置创建04_hugo_blog文件夹生成站点，运行后会在04_hugo_blog生成相应的文件结构。文件结构如下，content中放自己记录的blog，themes中放下载的主题，config.toml为配置文件，static放blog中用到的图片（blog插入图片时，直接放，不需要写路径，![hugo目录结构](hugo_tree.bmp)）。'>
 <title>Hugo搭建及基本使用</title>
 
 <link rel='canonical' href='https://frozen531.github.io/post/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/hugo%E6%90%AD%E5%BB%BA%E5%8F%8A%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/'>
@@ -17,7 +17,7 @@
 1 2 3 4 5 6 7 8 9 10 11 // (username是自己的账户名) git config --global user.name &amp;#34;username&amp;#34; // (useremail注册账号时用的邮箱) git config --global user.email &amp;#34;useremail&amp;#34; // 查看配置 git config --global --list // 生成ssh ssh-keygen -t rsa 将C:\Users\usrname\.ssh\id_rsa.pub中内容复制到github中setting-&amp;gt;SSH and GPG keys-&amp;gt;New SSH key-&amp;gt;key栏-&amp;gt;Add SSH key。
 1.2 hugo hugo，使用当前最新0.110.0版本，需要下载extend版本，我选的是hugo_extended_0.110.0_windows-amd64.zip。否则下载的主题无法渲染，提示is not compatible with this Hugo version; run &amp;quot;hugo mod graph&amp;quot; for more info。
 压缩包解压缩后将hugo.exe文件添加到系统环境变量中，cmd中hugo version可查看版本说明添加成功。
-在想要写博客的位置创建04_hugo_blog文件夹生成站点，运行后会在04_hugo_blog生成相应的文件结构。基本操作如下：'>
+在想要写博客的位置创建04_hugo_blog文件夹生成站点，运行后会在04_hugo_blog生成相应的文件结构。文件结构如下，content中放自己记录的blog，themes中放下载的主题，config.toml为配置文件，static放blog中用到的图片（blog插入图片时，直接放，不需要写路径，![hugo目录结构](hugo_tree.bmp)）。'>
 <meta property='og:url' content='https://frozen531.github.io/post/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/hugo%E6%90%AD%E5%BB%BA%E5%8F%8A%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/'>
 <meta property='og:site_name' content='浅浅的行迹'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='hugo' /><meta property='article:published_time' content='2023-02-05T10:57:37&#43;08:00'/><meta property='article:modified_time' content='2023-02-05T10:57:37&#43;08:00'/>
@@ -27,7 +27,7 @@
 1 2 3 4 5 6 7 8 9 10 11 // (username是自己的账户名) git config --global user.name &amp;#34;username&amp;#34; // (useremail注册账号时用的邮箱) git config --global user.email &amp;#34;useremail&amp;#34; // 查看配置 git config --global --list // 生成ssh ssh-keygen -t rsa 将C:\Users\usrname\.ssh\id_rsa.pub中内容复制到github中setting-&amp;gt;SSH and GPG keys-&amp;gt;New SSH key-&amp;gt;key栏-&amp;gt;Add SSH key。
 1.2 hugo hugo，使用当前最新0.110.0版本，需要下载extend版本，我选的是hugo_extended_0.110.0_windows-amd64.zip。否则下载的主题无法渲染，提示is not compatible with this Hugo version; run &amp;quot;hugo mod graph&amp;quot; for more info。
 压缩包解压缩后将hugo.exe文件添加到系统环境变量中，cmd中hugo version可查看版本说明添加成功。
-在想要写博客的位置创建04_hugo_blog文件夹生成站点，运行后会在04_hugo_blog生成相应的文件结构。基本操作如下：">
+在想要写博客的位置创建04_hugo_blog文件夹生成站点，运行后会在04_hugo_blog生成相应的文件结构。文件结构如下，content中放自己记录的blog，themes中放下载的主题，config.toml为配置文件，static放blog中用到的图片（blog插入图片时，直接放，不需要写路径，![hugo目录结构](hugo_tree.bmp)）。">
     </head>
     <body class="
     article-page
@@ -349,19 +349,8 @@
 <h3 id="12-hugo">1.2 hugo</h3>
 <p><a class="link" href="https://github.com/gohugoio/hugo/releases"  target="_blank" rel="noopener"
     >hugo</a>，使用当前最新0.110.0版本，需要下载extend版本，我选的是hugo_extended_0.110.0_windows-amd64.zip。否则下载的主题无法渲染，提示<code>is not compatible with this Hugo version; run &quot;hugo mod graph&quot; for more info</code>。</p>
-<p>压缩包解压缩后将hugo.exe文件添加到系统环境变量中，cmd中hugo version可查看版本说明添加成功。</p>
-<p>在想要写博客的位置创建04_hugo_blog文件夹生成站点，运行后会在04_hugo_blog生成相应的文件结构。基本操作如下：</p>
-<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
-<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
-</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
-</span></code></pre></td>
-<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>// 创建04_hugo_blog
-</span></span><span style="display:flex;"><span>hugo new site 04_hugo_blog
-</span></span></code></pre></td></tr></table>
-</div>
-</div><p>文件结构如下，content中放自己记录的blog，themes中放下载的主题，config.toml为配置文件，static放blog中用到的图片（直接放，不需要写路径，<code>![hugo目录结构](hugo_tree.bmp)</code>）。</p>
+<p>压缩包解压缩后将hugo.exe文件添加到系统环境变量中，cmd中<code>hugo version</code>可查看版本说明添加成功。</p>
+<p>在想要写博客的位置创建04_hugo_blog文件夹生成站点，运行后会在04_hugo_blog生成相应的文件结构。文件结构如下，content中放自己记录的blog，themes中放下载的主题，config.toml为配置文件，static放blog中用到的图片（blog插入图片时，直接放，不需要写路径，<code>![hugo目录结构](hugo_tree.bmp)</code>）。</p>
 <p><img src="/hugo_tree.bmp"
 	
 	
@@ -372,10 +361,48 @@
 	
 	
 ></p>
-<h3 id="13-主题下载">1.3 主题下载</h3>
+<p>基本操作如下：</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>// 创建hugo站点：04_hugo_blog
+</span></span><span style="display:flex;"><span>hugo new site 04_hugo_blog
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>// 根文件04_hugo_blog下创建blog文件，自动创建到content中
+</span></span><span style="display:flex;"><span>hugo new post/安装配置/Hugo搭建及基本使用.md
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>创建文件后会生成文件头信息，可以添加相应的多tags和categories，如下。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>---
+</span></span><span style="display:flex;"><span>title: &#34;Hugo搭建及基本使用&#34;
+</span></span><span style="display:flex;"><span>date: 2023-02-05T10:57:37+08:00
+</span></span><span style="display:flex;"><span>draft: true
+</span></span><span style="display:flex;"><span>tags: [&#34;hugo&#34;,&#34;配置&#34;]
+</span></span><span style="display:flex;"><span>categories: [&#34;安装配置&#34;]
+</span></span><span style="display:flex;"><span>---
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="13-主题下载">1.3 主题下载</h3>
 <p><a class="link" href="https://themes.gohugo.io/"  target="_blank" rel="noopener"
     >主题下载</a>，需要下载你想要的主题到04_hugo_blog/themes/文件夹下，我选用的主题是<a class="link" href="https://github.com/CaiJimmy/hugo-theme-stack"  target="_blank" rel="noopener"
-    >hugo-theme-stack</a>。主题直接clone下来后，有</p>
+    >hugo-theme-stack</a>，建议下载有搜索功能，分类的，方便修改。</p>
 <div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
 <table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
 <pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
@@ -440,7 +467,7 @@
 </span></span></code></pre></td></tr></table>
 </div>
 </div><h2 id="3-部署到github">3. 部署到github</h2>
-<p>hugo是将编译后的文件上传到github上，并不需要上传源文件，所以需要将源文件和编译后的均上传。</p>
+<p>hugo是将编译后的文件上传到github上，并不需要上传源文件，为备份需要将源文件和编译后的均上传。</p>
 <h3 id="31-html部署">3.1 html部署</h3>
 <p>github上新建仓库，命名需要注意usrname.github.io</p>
 <div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
@@ -464,7 +491,7 @@
 </span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
 </span></code></pre></td>
 <td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>//指定aseUrl仓库地址，生成04_hugo_blog/public文件夹，将blog转成html文件
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>//指定baseUrl仓库地址，生成04_hugo_blog/public文件夹，将blog转成html文件
 </span></span><span style="display:flex;"><span>hugo --baseUrl=&#34;https://frozen531.github.io/&#34; --buildDrafts
 </span></span><span style="display:flex;"><span>
 </span></span><span style="display:flex;"><span>//进入public，创建git仓库
@@ -487,7 +514,17 @@
     >https://frozen531.github.io/</a></p>
 <h3 id="32-源文件备份">3.2 源文件备份</h3>
 <p>源文件备份到github，创建新的仓库。04_hugo_blog文件夹下<code>git init</code>，因为.git仓库不能嵌套，themes主题中的.git需要删除，pulbic中的.git可以通过创建.gitignore文件忽略。</p>
-<h2 id="4-参考文章">4. 参考文章</h2>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span># 忽略 public/ 文件夹下的所有文件
+</span></span><span style="display:flex;"><span>public/
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="4-参考文章">4. 参考文章</h2>
 <ol>
 <li><a class="link" href="https://blog.csdn.net/shuang_waiwai/article/details/121108964"  target="_blank" rel="noopener"
     >Git的环境配置（超详细）</a></li>

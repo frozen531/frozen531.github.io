@@ -3,18 +3,30 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://frozen531.github.io/</loc>
-    <lastmod>2023-02-05T22:26:47+08:00</lastmod>
-  </url><url>
-    <loc>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/02_%E7%BC%96%E8%AF%91%E5%92%8C%E9%93%BE%E6%8E%A5/</loc>
-    <lastmod>2023-02-05T22:26:47+08:00</lastmod>
+    <lastmod>2023-02-11T14:58:36+08:00</lastmod>
   </url><url>
     <loc>https://frozen531.github.io/categories/</loc>
-    <lastmod>2023-02-05T22:26:47+08:00</lastmod>
+    <lastmod>2023-02-11T14:58:36+08:00</lastmod>
+  </url><url>
+    <loc>https://frozen531.github.io/tags/git/</loc>
+    <lastmod>2023-02-11T14:58:36+08:00</lastmod>
+  </url><url>
+    <loc>https://frozen531.github.io/post/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/git%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/</loc>
+    <lastmod>2023-02-11T14:58:36+08:00</lastmod>
   </url><url>
     <loc>https://frozen531.github.io/post/</loc>
-    <lastmod>2023-02-05T22:26:47+08:00</lastmod>
+    <lastmod>2023-02-11T14:58:36+08:00</lastmod>
   </url><url>
     <loc>https://frozen531.github.io/tags/</loc>
+    <lastmod>2023-02-11T14:58:36+08:00</lastmod>
+  </url><url>
+    <loc>https://frozen531.github.io/categories/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/</loc>
+    <lastmod>2023-02-11T14:58:36+08:00</lastmod>
+  </url><url>
+    <loc>https://frozen531.github.io/post/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/git%E9%85%8D%E7%BD%AE%E5%8F%8A%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/</loc>
+    <lastmod>2023-02-10T20:15:58+08:00</lastmod>
+  </url><url>
+    <loc>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/02_%E7%BC%96%E8%AF%91%E5%92%8C%E9%93%BE%E6%8E%A5/</loc>
     <lastmod>2023-02-05T22:26:47+08:00</lastmod>
   </url><url>
     <loc>https://frozen531.github.io/tags/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/</loc>
@@ -29,9 +41,6 @@
     <loc>https://frozen531.github.io/post/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/hugo%E6%90%AD%E5%BB%BA%E5%8F%8A%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/</loc>
     <lastmod>2023-02-05T10:57:37+08:00</lastmod>
   </url><url>
-    <loc>https://frozen531.github.io/categories/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/</loc>
-    <lastmod>2023-02-05T10:57:37+08:00</lastmod>
-  </url><url>
     <loc>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/03_%E7%9B%AE%E6%A0%87%E6%96%87%E4%BB%B6%E9%87%8C%E6%9C%89%E4%BB%80%E4%B9%88/</loc>
     <lastmod>2023-02-05T10:47:08+08:00</lastmod>
   </url><url>
@@ -42,6 +51,8 @@
     <lastmod>2019-05-28T00:00:00+00:00</lastmod>
   </url><url>
     <loc>https://frozen531.github.io/page/links/</loc>
+  </url><url>
+    <loc>https://frozen531.github.io/categories/linux/</loc>
   </url><url>
     <loc>https://frozen531.github.io/page/search/</loc>
   </url>

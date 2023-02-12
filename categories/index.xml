@@ -6,7 +6,15 @@
         <description>Recent content in Categories on 浅浅的行迹</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
-        <lastBuildDate>Sun, 05 Feb 2023 22:26:47 +0800</lastBuildDate><atom:link href="https://frozen531.github.io/categories/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Sat, 11 Feb 2023 14:58:36 +0800</lastBuildDate><atom:link href="https://frozen531.github.io/categories/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>安装配置</title>
+        <link>https://frozen531.github.io/categories/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/</link>
+        <pubDate>Sat, 11 Feb 2023 14:58:36 +0800</pubDate>
+        
+        <guid>https://frozen531.github.io/categories/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/</guid>
+        <description>&lt;img src="https://frozen531.github.io/categories/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/618cea768fa3c7817.jpg" alt="Featured image of post 安装配置" /&gt;</description>
+        </item>
+        <item>
         <title>读书笔记</title>
         <link>https://frozen531.github.io/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/</link>
         <pubDate>Sun, 05 Feb 2023 22:26:47 +0800</pubDate>
@@ -15,12 +23,12 @@
         <description>&lt;img src="https://frozen531.github.io/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/1.jpg" alt="Featured image of post 读书笔记" /&gt;</description>
         </item>
         <item>
-        <title>安装配置</title>
-        <link>https://frozen531.github.io/categories/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/</link>
-        <pubDate>Sun, 05 Feb 2023 10:57:37 +0800</pubDate>
+        <title>Linux</title>
+        <link>https://frozen531.github.io/categories/linux/</link>
+        <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
         
-        <guid>https://frozen531.github.io/categories/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/</guid>
-        <description>&lt;img src="https://frozen531.github.io/categories/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/618cea768fa3c7817.jpg" alt="Featured image of post 安装配置" /&gt;</description>
+        <guid>https://frozen531.github.io/categories/linux/</guid>
+        <description>&lt;img src="https://frozen531.github.io/categories/linux/1.jpg" alt="Featured image of post Linux" /&gt;</description>
         </item>
         
     </channel>
