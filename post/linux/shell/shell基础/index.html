@@ -1,0 +1,1495 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='1. Shell简介 Shell为用户提供一个命令输入界面，也是一种强大的编程语言，一种解释执行的脚本语言，在Shell中可以直接调用Linux系统命令。 同时，Shell是一个命令解析器，将用户输入的命令转换为内核可以识别的机器语言，同时内核将硬件的执行结果通过Shell转换为我们可以读懂的语言。
+1.1 分类 Shell分两大类，B Shell（Bourne Shell）和C Shell（主要用于BSD版的Uinx系统，语法与C语言类似），两者语法不兼容，B Shell主要有sh、Bash、ksh、psh、zsh；C Shell主要有csh、tcsh。Linux中以Bash作为用户的基本Shell，与sh兼容。
+1.2 查看系统所支持的Shell和当前Shell 查看系统中支持的Shell，cat /etc/shells
+1 2 3 4 5 6 [root@bogon ~]# cat /etc/shells /bin/sh /bin/bash /sbin/nologin /bin/tcsh /bin/csh 查询当前Shell，echo $SHELL
+1 2 [root@bogon ~]# echo $SHELL /bin/bash 各种Shell的切换，输入相应的Shellm名即可切换，exit退出
+1 2 3 4 5 6 [root@bogon ~]# sh sh-4.1# ls anaconda-ks.cfg install.log install.log.syslog sh-4.1# exit exit [root@bogon ~]# 1.3 注释 注释使用#，首行必须加#!/bin/bash，标注该脚本用/bin/bash解释执行。
+2. echo命令 1 2 # 基本格式 echo [选项] [输出内容] 输出内容注意：'>
+<title>Shell基础</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/linux/shell/shell%E5%9F%BA%E7%A1%80/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='Shell基础'>
+<meta property='og:description' content='1. Shell简介 Shell为用户提供一个命令输入界面，也是一种强大的编程语言，一种解释执行的脚本语言，在Shell中可以直接调用Linux系统命令。 同时，Shell是一个命令解析器，将用户输入的命令转换为内核可以识别的机器语言，同时内核将硬件的执行结果通过Shell转换为我们可以读懂的语言。
+1.1 分类 Shell分两大类，B Shell（Bourne Shell）和C Shell（主要用于BSD版的Uinx系统，语法与C语言类似），两者语法不兼容，B Shell主要有sh、Bash、ksh、psh、zsh；C Shell主要有csh、tcsh。Linux中以Bash作为用户的基本Shell，与sh兼容。
+1.2 查看系统所支持的Shell和当前Shell 查看系统中支持的Shell，cat /etc/shells
+1 2 3 4 5 6 [root@bogon ~]# cat /etc/shells /bin/sh /bin/bash /sbin/nologin /bin/tcsh /bin/csh 查询当前Shell，echo $SHELL
+1 2 [root@bogon ~]# echo $SHELL /bin/bash 各种Shell的切换，输入相应的Shellm名即可切换，exit退出
+1 2 3 4 5 6 [root@bogon ~]# sh sh-4.1# ls anaconda-ks.cfg install.log install.log.syslog sh-4.1# exit exit [root@bogon ~]# 1.3 注释 注释使用#，首行必须加#!/bin/bash，标注该脚本用/bin/bash解释执行。
+2. echo命令 1 2 # 基本格式 echo [选项] [输出内容] 输出内容注意：'>
+<meta property='og:url' content='https://frozen531.github.io/post/linux/shell/shell%E5%9F%BA%E7%A1%80/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Shell' /><meta property='article:published_time' content='2023-02-16T21:29:39&#43;08:00'/><meta property='article:modified_time' content='2023-02-16T21:29:39&#43;08:00'/>
+<meta name="twitter:title" content="Shell基础">
+<meta name="twitter:description" content="1. Shell简介 Shell为用户提供一个命令输入界面，也是一种强大的编程语言，一种解释执行的脚本语言，在Shell中可以直接调用Linux系统命令。 同时，Shell是一个命令解析器，将用户输入的命令转换为内核可以识别的机器语言，同时内核将硬件的执行结果通过Shell转换为我们可以读懂的语言。
+1.1 分类 Shell分两大类，B Shell（Bourne Shell）和C Shell（主要用于BSD版的Uinx系统，语法与C语言类似），两者语法不兼容，B Shell主要有sh、Bash、ksh、psh、zsh；C Shell主要有csh、tcsh。Linux中以Bash作为用户的基本Shell，与sh兼容。
+1.2 查看系统所支持的Shell和当前Shell 查看系统中支持的Shell，cat /etc/shells
+1 2 3 4 5 6 [root@bogon ~]# cat /etc/shells /bin/sh /bin/bash /sbin/nologin /bin/tcsh /bin/csh 查询当前Shell，echo $SHELL
+1 2 [root@bogon ~]# echo $SHELL /bin/bash 各种Shell的切换，输入相应的Shellm名即可切换，exit退出
+1 2 3 4 5 6 [root@bogon ~]# sh sh-4.1# ls anaconda-ks.cfg install.log install.log.syslog sh-4.1# exit exit [root@bogon ~]# 1.3 注释 注释使用#，首行必须加#!/bin/bash，标注该脚本用/bin/bash解释执行。
+2. echo命令 1 2 # 基本格式 echo [选项] [输出内容] 输出内容注意：">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-shell简介">1. Shell简介</a>
+      <ul>
+        <li><a href="#11-分类">1.1 分类</a></li>
+        <li><a href="#12-查看系统所支持的shell和当前shell">1.2 查看系统所支持的Shell和当前Shell</a></li>
+        <li><a href="#13-注释">1.3 注释</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-echo命令">2. <code>echo</code>命令</a>
+      <ul>
+        <li><a href="#21-转义字符输出">2.1 转义字符输出</a></li>
+        <li><a href="#22-指定输出字符颜色">2.2 指定输出字符颜色</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-shell脚本的执行方式">3. Shell脚本的执行方式</a></li>
+    <li><a href="#4-基本功能">4. 基本功能</a>
+      <ul>
+        <li><a href="#历史命令history">历史命令<code>history</code></a></li>
+        <li><a href="#tab键补全">tab键补全</a></li>
+        <li><a href="#命令的别名aliasunalias">命令的别名<code>alias</code>，<code>unalias</code></a></li>
+        <li><a href="#bash常用快捷键">Bash常用快捷键</a></li>
+        <li><a href="#输入输出重定向">输入输出重定向</a></li>
+        <li><a href="#多命令顺序执行--">多命令顺序执行<code>;</code> <code>&amp;&amp;</code> <code>||</code></a></li>
+        <li><a href="#管道符">管道符<code>|</code></a></li>
+        <li><a href="#grep">grep</a></li>
+        <li><a href="#通配符与特殊符号">通配符与特殊符号</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-bash的变量">5. Bash的变量</a>
+      <ul>
+        <li><a href="#用户自定义变量">用户自定义变量</a></li>
+        <li><a href="#环境变量">环境变量</a></li>
+        <li><a href="#位置参数变量">位置参数变量</a></li>
+        <li><a href="#预定义变量">预定义变量</a></li>
+      </ul>
+    </li>
+    <li><a href="#bash的运算符">Bash的运算符</a>
+      <ul>
+        <li><a href="#数字运算与运算符">数字运算与运算符</a></li>
+        <li><a href="#变量测试与内容替换">变量测试与内容替换</a></li>
+      </ul>
+    </li>
+    <li><a href="#环境变量配置文件">环境变量配置文件</a>
+      <ul>
+        <li><a href="#source命令">source命令</a></li>
+        <li><a href="#环境变量配置文件-1">环境变量配置文件</a></li>
+        <li><a href="#其他配置文件">其他配置文件</a></li>
+      </ul>
+    </li>
+    <li><a href="#学习链接">学习链接</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/linux/" style="background-color: #B0C4DE; color: #fff;">
+                Linux
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/linux/shell/shell%E5%9F%BA%E7%A1%80/">Shell基础</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Feb 16, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    5 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="1-shell简介">1. Shell简介</h2>
+<p>Shell为用户提供一个命令输入界面，也是一种强大的编程语言，一种解释执行的脚本语言，在Shell中可以直接调用Linux系统命令。
+同时，Shell是一个命令解析器，将用户输入的命令转换为内核可以识别的机器语言，同时内核将硬件的执行结果通过Shell转换为我们可以读懂的语言。</p>
+<p><img src="/shell%e5%9f%ba%e7%a1%80_Shell%e4%bd%9c%e7%94%a8.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="shell基础_Shell作用"
+	
+	
+></p>
+<h3 id="11-分类">1.1 分类</h3>
+<p>Shell分两大类，B Shell（Bourne Shell）和C Shell（主要用于BSD版的Uinx系统，语法与C语言类似），两者语法不兼容，B Shell主要有sh、Bash、ksh、psh、zsh；C Shell主要有csh、tcsh。Linux中以Bash作为用户的基本Shell，与sh兼容。</p>
+<h3 id="12-查看系统所支持的shell和当前shell">1.2 查看系统所支持的Shell和当前Shell</h3>
+<p>查看系统中支持的Shell，<code>cat /etc/shells</code></p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[root@bogon ~]# cat /etc/shells 
+</span></span><span style="display:flex;"><span>/bin/sh
+</span></span><span style="display:flex;"><span>/bin/bash
+</span></span><span style="display:flex;"><span>/sbin/nologin
+</span></span><span style="display:flex;"><span>/bin/tcsh
+</span></span><span style="display:flex;"><span>/bin/csh
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>查询当前Shell，<code>echo $SHELL</code></p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[root@bogon ~]# echo $SHELL
+</span></span><span style="display:flex;"><span>/bin/bash
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>各种Shell的切换，输入相应的Shellm名即可切换，<code>exit</code>退出</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>[root@bogon ~]# sh
+</span></span><span style="display:flex;"><span>sh-4.1# ls
+</span></span><span style="display:flex;"><span>anaconda-ks.cfg  install.log  install.log.syslog
+</span></span><span style="display:flex;"><span>sh-4.1# exit
+</span></span><span style="display:flex;"><span>exit
+</span></span><span style="display:flex;"><span>[root@bogon ~]#
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="13-注释">1.3 注释</h3>
+<p>注释使用<code>#</code>，首行必须加<code>#!/bin/bash</code>，标注该脚本用<code>/bin/bash</code>解释执行。</p>
+<h2 id="2-echo命令">2. <code>echo</code>命令</h2>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 基本格式</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">echo</span> <span style="color:#000;font-weight:bold">[</span>选项<span style="color:#000;font-weight:bold">]</span> <span style="color:#000;font-weight:bold">[</span>输出内容<span style="color:#000;font-weight:bold">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>输出内容注意：</p>
+<ul>
+<li>如果有空格，需要加双引号<code>&quot;&quot;</code></li>
+<li>包含有<code>!</code>，需要用单引号<code>''</code></li>
+</ul>
+<h3 id="21-转义字符输出">2.1 转义字符输出</h3>
+<p>，其中<code>-e</code>选项可以支持反斜线<code>\</code>(转义符)控制的字符转换
+<img src="/shell%e5%9f%ba%e7%a1%80_echo%e7%89%b9%e6%ae%8a%e5%86%85%e5%ae%b9%e8%be%93%e5%87%ba.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="shell基础_echo特殊内容输出"
+	
+	
+></p>
+<h3 id="22-指定输出字符颜色">2.2 指定输出字符颜色</h3>
+<h2 id="3-shell脚本的执行方式">3. Shell脚本的执行方式</h2>
+<p><code>hello.sh</code>文件如下：</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#!/bin/bash
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span><span style="color:#0086b3">echo</span> <span style="color:#d14">&#34;hello world.&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>两种方式：</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic">#方式一：赋予权限后以文件路径执行（绝对或相对路径）</span>
+</span></span><span style="display:flex;"><span>chmod <span style="color:#099">755</span> hello.sh
+</span></span><span style="display:flex;"><span>./hello.sh
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#方式二：使用shell解释器解释执行，可以不用给权限(不常用)</span>
+</span></span><span style="display:flex;"><span>bash hello.sh
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#方式三：source</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="4-基本功能">4. 基本功能</h2>
+<h3 id="历史命令history">历史命令<code>history</code></h3>
+<p>所有历史命令默认存放在<code>~/.bash_history</code>下</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 基本格式</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">history</span> <span style="color:#000;font-weight:bold">[</span>选项<span style="color:#000;font-weight:bold">]</span> <span style="color:#000;font-weight:bold">[</span>历史命令保存文件<span style="color:#000;font-weight:bold">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-w</td>
+<td>将缓冲区中的命令希尔历史命令保存文件中</td>
+</tr>
+<tr>
+<td>-c</td>
+<td>清空历史命令</td>
+</tr>
+</tbody>
+</table></div>
+<p>历史命令默认保存1000条，满则从头删除，可在<code>/etc/profile</code>文件中修改保存条数：<code>HISTSIZE=1000</code>。</p>
+<p>调用方式</p>
+<ol>
+<li>使用上、下箭头调用以前的历史命令(<strong>最常使用</strong>)</li>
+<li>使用<code>!n</code>重复执行第n条历史命令</li>
+<li>使用<code>!!</code>重复执行上一条命令</li>
+<li>使用<code>!字串</code>重复执行最后一条以该字串开头的命令</li>
+</ol>
+<h3 id="tab键补全">tab键补全</h3>
+<p>可进行文件或目录补全，通常一次键入没反应是因为有前缀一样的，再键入一次即可看到所有以该前缀开头的文件/文件名</p>
+<h3 id="命令的别名aliasunalias">命令的别名<code>alias</code>，<code>unalias</code></h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 基本格式:alias 别名=&#39;原命令&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># alias ab=&#39;ls -al&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 查询别名</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># alias </span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">alias</span> <span style="color:#008080">ab</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;ls -al&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">alias</span> <span style="color:#008080">cp</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;cp -i&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">alias</span> l.<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;ls -d .* --color=auto&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">alias</span> <span style="color:#008080">ll</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;ls -l --color=auto&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">alias</span> <span style="color:#008080">ls</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;ls --color=auto&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">alias</span> <span style="color:#008080">mv</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;mv -i&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">alias</span> <span style="color:#008080">rm</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;rm -i&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">alias</span> <span style="color:#008080">which</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;alias | /usr/bin/which --tty-only --read-alias --show-dot --show-tilde&#39;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 删除别名，基本格式:unalias 别名</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># unalias ab</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># alias </span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">alias</span> <span style="color:#008080">cp</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;cp -i&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">alias</span> l.<span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;ls -d .* --color=auto&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">alias</span> <span style="color:#008080">ll</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;ls -l --color=auto&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">alias</span> <span style="color:#008080">ls</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;ls --color=auto&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">alias</span> <span style="color:#008080">mv</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;mv -i&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">alias</span> <span style="color:#008080">rm</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;rm -i&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">alias</span> <span style="color:#008080">which</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;alias | /usr/bin/which --tty-only --read-alias --show-dot --show-tilde&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>命令执行顺序：</p>
+<ol>
+<li>用绝对路径或相对路径执行的命令</li>
+<li>别名，alias仅在当前登录生效，若要永久生效，写入<code>~/.bashrc</code></li>
+<li>bash的内部命令</li>
+<li><code>$PATH</code>中环境变量定义的路径，顺序查找到的第一个</li>
+</ol>
+<h3 id="bash常用快捷键">Bash常用快捷键</h3>
+<p><img src="/shell%e5%9f%ba%e7%a1%80_bash%e5%b8%b8%e7%94%a8%e5%bf%ab%e6%8d%b7%e9%94%ae.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="shell基础_bash常用快捷键"
+	
+	
+></p>
+<h3 id="输入输出重定向">输入输出重定向</h3>
+<ul>
+<li>
+<p>标准输入输出
+<img src="/shell%e5%9f%ba%e7%a1%80_%e6%a0%87%e5%87%86%e8%be%93%e5%85%a5%e8%be%93%e5%87%ba.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="shell基础_标准输入输出"
+	
+	
+></p>
+</li>
+<li>
+<p>输出重定向<code>&gt;</code>，将原本命令输出到显示器的结果保存到文件中，便于查看。
+<img src="/shell%e5%9f%ba%e7%a1%80_%e8%be%93%e5%87%ba%e9%87%8d%e5%ae%9a%e5%90%91.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="shell基础_输出重定向"
+	
+	
+></p>
+</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 错误输出是2，需要标明</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># ab</span>
+</span></span><span style="display:flex;"><span>bash: ab: <span style="color:#0086b3">command</span> not found
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># ab 2&gt;&gt; err.log</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># cat err.log </span>
+</span></span><span style="display:flex;"><span>bash: ab: <span style="color:#0086b3">command</span> not found
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 丢弃输出，/dev/null类似垃圾箱</span>
+</span></span><span style="display:flex;"><span>ls &amp;&gt;/dev/null
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>输入重定向，将原本键盘输入的改为文件输入，使用不多</li>
+</ul>
+<h3 id="多命令顺序执行--">多命令顺序执行<code>;</code> <code>&amp;&amp;</code> <code>||</code></h3>
+<p><img src="/shell%e5%9f%ba%e7%a1%80_%e5%a4%9a%e5%91%bd%e4%bb%a4%e9%a1%ba%e5%ba%8f%e6%89%a7%e8%a1%8c.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="shell基础_多命令顺序执行"
+	
+	
+></p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># ;连接多条命令，各个命令间没有逻辑关系</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># ls ; date ; cd /user ; pwd</span>
+</span></span><span style="display:flex;"><span>anaconda-ks.cfg  err.log  install.log  install.log.syslog
+</span></span><span style="display:flex;"><span>2023年 02月 18日 星期六 16:46:35 CST
+</span></span><span style="display:flex;"><span>-bash: cd: /user: 没有那个文件或目录
+</span></span><span style="display:flex;"><span>/root
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># &amp;&amp; 逻辑与 前面命令正确执行才能执行后面的命令</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># ls &amp;&amp; echo yes</span>
+</span></span><span style="display:flex;"><span>anaconda-ks.cfg  err.log  install.log  install.log.syslog
+</span></span><span style="display:flex;"><span>yes
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># lsa &amp;&amp; echo yes</span>
+</span></span><span style="display:flex;"><span>-bash: lsa: <span style="color:#0086b3">command</span> not found
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># || 逻辑或 前面命令错误执行才会执行后面命令</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># ls || echo yes</span>
+</span></span><span style="display:flex;"><span>anaconda-ks.cfg  err.log  install.log  install.log.syslog
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># lsa || echo yes</span>
+</span></span><span style="display:flex;"><span>-bash: lsa: <span style="color:#0086b3">command</span> not found
+</span></span><span style="display:flex;"><span>yes
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># &amp;&amp; 与 || 一起使用判断命令是否正常执行</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># ls &amp;&amp; echo yes || echo no</span>
+</span></span><span style="display:flex;"><span>anaconda-ks.cfg  err.log  install.log  install.log.syslog
+</span></span><span style="display:flex;"><span>yes
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># lsa &amp;&amp; echo yes || echo no</span>
+</span></span><span style="display:flex;"><span>-bash: lsa: <span style="color:#0086b3">command</span> not found
+</span></span><span style="display:flex;"><span>no
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># ls || echo yes &amp;&amp; echo no</span>
+</span></span><span style="display:flex;"><span>anaconda-ks.cfg  err.log  install.log  install.log.syslog
+</span></span><span style="display:flex;"><span>no
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># lsa || echo yes &amp;&amp; echo no</span>
+</span></span><span style="display:flex;"><span>-bash: lsa: <span style="color:#0086b3">command</span> not found
+</span></span><span style="display:flex;"><span>yes
+</span></span><span style="display:flex;"><span>no
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>通过上例可以看出，<code>&amp;&amp;</code>与<code>||</code>共用时，并没有所谓的优先级一说，是顺序判断</p>
+<ul>
+<li><code>lsa &amp;&amp; echo yes || echo no</code>，lsa错误执行所以<code>echo yes</code>不执行，因为<code>echo yes</code>不执行，所以执行后面的<code>echo no</code></li>
+<li><code>lsa || echo yes &amp;&amp; echo no</code>，lsa错误执行所以<code>echo yes</code>执行，因为<code>echo yes</code>执行，所以执行后面的<code>echo no</code>也执行</li>
+</ul>
+<h3 id="管道符">管道符<code>|</code></h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 基本格式：命令1的输出作为命令2的输入</span>
+</span></span><span style="display:flex;"><span>命令1 | 命令2
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>注意：要求命令1必须正常执行</p>
+<h3 id="grep">grep</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 基本格式</span>
+</span></span><span style="display:flex;"><span>grep <span style="color:#000;font-weight:bold">[</span>选项<span style="color:#000;font-weight:bold">]</span> <span style="color:#d14">&#34;搜索内容&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-i</td>
+<td>忽略大小写</td>
+</tr>
+<tr>
+<td>-n</td>
+<td>输出行号</td>
+</tr>
+<tr>
+<td>-v</td>
+<td>反向查找</td>
+</tr>
+<tr>
+<td>&ndash;color=auto</td>
+<td>搜索出的关键字用颜色显示</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="通配符与特殊符号">通配符与特殊符号</h3>
+<ul>
+<li>通配符用来匹配文件名
+<img src="/shell%e5%9f%ba%e7%a1%80_%e9%80%9a%e9%85%8d%e7%ac%a6.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="shell基础_通配符"
+	
+	
+></li>
+<li>特色符号
+<img src="/shell%e5%9f%ba%e7%a1%80_%e5%85%b6%e4%bb%96%e7%89%b9%e6%ae%8a%e7%ac%a6%e5%8f%b7.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="shell基础_其他特殊符号"
+	
+	
+></li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># name=sa</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># echo &#34;$name&#34;</span>
+</span></span><span style="display:flex;"><span>sa
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># echo &#39;$name&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#008080">$name</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># echo $(date)</span>
+</span></span><span style="display:flex;"><span>2023年 02月 18日 星期六 17:23:43 CST
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="5-bash的变量">5. Bash的变量</h2>
+<p>注意点：</p>
+<ol>
+<li>在Bash中，变量默认都是字符串类型。如果要进行数值运算，必须指定变量类型为数值型。</li>
+<li>变量由<code>=</code>连接，两边不能有空格。</li>
+</ol>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 变量定义</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># name=alex</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 变量调用，使用$</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># echo $name</span>
+</span></span><span style="display:flex;"><span>alex
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 查看所以变量，包括用户自定义、环境变量等</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># set</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 删除变量</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># unset name</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="3">
+<li>变量的值如果有空格，需要用单引号<code>''</code>或双引号<code>&quot;&quot;</code>；可以使用转义符<code>\</code>;</li>
+<li>变量可以叠加，类似字符串拼接。使用双引号包含<code>&quot;$变量名&quot;</code>或用<code>${变量名}</code>包含</li>
+</ol>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># a=aaa</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># b=&#34;$a&#34;bbb</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># echo $b</span>
+</span></span><span style="display:flex;"><span>aaabbb
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># d=dd${b}</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># echo $d</span>
+</span></span><span style="display:flex;"><span>ddaaabbb
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="5">
+<li>
+<p>变量值可以是命令的执行结果，命令需要用反引号或$()包含。参考基础中的特殊符号。</p>
+</li>
+<li>
+<p>环境变量名建议大写，便于区分。</p>
+</li>
+</ol>
+<h3 id="用户自定义变量">用户自定义变量</h3>
+<p>本地变量，只在当前shell中生效。</p>
+<h3 id="环境变量">环境变量</h3>
+<p>环境变量可以在当前shell和这个shell的子shell中生效；<br>
+如果将环境变量写入到配置文件中，会在所有shell中生效。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 设置环境变量，允许用户自定义</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">export</span> 变量名<span style="color:#000;font-weight:bold">=</span>变量值
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 专门查看环境变量</span>
+</span></span><span style="display:flex;"><span>env
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 删除变量</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">unset</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 查看shell树</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># pstree</span>
+</span></span><span style="display:flex;"><span>init─┬─abrt-dump-oops
+</span></span><span style="display:flex;"><span>     ...
+</span></span><span style="display:flex;"><span>     ├─rsyslogd───3*<span style="color:#000;font-weight:bold">[{</span>rsyslogd<span style="color:#000;font-weight:bold">}]</span>
+</span></span><span style="display:flex;"><span>     <span style="color:#998;font-style:italic">#当前bash的父shell是sshd远程工具，在bash中创建了子shellpstree</span>
+</span></span><span style="display:flex;"><span>     ├─sshd───sshd───bash───pstree 
+</span></span><span style="display:flex;"><span>     └─udevd───2*<span style="color:#000;font-weight:bold">[</span>udevd<span style="color:#000;font-weight:bold">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>常见系统环境变量</p>
+<ol>
+<li><code>PATH</code>，里面存放有系统命令的执行路径，命令其实是二进制可执行文件，同样，我们可以将自己写的可执行程序的路径放入其中，这样执行的时候不需要绝对/相对路径就可直接执行。</li>
+</ol>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 查看PATH</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># echo $PATH</span>
+</span></span><span style="display:flex;"><span>/usr/lib64/qt-3.3/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:/root/bin
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 将路径添加到PATH，使用的是字符串的拼接</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># PATH=${PATH}:/00_test/01_hello_world/</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># echo $PATH</span>
+</span></span><span style="display:flex;"><span>/usr/lib64/qt-3.3/bin:/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin:
+</span></span><span style="display:flex;"><span>/root/bin:/00_test/01_hello_world/
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># hello1</span>
+</span></span><span style="display:flex;"><span>hello world!
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="2">
+<li><code>PS1</code>，定义系统提示符的变量。它是环境变量的一种，但是<code>env</code>查看不了，<code>set</code>可以。
+<img src="/shell%e5%9f%ba%e7%a1%80_PS1.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="shell基础_PS1"
+	
+	
+></li>
+</ol>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 查看</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon 01_hello_world<span style="color:#000;font-weight:bold">]</span>$ <span style="color:#0086b3">echo</span> <span style="color:#008080">$PS1</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span><span style="color:#d14">\u</span>@<span style="color:#d14">\h</span> <span style="color:#d14">\W</span><span style="color:#000;font-weight:bold">]</span>$
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 修改，仅显示最后一级目录改为完整路径</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon 01_hello_world<span style="color:#000;font-weight:bold">]</span>$ <span style="color:#008080">PS1</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#39;[\u@\h \w]\$&#39;</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon /00_test/01_hello_world<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic">#</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="位置参数变量">位置参数变量</h3>
+<p>命令行的输入参数。
+<img src="/shell%e5%9f%ba%e7%a1%80_%e4%bd%8d%e7%bd%ae%e5%8f%82%e6%95%b0%e5%8f%98%e9%87%8f.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="shell基础_位置参数变量"
+	
+	
+></p>
+<h4 id="read接收键盘输入"><code>read</code>接收键盘输入</h4>
+<p>由于只有程序编写者知道需要输入几个参数，所有可以使用<code>read</code>提示用户输入，这样更直观。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic">#基本格式</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">read</span> <span style="color:#000;font-weight:bold">[</span>选项<span style="color:#000;font-weight:bold">]</span> <span style="color:#000;font-weight:bold">[</span>变量名<span style="color:#000;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#案例</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#!/bin/bash</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">read</span> -t <span style="color:#099">30</span> -p <span style="color:#d14">&#34;Please input your name: &#34;</span> name
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#提示“请输入姓名”并等待30秒，把用户的输入保存入变量name中</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">echo</span> <span style="color:#d14">&#34;Name is </span><span style="color:#008080">$name</span><span style="color:#d14"> &#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">read</span> -s -t <span style="color:#099">30</span> -p <span style="color:#d14">&#34;Please enter your age: &#34;</span> age
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#年龄是隐私，所以我们用“-s”选项隐藏输入</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">echo</span> -e <span style="color:#d14">&#34;\n&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">echo</span> <span style="color:#d14">&#34;Age is </span><span style="color:#008080">$age</span><span style="color:#d14"> &#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">read</span> -n <span style="color:#099">1</span> -t <span style="color:#099">30</span> -p <span style="color:#d14">&#34;Please select your gender[M/F]: &#34;</span> gender
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#使用“-n 1”选项只接收一个输入字符就会执行（都不用输入回车）</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">echo</span> -e <span style="color:#d14">&#34;\n&#34;</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">echo</span> <span style="color:#d14">&#34;Sex is </span><span style="color:#008080">$gender</span><span style="color:#d14">&#34;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-p</td>
+<td>“提示信息”：在等待read输入时，输出提示信息</td>
+</tr>
+<tr>
+<td>-t</td>
+<td>秒数： read命令会一直等待用户输入，使用此选项可以指定等待时间</td>
+</tr>
+<tr>
+<td>-n</td>
+<td>字符数： read命令只接受指定的字符数，就会执行</td>
+</tr>
+<tr>
+<td>-s</td>
+<td>隐藏输入的数据，适用于机密信息的输入</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="预定义变量">预定义变量</h3>
+<p>变量名不能自定义，作用也是固定的。位置参数变量是预定义变量的一类。
+<img src="/shell%e5%9f%ba%e7%a1%80_%e9%a2%84%e5%ae%9a%e4%b9%89%e5%8f%98%e9%87%8f.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="shell基础_预定义变量"
+	
+	
+></p>
+<p><code>$?</code>体现在之前的命令顺序执行中的<code>&amp;&amp;</code>和<code>||</code>。 <br>
+<code>$$</code>是当前shell的PID，<code>$PPID</code>是父shell的PID号。<br>
+<code>./hello &amp;</code>是将脚本放入后台执行。</p>
+<h2 id="bash的运算符">Bash的运算符</h2>
+<p>由于bash的变量默认都是字符串，所以要进行数值运算，需要专门的声明。</p>
+<h3 id="数字运算与运算符">数字运算与运算符</h3>
+<ul>
+<li>方式1：declare声明变量类型</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic">#基本格式</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">declare</span> <span style="color:#000;font-weight:bold">[</span>+/-<span style="color:#000;font-weight:bold">][</span>选项<span style="color:#000;font-weight:bold">]</span> 变量名
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#举例</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#查看环境变量类型，这里注意，变量一定要被赋值，可以是空，否则报错</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># export aa=</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># declare -p aa</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">declare</span> -x <span style="color:#008080">aa</span><span style="color:#000;font-weight:bold">=</span><span style="color:#d14">&#34;&#34;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># export bb</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># declare -p bb</span>
+</span></span><span style="display:flex;"><span>-bash: declare: bb: not found
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#定义整形</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># a=3</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># b=5</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># declare -i sum=$a+$b</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># echo $sum</span>
+</span></span><span style="display:flex;"><span><span style="color:#099">8</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-</td>
+<td>给变量设定类型属性</td>
+</tr>
+<tr>
+<td>+</td>
+<td>取消变量的类型属性</td>
+</tr>
+<tr>
+<td>-i</td>
+<td>将变量声明为整数型（integer）</td>
+</tr>
+<tr>
+<td>-x</td>
+<td>将变量声明为环境变量</td>
+</tr>
+<tr>
+<td>-p</td>
+<td>显示指定变量的被声明的类型</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>方式2：expr或let数值运算工具</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 注意：+号左右必须有空格，$()里是命令执行结果，let用法一样</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># c=$(expr $a + $b)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># echo $c</span>
+</span></span><span style="display:flex;"><span><span style="color:#099">8</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>方式3：<code>$((运算式))</code>或<code>$[运算式]</code></li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># $(())和$[]代表数值运算</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># d=$(($a+$b))</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># echo $d</span>
+</span></span><span style="display:flex;"><span><span style="color:#099">8</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># e=$[$a+$b]</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># echo $e</span>
+</span></span><span style="display:flex;"><span><span style="color:#099">8</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>运算符
+<img src="/shell%e5%9f%ba%e7%a1%80_%e6%95%b0%e5%80%bc%e8%bf%90%e7%ae%97%e7%ac%a6.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="shell基础_数值运算符"
+	
+	
+></p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># aa=$(((11+3)/2))</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># echo $aa</span>
+</span></span><span style="display:flex;"><span><span style="color:#099">7</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># bb=$((14%3))</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># echo $bb</span>
+</span></span><span style="display:flex;"><span><span style="color:#099">2</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># cc=$((1&amp;&amp;0))</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># echo $cc</span>
+</span></span><span style="display:flex;"><span><span style="color:#099">0</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># dd=$((1||0))</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># echo $dd</span>
+</span></span><span style="display:flex;"><span><span style="color:#099">1</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="变量测试与内容替换">变量测试与内容替换</h3>
+<p>用于测试y是否存在、为空，其实可以用条件语句实现同样功能。(不需要背，使用时知道查表就行)
+<img src="/shell%e5%9f%ba%e7%a1%80_%e5%8f%98%e9%87%8f%e6%b5%8b%e8%af%95%e4%b8%8e%e5%86%85%e5%ae%b9%e6%9b%bf%e6%8d%a2.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="shell基础_变量测试与内容替换.bmp"
+	
+	
+></p>
+<h2 id="环境变量配置文件">环境变量配置文件</h2>
+<p>环境变量配置主要是定义系统的默认变量，如<code>PATH</code>、<code>HIETSIZE</code>、<code>PS1</code>、<code>HOSTNAME</code>等</p>
+<h3 id="source命令">source命令</h3>
+<p>修改配置文件后需要重新登录才能生效，使用source可以直接生效。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic">#基本格式</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">source</span> 配置文件
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#等价于</span>
+</span></span><span style="display:flex;"><span>.配置文件
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="环境变量配置文件-1">环境变量配置文件</h3>
+<ul>
+<li><code>/etc/profile</code>、<code>/etc/profile.d/*.sh</code>、<code>/etc/bashrc</code>对所有用户生效</li>
+<li><code>~/.bash_profile</code>和<code>~/.bashrc</code>对当前用户生效</li>
+</ul>
+<p>文件配置优先级如下：</p>
+<p><img src="/shell%e5%9f%ba%e7%a1%80_%e7%8e%af%e5%a2%83%e5%8f%98%e9%87%8f%e6%96%87%e4%bb%b6%e9%85%8d%e7%bd%ae%e4%bc%98%e5%85%88%e7%ba%a7.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="shell基础_环境变量文件配置优先级.bmp"
+	
+	
+></p>
+<h3 id="其他配置文件">其他配置文件</h3>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>文件</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>~/.bash_logout</td>
+<td>注销时生效的环境变量配置文件</td>
+</tr>
+<tr>
+<td>~/bash_history</td>
+<td>历史信息配置文件</td>
+</tr>
+<tr>
+<td>/etc/issue</td>
+<td>本地终端登录信息</td>
+</tr>
+<tr>
+<td>/etc/issue.net</td>
+<td>远程终端登录信息</td>
+</tr>
+<tr>
+<td>/etc/motd</td>
+<td>本地和远程登录，登录后的显示信息</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="学习链接">学习链接</h2>
+<p><a class="link" href="https://www.bilibili.com/video/BV1mW411i7Qf?p=63&amp;vd_source=b6daecdfe358d06b1107a6d13e19fe3f"  target="_blank" rel="noopener"
+    >史上最牛的Linux视频教程—兄弟连</a></p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/shell/">Shell</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

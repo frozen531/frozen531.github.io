@@ -1,18 +1,18 @@
 <!DOCTYPE html>
 <html lang="en-us" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='第二章：编译和链接 '>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='1. 编译链接过程图 2. 命令 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 // 预处理 gcc -E hello.c -o hello.i // 编译 gcc -S hello.i -o hello.s // 将汇编文件转为目标文件 gcc -c hello.s -o hello.o	或 // 将源文件预编译、编译和汇编得到目标文件 gcc -c hello.c -o hello.o	// 链接 // 这里...省去了需要用到的其他库，最终得到可执行文件hello ld ... hello.o -o hello	'>
 <title>02_编译和链接</title>
 
 <link rel='canonical' href='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/02_%E7%BC%96%E8%AF%91%E5%92%8C%E9%93%BE%E6%8E%A5/'>
 
 <link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='02_编译和链接'>
-<meta property='og:description' content='第二章：编译和链接 '>
+<meta property='og:description' content='1. 编译链接过程图 2. 命令 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 // 预处理 gcc -E hello.c -o hello.i // 编译 gcc -S hello.i -o hello.s // 将汇编文件转为目标文件 gcc -c hello.s -o hello.o	或 // 将源文件预编译、编译和汇编得到目标文件 gcc -c hello.c -o hello.o	// 链接 // 这里...省去了需要用到的其他库，最终得到可执行文件hello ld ... hello.o -o hello	'>
 <meta property='og:url' content='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/02_%E7%BC%96%E8%AF%91%E5%92%8C%E9%93%BE%E6%8E%A5/'>
 <meta property='og:site_name' content='浅浅的行迹'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='程序员的自我修养' /><meta property='article:published_time' content='2023-02-05T22:26:47&#43;08:00'/><meta property='article:modified_time' content='2023-02-05T22:26:47&#43;08:00'/>
 <meta name="twitter:title" content="02_编译和链接">
-<meta name="twitter:description" content="第二章：编译和链接 ">
+<meta name="twitter:description" content="1. 编译链接过程图 2. 命令 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 // 预处理 gcc -E hello.c -o hello.i // 编译 gcc -S hello.i -o hello.s // 将汇编文件转为目标文件 gcc -c hello.s -o hello.o	或 // 将源文件预编译、编译和汇编得到目标文件 gcc -c hello.c -o hello.o	// 链接 // 这里...省去了需要用到的其他库，最终得到可执行文件hello ld ... hello.o -o hello	">
     </head>
     <body class="
     article-page
@@ -203,7 +203,8 @@
         <div class="widget--toc">
             <nav id="TableOfContents">
   <ul>
-    <li><a href="#第二章编译和链接">第二章：编译和链接</a></li>
+    <li><a href="#1-编译链接过程图">1. 编译链接过程图</a></li>
+    <li><a href="#2-命令">2. 命令</a></li>
   </ul>
 </nav>
         </div>
@@ -283,8 +284,8 @@
     <section class="article-content">
     
     
-    <h2 id="第二章编译和链接">第二章：编译和链接</h2>
-<p><img src="https://img-blog.csdnimg.cn/2020091218042853.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzM1MzE3MDA5,size_16,color_FFFFFF,t_70#pic_center"
+    <h2 id="1-编译链接过程图">1. 编译链接过程图</h2>
+<p><img src="/%e7%bc%96%e8%af%91%e9%93%be%e6%8e%a5%e8%bf%87%e7%a8%8b%e5%9b%be.png"
 	
 	
 	
@@ -294,7 +295,44 @@
 	
 	
 ></p>
-
+<h2 id="2-命令">2. 命令</h2>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>// 预处理
+</span></span><span style="display:flex;"><span>gcc -E hello.c -o hello.i
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>// 编译
+</span></span><span style="display:flex;"><span>gcc -S hello.i -o hello.s
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>// 将汇编文件转为目标文件
+</span></span><span style="display:flex;"><span>gcc -c hello.s -o hello.o	
+</span></span><span style="display:flex;"><span>或
+</span></span><span style="display:flex;"><span>// 将源文件预编译、编译和汇编得到目标文件
+</span></span><span style="display:flex;"><span>gcc -c hello.c -o hello.o	
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>// 链接
+</span></span><span style="display:flex;"><span>// 这里...省去了需要用到的其他库，最终得到可执行文件hello
+</span></span><span style="display:flex;"><span>ld ... hello.o -o hello	
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
 </section>
 
 

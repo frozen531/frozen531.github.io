@@ -8,10 +8,10 @@
         <language>en-us</language>
         <lastBuildDate>Sun, 05 Feb 2023 10:57:37 +0800</lastBuildDate><atom:link href="https://frozen531.github.io/tags/hugo/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>Hugo搭建及基本使用</title>
-        <link>https://frozen531.github.io/post/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/hugo%E6%90%AD%E5%BB%BA%E5%8F%8A%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/</link>
+        <link>https://frozen531.github.io/post/%E5%AE%9E%E7%94%A8%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/hugo/hugo%E6%90%AD%E5%BB%BA%E5%8F%8A%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/</link>
         <pubDate>Sun, 05 Feb 2023 10:57:37 +0800</pubDate>
         
-        <guid>https://frozen531.github.io/post/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/hugo%E6%90%AD%E5%BB%BA%E5%8F%8A%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/</guid>
+        <guid>https://frozen531.github.io/post/%E5%AE%9E%E7%94%A8%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/hugo/hugo%E6%90%AD%E5%BB%BA%E5%8F%8A%E5%9F%BA%E6%9C%AC%E4%BD%BF%E7%94%A8/</guid>
         <description>&lt;p&gt;记录hugo在win11上的搭建和主题自定义。所有操作使用git bash。&lt;/p&gt;
 &lt;h2 id=&#34;1-环境搭建&#34;&gt;1. 环境搭建&lt;/h2&gt;
 &lt;h3 id=&#34;11-git&#34;&gt;1.1 git&lt;/h3&gt;

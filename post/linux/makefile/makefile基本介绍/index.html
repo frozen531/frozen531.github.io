@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='1. 工具简介 在工程文件中，按照类型、功能、模块等将源文件分布于不同的目录下，makefile的好处是描述Linux下一个工程的编译和链接规则，使工程编译自动化执行。
+2. 编写格式和规范 2.1 文件命名规则 makefile文件的命名通常为makefile和Makefile，但也可以是其他任意名字，但要通过-f执行。
+2.2 基本格式 1 2 3 4 5 6 7 目标:依赖 命令 // 如： A: B C... (tab)&amp;lt;command&amp;gt; (tab)&amp;lt;command&amp;gt; 注意：
+每个命令行前都必须键入tab； 依赖可以有多个，空格隔开； 3. 执行过程 3.1 make执行顺序 make时，默认查找顺序：当前目录下依次寻找&amp;quot;GNUmakefile&amp;quot;、&amp;ldquo;makefile&amp;quot;和&amp;quot;Makefile&amp;rdquo;，并默认生成第一个目标。
+make命令生成makefile文件中的终极目标（第一个规则） 在最上一个规则写我们最终要生成的目标文件（终极目标），对于其中的依赖项，如果没有相应文件，则向下查找生成该依赖文件的规则（子目标，为终极目标提供依赖） 1 2 3 4 5 6 7 8 9 10 11 // 可以生成hello5.o和hello5 main: hello5.o gcc hello5.o -o hello5 hello5.o :hello.c gcc -c hello.c -o hello5.o // 只能执行第一个目标格式中命令，只生成hello6.o hello6.o :hello.c gcc -c hello.c -o hello6.'>
+<title>Makefile基本介绍</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/linux/makefile/makefile%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='Makefile基本介绍'>
+<meta property='og:description' content='1. 工具简介 在工程文件中，按照类型、功能、模块等将源文件分布于不同的目录下，makefile的好处是描述Linux下一个工程的编译和链接规则，使工程编译自动化执行。
+2. 编写格式和规范 2.1 文件命名规则 makefile文件的命名通常为makefile和Makefile，但也可以是其他任意名字，但要通过-f执行。
+2.2 基本格式 1 2 3 4 5 6 7 目标:依赖 命令 // 如： A: B C... (tab)&amp;lt;command&amp;gt; (tab)&amp;lt;command&amp;gt; 注意：
+每个命令行前都必须键入tab； 依赖可以有多个，空格隔开； 3. 执行过程 3.1 make执行顺序 make时，默认查找顺序：当前目录下依次寻找&amp;quot;GNUmakefile&amp;quot;、&amp;ldquo;makefile&amp;quot;和&amp;quot;Makefile&amp;rdquo;，并默认生成第一个目标。
+make命令生成makefile文件中的终极目标（第一个规则） 在最上一个规则写我们最终要生成的目标文件（终极目标），对于其中的依赖项，如果没有相应文件，则向下查找生成该依赖文件的规则（子目标，为终极目标提供依赖） 1 2 3 4 5 6 7 8 9 10 11 // 可以生成hello5.o和hello5 main: hello5.o gcc hello5.o -o hello5 hello5.o :hello.c gcc -c hello.c -o hello5.o // 只能执行第一个目标格式中命令，只生成hello6.o hello6.o :hello.c gcc -c hello.c -o hello6.'>
+<meta property='og:url' content='https://frozen531.github.io/post/linux/makefile/makefile%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='makefile' /><meta property='article:published_time' content='2023-02-12T21:26:08&#43;08:00'/><meta property='article:modified_time' content='2023-02-12T21:26:08&#43;08:00'/>
+<meta name="twitter:title" content="Makefile基本介绍">
+<meta name="twitter:description" content="1. 工具简介 在工程文件中，按照类型、功能、模块等将源文件分布于不同的目录下，makefile的好处是描述Linux下一个工程的编译和链接规则，使工程编译自动化执行。
+2. 编写格式和规范 2.1 文件命名规则 makefile文件的命名通常为makefile和Makefile，但也可以是其他任意名字，但要通过-f执行。
+2.2 基本格式 1 2 3 4 5 6 7 目标:依赖 命令 // 如： A: B C... (tab)&amp;lt;command&amp;gt; (tab)&amp;lt;command&amp;gt; 注意：
+每个命令行前都必须键入tab； 依赖可以有多个，空格隔开； 3. 执行过程 3.1 make执行顺序 make时，默认查找顺序：当前目录下依次寻找&amp;quot;GNUmakefile&amp;quot;、&amp;ldquo;makefile&amp;quot;和&amp;quot;Makefile&amp;rdquo;，并默认生成第一个目标。
+make命令生成makefile文件中的终极目标（第一个规则） 在最上一个规则写我们最终要生成的目标文件（终极目标），对于其中的依赖项，如果没有相应文件，则向下查找生成该依赖文件的规则（子目标，为终极目标提供依赖） 1 2 3 4 5 6 7 8 9 10 11 // 可以生成hello5.o和hello5 main: hello5.o gcc hello5.o -o hello5 hello5.o :hello.c gcc -c hello.c -o hello5.o // 只能执行第一个目标格式中命令，只生成hello6.o hello6.o :hello.c gcc -c hello.c -o hello6.">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-工具简介">1. 工具简介</a></li>
+    <li><a href="#2-编写格式和规范">2. 编写格式和规范</a>
+      <ul>
+        <li><a href="#21-文件命名规则">2.1 文件命名规则</a></li>
+        <li><a href="#22-基本格式">2.2 基本格式</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-执行过程">3. 执行过程</a>
+      <ul>
+        <li><a href="#31-make执行顺序">3.1 make执行顺序</a></li>
+        <li><a href="#32-执行伪目标">3.2 执行伪目标</a></li>
+        <li><a href="#33-命令参数">3.3 命令参数</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-make执行步骤">4. make执行步骤</a></li>
+    <li><a href="#参考链接">参考链接</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/linux/" style="background-color: #B0C4DE; color: #fff;">
+                Linux
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/linux/makefile/makefile%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/">Makefile基本介绍</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Feb 12, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    1 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="1-工具简介">1. 工具简介</h2>
+<p>在工程文件中，按照类型、功能、模块等将源文件分布于不同的目录下，<code>makefile</code>的好处是描述Linux下一个工程的编译和链接规则，使工程编译自动化执行。</p>
+<h2 id="2-编写格式和规范">2. 编写格式和规范</h2>
+<h3 id="21-文件命名规则">2.1 文件命名规则</h3>
+<p>makefile文件的命名通常为<code>makefile</code>和<code>Makefile</code>，但也可以是其他任意名字，但要通过<code>-f</code>执行。</p>
+<h3 id="22-基本格式">2.2 基本格式</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2">目标</span><span style="color:#000;font-weight:bold">:</span><span style="color:#a61717;background-color:#e3d2d2">依赖</span>
+</span></span><span style="display:flex;"><span>	<span style="color:#a61717;background-color:#e3d2d2">命令</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 如：
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#900;font-weight:bold">A</span>: B C...
+</span></span><span style="display:flex;"><span>(tab)<span style="color:#000;font-weight:bold">&lt;</span>command<span style="color:#000;font-weight:bold">&gt;</span>
+</span></span><span style="display:flex;"><span>(tab)<span style="color:#000;font-weight:bold">&lt;</span>command<span style="color:#000;font-weight:bold">&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>注意：</p>
+<ul>
+<li>每个命令行前都必须键入<code>tab</code>；</li>
+<li>依赖可以有多个，空格隔开；</li>
+</ul>
+<h2 id="3-执行过程">3. 执行过程</h2>
+<h3 id="31-make执行顺序">3.1 make执行顺序</h3>
+<p><code>make</code>时，默认查找顺序：当前目录下依次寻找&quot;GNUmakefile&quot;、&ldquo;makefile&quot;和&quot;Makefile&rdquo;，并默认生成第一个目标。</p>
+<ul>
+<li><code>make</code>命令生成<code>makefile</code>文件中的终极目标（第一个规则）</li>
+<li>在最上一个规则写我们最终要生成的目标文件（终极目标），对于其中的依赖项，如果没有相应文件，则向下查找生成该依赖文件的规则（子目标，为终极目标提供依赖）</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 可以生成hello5.o和hello5
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#900;font-weight:bold">main</span>: hello5.o
+</span></span><span style="display:flex;"><span>     gcc hello5.o <span style="color:#000;font-weight:bold">-</span>o hello5
+</span></span><span style="display:flex;"><span>hello5.<span style="color:#900;font-weight:bold">o</span> :hello.c
+</span></span><span style="display:flex;"><span>     gcc <span style="color:#000;font-weight:bold">-</span>c hello.c <span style="color:#000;font-weight:bold">-</span>o hello5.o
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 只能执行第一个目标格式中命令，只生成hello6.o
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>hello6.<span style="color:#900;font-weight:bold">o</span> :hello.c
+</span></span><span style="display:flex;"><span>	gcc <span style="color:#000;font-weight:bold">-</span>c hello.c <span style="color:#000;font-weight:bold">-</span>o hello6.o
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">main</span>: hello6.o
+</span></span><span style="display:flex;"><span>	gcc hello6.o <span style="color:#000;font-weight:bold">-</span>o hello6
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<p>也可以指定目标，如：<code>make clean</code>。</p>
+</li>
+<li>
+<p>当有文件修改后，并不是所有的文件都会被编译，只有发生改变后的文件会重新编译一次，并且终极目标规则一定会被编译</p>
+</li>
+</ul>
+<blockquote>
+<p>对于目标是否需要重新编译更新，工作原理是文件生成时间的对比，以提高编译效率</p>
+<ol>
+<li><code>.o</code>和<code>.c</code>的时间，如果<code>.c</code>比<code>.o</code>晚，则对<code>.c</code>进行重新编译</li>
+<li>在生成终极目标（例如生成名为<code>app</code>的文件）时，<code>app</code>的时间比<code>.o</code>晚，则会重新生成一个<code>app</code>文件）</li>
+</ol>
+</blockquote>
+<h3 id="32-执行伪目标">3.2 执行伪目标</h3>
+<p>可以使用伪目标让<code>makefile</code>执行不同的操作，如：定制<code>Debug</code>和<code>Release</code>版本，清空中间生成文件，安装软件包等。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>main: hello7.o
+</span></span><span style="display:flex;"><span>	gcc hello7.o -o hello7
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>hello7.o :hello.c
+</span></span><span style="display:flex;"><span>	gcc -c hello.c -o hello7.o
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>.PHONY:clean
+</span></span><span style="display:flex;"><span>clean:
+</span></span><span style="display:flex;"><span>	rm hello7 hello7.o -f
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>由于<code>clean</code>后面没有依赖文件，所以不会顺着上面执行<code>clean</code>中的命令行</li>
+<li>执行方法：<code>make 伪目标名</code>命令执行对应的伪目标，例如<code>make clean</code></li>
+<li><code>-f</code>强制执行，不论删除的文件是否存在，就是不会有文件不存在的提示了</li>
+<li><code>.PHONY</code>声明<code>clean</code>为伪目标，不会与本地同名文件进行是否更新的比较</li>
+</ul>
+<h3 id="33-命令参数">3.3 命令参数</h3>
+<p><code>man make</code>查看选项。</p>
+<ul>
+<li>通过<code>-f</code>选项指定文件，而不在使用上面名字，例如<code>test.make </code>。</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost 01_hello_world<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># make -f test.make </span>
+</span></span><span style="display:flex;"><span>gcc hello.c -o hello2 -DDEBUG
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost 01_hello_world<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># ./hello2 </span>
+</span></span><span style="display:flex;"><span>hello world!
+</span></span><span style="display:flex;"><span>debug
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>-C</code>指定makefile路径</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost ~<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># make -C /00_test/01_hello_world/ -f test.make</span>
+</span></span><span style="display:flex;"><span>make: Entering directory <span style="color:#d14">`</span>/00_test/01_hello_world<span style="color:#d14">&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">gcc hello.c -o hello3 -DDEBUG
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">make: Leaving directory `/00_test/01_hello_world&#39;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="4-make执行步骤">4. make执行步骤</h2>
+<ol>
+<li>读入所有的makefile</li>
+<li>读入被include的其他文件</li>
+<li>初始化文件中的变量</li>
+<li>推到规则并分析规则</li>
+<li>为所有的目标文件创建依赖关系链</li>
+<li>根据依赖关系，决定哪些目标要重新生成</li>
+<li>执行生成命令</li>
+</ol>
+<p>1~5为第一阶段，6~7为第二阶段。在1~5中变量并不会马上展开，只有变量在规则中被依赖且决定要使用，变量才会展开。</p>
+<h2 id="参考链接">参考链接</h2>
+<ol>
+<li><a class="link" href="https://blog.csdn.net/Black_Cat_33/article/details/123184325"  target="_blank" rel="noopener"
+    >Makefile的使用</a></li>
+<li><a class="link" href="https://blog.csdn.net/ruglcc/article/details/7814546"  target="_blank" rel="noopener"
+    >Makefile经典教程(掌握这些足够)</a></li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/makefile/">makefile</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/linux/01_%E4%BB%A5helloworld%E4%B8%BA%E4%BE%8B%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8Dgcc%E4%B8%8Emakefile/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">01_以helloworld为例简单介绍gcc与makefile</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

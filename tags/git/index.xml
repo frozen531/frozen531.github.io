@@ -8,10 +8,10 @@
         <language>en-us</language>
         <lastBuildDate>Sat, 11 Feb 2023 14:58:36 +0800</lastBuildDate><atom:link href="https://frozen531.github.io/tags/git/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>Git常见问题</title>
-        <link>https://frozen531.github.io/post/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/git%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/</link>
+        <link>https://frozen531.github.io/post/%E5%AE%9E%E7%94%A8%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/git/git%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/</link>
         <pubDate>Sat, 11 Feb 2023 14:58:36 +0800</pubDate>
         
-        <guid>https://frozen531.github.io/post/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/git%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/</guid>
+        <guid>https://frozen531.github.io/post/%E5%AE%9E%E7%94%A8%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/git/git%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/</guid>
         <description>&lt;p&gt;win11下使用git，遇到如下问题做记录。&lt;/p&gt;
 &lt;h2 id=&#34;1-git-status中文乱码显示数字&#34;&gt;1. git status中文乱码显示数字&lt;/h2&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
@@ -51,10 +51,10 @@ Mac/Linux平台默认换行符：换行（LF），即’\n’ &lt;br&gt;
         </item>
         <item>
         <title>Git配置及常用操作</title>
-        <link>https://frozen531.github.io/post/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/git%E9%85%8D%E7%BD%AE%E5%8F%8A%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/</link>
+        <link>https://frozen531.github.io/post/%E5%AE%9E%E7%94%A8%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/git/git%E9%85%8D%E7%BD%AE%E5%8F%8A%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/</link>
         <pubDate>Fri, 10 Feb 2023 20:15:58 +0800</pubDate>
         
-        <guid>https://frozen531.github.io/post/%E5%AE%89%E8%A3%85%E9%85%8D%E7%BD%AE/git%E9%85%8D%E7%BD%AE%E5%8F%8A%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/</guid>
+        <guid>https://frozen531.github.io/post/%E5%AE%9E%E7%94%A8%E5%B7%A5%E5%85%B7%E4%BD%BF%E7%94%A8/git/git%E9%85%8D%E7%BD%AE%E5%8F%8A%E5%B8%B8%E7%94%A8%E6%93%8D%E4%BD%9C/</guid>
         <description>&lt;p&gt;git是一个分布式版本控制系统，用于记录版本信息。个人的电脑都拥有完整的版本控制库，即使没有网络也可以拉取分支、提交修改等，对别人没有任何影响，即所谓的分布式。当需要多人开发时，大家都拥有完整的版本库，只需要将各自修改推送给对方，就能相互看到。 &amp;mdash; 记录完整的文件&lt;/p&gt;
 &lt;p&gt;相比于svn(集中式版本控制系统)，所有修改都提交到一个服务器上，这样个人拉取的的分支和修改都会提交到这个服务器上，对于别人，这个修改也体现到了他的代码中，而不论这个改动是对是错。 &amp;mdash; 增量式记录&lt;/p&gt;
 &lt;h2 id=&#34;1-git基本配置&#34;&gt;1. git基本配置&lt;/h2&gt;
@@ -83,7 +83,7 @@ Mac/Linux平台默认换行符：换行（LF），即’\n’ &lt;br&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;h2 id=&#34;2-git基本理论&#34;&gt;2. git基本理论&lt;/h2&gt;
-&lt;p&gt;本地git仓库有3部分组成：工作区、暂存区和git仓库&lt;/p&gt;
+&lt;p&gt;本地git仓库有3部分组成：&lt;strong&gt;工作区&lt;/strong&gt;、&lt;strong&gt;暂存区&lt;/strong&gt;和&lt;strong&gt;git仓库&lt;/strong&gt;&lt;/p&gt;
 &lt;h3 id=&#34;21-工作区&#34;&gt;2.1 工作区&lt;/h3&gt;
 &lt;p&gt;我们写和改文件的地方。&lt;/p&gt;
 &lt;h3 id=&#34;22-暂存区&#34;&gt;2.2 暂存区&lt;/h3&gt;
@@ -147,8 +147,7 @@ Mac/Linux平台默认换行符：换行（LF），即’\n’ &lt;br&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;git reflog
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;h3 id=&#34;24-三者间的腾挪&#34;&gt;2.4 三者间的腾挪&lt;/h3&gt;
-&lt;h2 id=&#34;3-首次上传&#34;&gt;3. 首次上传&lt;/h2&gt;
+&lt;/div&gt;&lt;h2 id=&#34;3-首次上传&#34;&gt;3. 首次上传&lt;/h2&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
 &lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
 &lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
@@ -204,7 +203,15 @@ Mac/Linux平台默认换行符：换行（LF），即’\n’ &lt;br&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;h2 id=&#34;7-gitignore忽略指定文件&#34;&gt;7. .gitignore忽略指定文件&lt;/h2&gt;
-&lt;p&gt;在.git同级目录下创建.gitignore文件，可在该文件下添加git需要忽略的文件。&lt;/p&gt;
+&lt;p&gt;在.git同级目录下创建.gitignore文件，可在该文件下添加git需要忽略的文件。.gitignore 可以使用标准的 glob 模式匹配（glob 模式是指 shell 所使用的简化了的正则表达式）：&lt;/p&gt;
+&lt;p&gt;所有空行或者以注释符号 # 开头的行都会被 Git 忽略；&lt;br&gt;
+星号（*）匹配零个或多个任意字符；&lt;br&gt;
+[abc] 匹配任何一个列在方括号中的字符；&lt;br&gt;
+问号（?）只匹配一个任意字符；&lt;br&gt;
+[a-z] 匹配所有在这两个字符范围内的字符；&lt;br&gt;
+匹配模式最后跟反斜杠（/）说明要忽略的是目录；&lt;br&gt;
+匹配模式以反斜杠（/）开头说明防止递归；&lt;br&gt;
+要忽略指定模式以外的文件或目录，可以在模式前加上惊叹号（!）取反。&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
 &lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
 &lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
@@ -215,10 +222,15 @@ Mac/Linux平台默认换行符：换行（LF），即’\n’ &lt;br&gt;
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;public/
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;h2 id=&#34;6-分支操作&#34;&gt;6. 分支操作&lt;/h2&gt;
-&lt;h2 id=&#34;参考链接&#34;&gt;参考链接&lt;/h2&gt;
-&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://fishc.com.cn/forum-334-1.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
-    &gt;《极客Python之Git实用教程》 &lt;/a&gt;&lt;/p&gt;
+&lt;/div&gt;&lt;h2 id=&#34;参考链接&#34;&gt;参考链接&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://fishc.com.cn/forum-334-1.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;《极客Python之Git实用教程》 &lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.cnblogs.com/uoky/p/16614929.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;git重命名文件夹&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://github.com/github/gitignore&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;gitignore&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
 </description>
         </item>
         
