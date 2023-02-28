@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='字符串操作 正则表达式 正则表达式 通配符 用来在文件中匹配符合条件的字符串 用来匹配符合条件的文件名 包含匹配 完全匹配 注意与通配符的区别。
+字符截取命令：cut 使用grep提取行，通过cut提取列，两者常结合使用
+1 2 3 4 5 #基本用法 cut [选项] 文件名 #举例，以:为分隔符，列出文件中的第一、三列 [root@localhost 03_make_set]# cut -d &amp;#34;:&amp;#34; -f 1,3 /etc/passwd 选项 说明 -f value 提取第几列 -d value 按照指定分隔符分隔列 只能用于tab或明确的分隔符，如:，对于空格不行
+字符截取命令：printf 1 2 3 4 5 6 7 #基本格式：格式化输出命令 printf &amp;#39;输出类型输出格式&amp;#39; 要做格式化输出的内容 #举例，输出字符串，中间空格隔开，每三个为一行 [root@localhost 03_make_set]# printf &amp;#39;%s %s %s\n&amp;#39; 1 2 3 4 5 1 2 3 4 5 输出类型 说明 %ns 输出字符串。 n是数字指代输出几个字符 %ni 输出整数。 n是数字指代输出几个数字 %m.'>
+<title>Shell字符串操作</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/linux/shell/shell%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%93%8D%E4%BD%9C/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='Shell字符串操作'>
+<meta property='og:description' content='字符串操作 正则表达式 正则表达式 通配符 用来在文件中匹配符合条件的字符串 用来匹配符合条件的文件名 包含匹配 完全匹配 注意与通配符的区别。
+字符截取命令：cut 使用grep提取行，通过cut提取列，两者常结合使用
+1 2 3 4 5 #基本用法 cut [选项] 文件名 #举例，以:为分隔符，列出文件中的第一、三列 [root@localhost 03_make_set]# cut -d &amp;#34;:&amp;#34; -f 1,3 /etc/passwd 选项 说明 -f value 提取第几列 -d value 按照指定分隔符分隔列 只能用于tab或明确的分隔符，如:，对于空格不行
+字符截取命令：printf 1 2 3 4 5 6 7 #基本格式：格式化输出命令 printf &amp;#39;输出类型输出格式&amp;#39; 要做格式化输出的内容 #举例，输出字符串，中间空格隔开，每三个为一行 [root@localhost 03_make_set]# printf &amp;#39;%s %s %s\n&amp;#39; 1 2 3 4 5 1 2 3 4 5 输出类型 说明 %ns 输出字符串。 n是数字指代输出几个字符 %ni 输出整数。 n是数字指代输出几个数字 %m.'>
+<meta property='og:url' content='https://frozen531.github.io/post/linux/shell/shell%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%93%8D%E4%BD%9C/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Shell' /><meta property='article:published_time' content='2023-02-28T22:22:34&#43;08:00'/><meta property='article:modified_time' content='2023-02-28T22:22:34&#43;08:00'/>
+<meta name="twitter:title" content="Shell字符串操作">
+<meta name="twitter:description" content="字符串操作 正则表达式 正则表达式 通配符 用来在文件中匹配符合条件的字符串 用来匹配符合条件的文件名 包含匹配 完全匹配 注意与通配符的区别。
+字符截取命令：cut 使用grep提取行，通过cut提取列，两者常结合使用
+1 2 3 4 5 #基本用法 cut [选项] 文件名 #举例，以:为分隔符，列出文件中的第一、三列 [root@localhost 03_make_set]# cut -d &amp;#34;:&amp;#34; -f 1,3 /etc/passwd 选项 说明 -f value 提取第几列 -d value 按照指定分隔符分隔列 只能用于tab或明确的分隔符，如:，对于空格不行
+字符截取命令：printf 1 2 3 4 5 6 7 #基本格式：格式化输出命令 printf &amp;#39;输出类型输出格式&amp;#39; 要做格式化输出的内容 #举例，输出字符串，中间空格隔开，每三个为一行 [root@localhost 03_make_set]# printf &amp;#39;%s %s %s\n&amp;#39; 1 2 3 4 5 1 2 3 4 5 输出类型 说明 %ns 输出字符串。 n是数字指代输出几个字符 %ni 输出整数。 n是数字指代输出几个数字 %m.">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#字符串操作">字符串操作</a>
+      <ul>
+        <li><a href="#正则表达式">正则表达式</a></li>
+        <li><a href="#字符截取命令cut">字符截取命令：cut</a></li>
+        <li><a href="#字符截取命令printf">字符截取命令：printf</a></li>
+        <li><a href="#字符截取命令awk">字符截取命令：awk</a></li>
+        <li><a href="#字符截取命令sed">字符截取命令：sed</a></li>
+        <li><a href="#字符处理命令sort">字符处理命令：sort</a></li>
+        <li><a href="#字符处理命令wc">字符处理命令：wc</a></li>
+      </ul>
+    </li>
+    <li><a href="#学习链接">学习链接</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/linux/" style="background-color: #B0C4DE; color: #fff;">
+                Linux
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/linux/shell/shell%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%93%8D%E4%BD%9C/">Shell字符串操作</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Feb 28, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    2 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="字符串操作">字符串操作</h2>
+<h3 id="正则表达式">正则表达式</h3>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>正则表达式</th>
+<th>通配符</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>用来在文件中匹配符合条件的字符串</td>
+<td>用来匹配符合条件的文件名</td>
+</tr>
+<tr>
+<td>包含匹配</td>
+<td>完全匹配</td>
+</tr>
+</tbody>
+</table></div>
+<p><img src="/shell%e5%9f%ba%e7%a1%80_%e5%9f%ba%e7%a1%80%e6%ad%a3%e5%88%99%e8%a1%a8%e8%be%be%e5%bc%8f.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="shell基础_基础正则表达式"
+	
+	
+></p>
+<p>注意与通配符的区别。</p>
+<h3 id="字符截取命令cut">字符截取命令：cut</h3>
+<p>使用<code>grep</code>提取行，通过cut提取列，两者常结合使用</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic">#基本用法</span>
+</span></span><span style="display:flex;"><span>cut <span style="color:#000;font-weight:bold">[</span>选项<span style="color:#000;font-weight:bold">]</span> 文件名
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#举例，以:为分隔符，列出文件中的第一、三列</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost 03_make_set<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># cut -d &#34;:&#34; -f 1,3 /etc/passwd</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-f value</td>
+<td>提取第几列</td>
+</tr>
+<tr>
+<td>-d value</td>
+<td>按照指定分隔符分隔列</td>
+</tr>
+</tbody>
+</table></div>
+<p>只能用于tab或明确的分隔符，如:，对于空格不行</p>
+<h3 id="字符截取命令printf">字符截取命令：printf</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic">#基本格式：格式化输出命令</span>
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">printf</span> <span style="color:#d14">&#39;输出类型输出格式&#39;</span> 要做格式化输出的内容
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#举例，输出字符串，中间空格隔开，每三个为一行</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost 03_make_set<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># printf &#39;%s %s %s\n&#39; 1 2 3 4 5 </span>
+</span></span><span style="display:flex;"><span><span style="color:#099">1</span> <span style="color:#099">2</span> <span style="color:#099">3</span>
+</span></span><span style="display:flex;"><span><span style="color:#099">4</span> <span style="color:#099">5</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>输出类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>%ns</td>
+<td>输出字符串。 n是数字指代输出几个字符</td>
+</tr>
+<tr>
+<td>%ni</td>
+<td>输出整数。 n是数字指代输出几个数字</td>
+</tr>
+<tr>
+<td>%m.nf</td>
+<td>输出浮点数。 m和n是数字， 指代输出的整数位数和小数位数。 如%8.2f代表共输出8位数，其中2位是小数， 6位是整数。</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>输出格式</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>\a</td>
+<td>输出警告声音</td>
+</tr>
+<tr>
+<td>\b</td>
+<td>输出退格键， 也就是Backspace键</td>
+</tr>
+<tr>
+<td>\f</td>
+<td>清除屏幕</td>
+</tr>
+<tr>
+<td>\n（常用）</td>
+<td>换行</td>
+</tr>
+<tr>
+<td>\r（常用）</td>
+<td>回车， 也就是Enter键</td>
+</tr>
+<tr>
+<td>\t（常用）</td>
+<td>水平输出退格键， 也就是Tab键</td>
+</tr>
+<tr>
+<td>\v</td>
+<td>垂直输出退格键， 也就是Tab键</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="字符截取命令awk">字符截取命令：awk</h3>
+<p>awk中不能用cat和echo，只能用printf和print(Linux默认没有)。print相比printf，会自动在行尾添加换行符，而printf需要手动添加。</p>
+<p>同cut功能，截取符合条件的列，没有cut的局限性且可以运行命令，比cut强大很多。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic">#基本格式，其中条件可以是关系表达式，动作可以是格式化说出、流程控制等语句，默认识别的分隔符还tab和空格</span>
+</span></span><span style="display:flex;"><span> awk <span style="color:#d14">&#39;条件1{动作1} 条件2{动作2}…&#39;</span> 文件名
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#举例，svn info信息中截取版本号</span>
+</span></span><span style="display:flex;"><span><span style="color:#008080">svn_version</span><span style="color:#000;font-weight:bold">=</span><span style="color:#000;font-weight:bold">$(</span>svn info | grep <span style="color:#d14">&#34;Last Changed Rev:&#34;</span> | awk -F <span style="color:#d14">&#39;: &#39;</span> <span style="color:#d14">&#39;{print $2}&#39;</span><span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#输出df中第一列和第5列</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost 03_make_set<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># df -h | awk &#39;{print $1 &#34;\t&#34; $5}&#39;</span>
+</span></span><span style="display:flex;"><span>文件系统        已用%%
+</span></span><span style="display:flex;"><span>/dev/sda5       13%
+</span></span><span style="display:flex;"><span>tmpfs   0%
+</span></span><span style="display:flex;"><span>/dev/sda1       15%
+</span></span><span style="display:flex;"><span>/dev/sda2       2%
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="字符截取命令sed">字符截取命令：sed</h3>
+<p>sed可以将数据进行选取、替换、删除和新增命令。是一种轻量级流编辑器，可接收<code>|</code>的输入。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic">#基本格式</span>
+</span></span><span style="display:flex;"><span>sed <span style="color:#000;font-weight:bold">[</span>选项<span style="color:#000;font-weight:bold">]</span> <span style="color:#d14">&#39;[动作]&#39;</span> 文件名
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#举例</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost 03_make_set<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># df -h | sed -n &#39;2p&#39;</span>
+</span></span><span style="display:flex;"><span>/dev/sda5              17G  2.0G   14G  13% /
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-n</td>
+<td>一般sed命令会把所有数据都输出到屏幕 ，如果加入此选择，则只会把经过sed命令处理的行输出到屏幕。</td>
+</tr>
+<tr>
+<td>-e</td>
+<td>允许对输入数据应用多条sed命令编辑</td>
+</tr>
+<tr>
+<td>-i</td>
+<td>用sed的修改结果直接修改读取数据的文件，而不是由屏幕输出</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>动作</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>a \</td>
+<td>追加，在当前行后添加一行或多行。添加多行时，除最后 一行外，每行末尾需要用“\”代表数据未完结。</td>
+</tr>
+<tr>
+<td>c \</td>
+<td>行替换，用c后面的字符串替换原数据行，替换多行时，除最后一行外，每行末尾需用“\”代表数据未完结。</td>
+</tr>
+<tr>
+<td>i \</td>
+<td>插入，在当期行前插入一行或多行。插入多行时，除最后 一行外，每行末尾需要用“\”代表数据未完结。</td>
+</tr>
+<tr>
+<td>d</td>
+<td>删除，删除指定的行。</td>
+</tr>
+<tr>
+<td>p</td>
+<td>打印，输出指定的行。</td>
+</tr>
+<tr>
+<td>s</td>
+<td>字串替换，用一个字符串替换另外一个字符串。格式为“行范围s/旧字串/新字串/g”（和vim中的替换格式类似） 。</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="字符处理命令sort">字符处理命令：sort</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic">#基本用法</span>
+</span></span><span style="display:flex;"><span>sort <span style="color:#000;font-weight:bold">[</span>选项<span style="color:#000;font-weight:bold">]</span> 文件名
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#举例</span>
+</span></span><span style="display:flex;"><span>sort /etc/passwd
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-f</td>
+<td>忽略大小写</td>
+</tr>
+<tr>
+<td>-n</td>
+<td>以数值型进行排序，默认使用字符串型排序</td>
+</tr>
+<tr>
+<td>-r</td>
+<td>反向排序</td>
+</tr>
+<tr>
+<td>-t</td>
+<td>指定分隔符，默认是分隔符是制表符</td>
+</tr>
+<tr>
+<td>-k n[,m]</td>
+<td>按照指定的字段范围排序。从第n字段开始，m字段结束（默认到行尾）</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="字符处理命令wc">字符处理命令：wc</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic">#基本用法</span>
+</span></span><span style="display:flex;"><span>wc <span style="color:#000;font-weight:bold">[</span>选项<span style="color:#000;font-weight:bold">]</span> 文件名
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#举例，默认直接列出所有统计信息：29行、52个单词、1412个字符</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost 03_make_set<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># wc /etc/passwd</span>
+</span></span><span style="display:flex;"><span>  <span style="color:#099">29</span>   <span style="color:#099">52</span> <span style="color:#099">1412</span> /etc/passwd
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>选项</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>-l</td>
+<td>只统计行数</td>
+</tr>
+<tr>
+<td>-w</td>
+<td>只统计单词数</td>
+</tr>
+<tr>
+<td>-m</td>
+<td>只统计字符数</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="学习链接">学习链接</h2>
+<ol>
+<li><a class="link" href="https://www.bilibili.com/video/BV1mW411i7Qf?p=63&amp;vd_source=b6daecdfe358d06b1107a6d13e19fe3f"  target="_blank" rel="noopener"
+    >史上最牛的Linux视频教程—兄弟连</a></li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/shell/">Shell</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/linux/shell/shell%E5%8F%98%E9%87%8F%E5%8F%8A%E8%BF%90%E7%AE%97%E7%AC%A6/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Shell变量及运算符</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/linux/shell/shell%E6%9D%A1%E4%BB%B6%E5%88%A4%E6%96%AD%E5%BC%8F%E5%8F%8A%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6%E8%AF%AD%E5%8F%A5/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Shell条件判断式及流程控制语句</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/linux/shell/shell%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Shell常见问题</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/linux/shell/shell%E5%9F%BA%E7%A1%80/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">Shell基础</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

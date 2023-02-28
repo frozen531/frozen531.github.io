@@ -18,11 +18,10 @@
 &lt;li&gt;变量定义。变量可以是空、一项或多项，等号左右两边空格无要求。&lt;/li&gt;
 &lt;li&gt;变量区分大小写，推荐内部定义的一般变量用小写。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;h3 id=&#34;11-自定义变量&#34;&gt;1.1 自定义变量&lt;/h3&gt;
+&lt;h3 id=&#34;11-自定义变量与引用&#34;&gt;1.1 自定义变量与引用&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;定义变量（通常小写）&lt;/li&gt;
 &lt;li&gt;变量名=值1 值2 &amp;hellip;&lt;/li&gt;
-&lt;li&gt;使用变量 &lt;code&gt;$(变量名)&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
 &lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
@@ -43,8 +42,9 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;ul&gt;
-&lt;li&gt;变量使用，可以通过&lt;code&gt;$(name)&lt;/code&gt;和&lt;code&gt;${name}&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;变量引用&lt;/li&gt;
 &lt;/ul&gt;
+&lt;p&gt;makefile可以通过&lt;code&gt;$(name)&lt;/code&gt;和&lt;code&gt;${name}&lt;/code&gt;对变量进行引用，当然也可以直接使用&lt;code&gt;$x&lt;/code&gt;，但变量名必须为单字符。多字符则必须使用&lt;code&gt;()&lt;/code&gt;和&lt;code&gt;{}&lt;/code&gt;，否则make将会把变量名首字符作为变量而不是整个字符串，即&lt;code&gt;$PATH&lt;/code&gt;意为&lt;code&gt;$(P)ATH&lt;/code&gt;。这点不同于shell中变量的引用。&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
 &lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
 &lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
@@ -200,10 +200,50 @@
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;WORK_PATH?&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt;/00_test/src
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;h2 id=&#34;参考链接&#34;&gt;参考链接&lt;/h2&gt;
+&lt;/div&gt;&lt;h2 id=&#34;5-变量匹配符&#34;&gt;5. 变量匹配符%&lt;/h2&gt;
+&lt;p&gt;有时候文件命名具有一定的格式，那么我们可以使用&lt;code&gt;%&lt;/code&gt;来进行匹配和提取。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;11
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;12
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;13
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;14
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;foo :&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; a.c b.c c.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;libs :&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;$(&lt;/span&gt;foo:%.c&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt;lib%.a&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;bar :&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;$(&lt;/span&gt;libs:lib%.a&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt;%.o&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;test:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        @echo &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;$(&lt;/span&gt;foo&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        @echo &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;$(&lt;/span&gt;libs&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        @echo &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;$(&lt;/span&gt;bar&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;#结果&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;root@localhost 03_make_set&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;# make&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;a.c b.c c.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;liba.a libb.a libc.a
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;a.o b.o c.o
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;对于&lt;code&gt;foo&lt;/code&gt;，表示一个包含源文件的列表，那么可以通过&lt;code&gt;%&lt;/code&gt;生成对应的&lt;code&gt;.a&lt;/code&gt;文件列表，&lt;code&gt;.o&lt;/code&gt;文件列表。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;libs := $(foo:%.c=lib%.a)&lt;/code&gt;表示将&lt;code&gt;foo&lt;/code&gt;匹配&lt;code&gt;%.c&lt;/code&gt;格式，&lt;code&gt;%&lt;/code&gt;匹配到的是&lt;code&gt;a b c&lt;/code&gt;，然后替换等号后面的&lt;code&gt;%&lt;/code&gt;，所以&lt;code&gt;libs&lt;/code&gt;结果是&lt;code&gt;liba.a libb.a libc.a&lt;/code&gt;。&lt;code&gt;bar&lt;/code&gt;同上。&lt;/p&gt;
+&lt;h2 id=&#34;参考链接&#34;&gt;参考链接&lt;/h2&gt;
 &lt;ol&gt;
 &lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/qq_42746890/article/details/123580251&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
     &gt;Makefile变量的定义和使用&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;http://www.360doc.com/content/09/0609/16/36491_3830318.shtml&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Makefile中的变量&lt;/a&gt;&lt;/li&gt;
 &lt;/ol&gt;
 </description>
         </item>
@@ -765,10 +805,10 @@
         </item>
         <item>
         <title>01_以helloworld为例简单介绍gcc与makefile</title>
-        <link>https://frozen531.github.io/post/linux/01_%E4%BB%A5helloworld%E4%B8%BA%E4%BE%8B%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8Dgcc%E4%B8%8Emakefile/</link>
+        <link>https://frozen531.github.io/post/linux/gcc/01_%E4%BB%A5helloworld%E4%B8%BA%E4%BE%8B%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8Dgcc%E4%B8%8Emakefile/</link>
         <pubDate>Sun, 12 Feb 2023 20:57:53 +0800</pubDate>
         
-        <guid>https://frozen531.github.io/post/linux/01_%E4%BB%A5helloworld%E4%B8%BA%E4%BE%8B%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8Dgcc%E4%B8%8Emakefile/</guid>
+        <guid>https://frozen531.github.io/post/linux/gcc/01_%E4%BB%A5helloworld%E4%B8%BA%E4%BE%8B%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8Dgcc%E4%B8%8Emakefile/</guid>
         <description>&lt;h2 id=&#34;1-helloc&#34;&gt;1. hello.c&lt;/h2&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
 &lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;

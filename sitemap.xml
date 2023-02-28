@@ -3,13 +3,31 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://frozen531.github.io/</loc>
-    <lastmod>2023-02-23T22:30:25+08:00</lastmod>
+    <lastmod>2023-02-28T22:22:34+08:00</lastmod>
   </url><url>
     <loc>https://frozen531.github.io/categories/</loc>
-    <lastmod>2023-02-23T22:30:25+08:00</lastmod>
+    <lastmod>2023-02-28T22:22:34+08:00</lastmod>
   </url><url>
     <loc>https://frozen531.github.io/categories/linux/</loc>
-    <lastmod>2023-02-23T22:30:25+08:00</lastmod>
+    <lastmod>2023-02-28T22:22:34+08:00</lastmod>
+  </url><url>
+    <loc>https://frozen531.github.io/post/</loc>
+    <lastmod>2023-02-28T22:22:34+08:00</lastmod>
+  </url><url>
+    <loc>https://frozen531.github.io/tags/shell/</loc>
+    <lastmod>2023-02-28T22:22:34+08:00</lastmod>
+  </url><url>
+    <loc>https://frozen531.github.io/post/linux/shell/shell%E5%AD%97%E7%AC%A6%E4%B8%B2%E6%93%8D%E4%BD%9C/</loc>
+    <lastmod>2023-02-28T22:22:34+08:00</lastmod>
+  </url><url>
+    <loc>https://frozen531.github.io/tags/</loc>
+    <lastmod>2023-02-28T22:22:34+08:00</lastmod>
+  </url><url>
+    <loc>https://frozen531.github.io/post/linux/shell/shell%E5%8F%98%E9%87%8F%E5%8F%8A%E8%BF%90%E7%AE%97%E7%AC%A6/</loc>
+    <lastmod>2023-02-28T22:16:27+08:00</lastmod>
+  </url><url>
+    <loc>https://frozen531.github.io/post/linux/shell/shell%E6%9D%A1%E4%BB%B6%E5%88%A4%E6%96%AD%E5%BC%8F%E5%8F%8A%E6%B5%81%E7%A8%8B%E6%8E%A7%E5%88%B6%E8%AF%AD%E5%8F%A5/</loc>
+    <lastmod>2023-02-28T22:07:31+08:00</lastmod>
   </url><url>
     <loc>https://frozen531.github.io/tags/makefile/</loc>
     <lastmod>2023-02-23T22:30:25+08:00</lastmod>
@@ -17,20 +35,11 @@
     <loc>https://frozen531.github.io/post/linux/makefile/makefile%E5%8F%98%E9%87%8F/</loc>
     <lastmod>2023-02-23T22:30:25+08:00</lastmod>
   </url><url>
-    <loc>https://frozen531.github.io/post/</loc>
-    <lastmod>2023-02-23T22:30:25+08:00</lastmod>
-  </url><url>
-    <loc>https://frozen531.github.io/tags/</loc>
-    <lastmod>2023-02-23T22:30:25+08:00</lastmod>
-  </url><url>
     <loc>https://frozen531.github.io/post/linux/makefile/makefile%E5%87%BD%E6%95%B0%E4%BD%BF%E7%94%A8/</loc>
     <lastmod>2023-02-23T22:26:51+08:00</lastmod>
   </url><url>
     <loc>https://frozen531.github.io/post/linux/makefile/makefile%E6%A8%A1%E6%9D%BF/</loc>
     <lastmod>2023-02-22T18:55:54+08:00</lastmod>
-  </url><url>
-    <loc>https://frozen531.github.io/tags/shell/</loc>
-    <lastmod>2023-02-16T22:33:39+08:00</lastmod>
   </url><url>
     <loc>https://frozen531.github.io/post/linux/shell/shell%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/</loc>
     <lastmod>2023-02-16T22:33:39+08:00</lastmod>
@@ -56,13 +65,13 @@
     <loc>https://frozen531.github.io/post/linux/makefile/makefile%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/</loc>
     <lastmod>2023-02-12T21:26:08+08:00</lastmod>
   </url><url>
-    <loc>https://frozen531.github.io/post/linux/02_%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5%E9%9D%99%E6%80%81%E5%BA%93%E4%B8%8E%E5%8A%A8%E6%80%81%E5%BA%93/</loc>
+    <loc>https://frozen531.github.io/post/linux/gcc/02_%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5%E9%9D%99%E6%80%81%E5%BA%93%E4%B8%8E%E5%8A%A8%E6%80%81%E5%BA%93/</loc>
     <lastmod>2023-02-12T21:11:06+08:00</lastmod>
   </url><url>
     <loc>https://frozen531.github.io/tags/gcc/</loc>
     <lastmod>2023-02-12T21:11:06+08:00</lastmod>
   </url><url>
-    <loc>https://frozen531.github.io/post/linux/01_%E4%BB%A5helloworld%E4%B8%BA%E4%BE%8B%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8Dgcc%E4%B8%8Emakefile/</loc>
+    <loc>https://frozen531.github.io/post/linux/gcc/01_%E4%BB%A5helloworld%E4%B8%BA%E4%BE%8B%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8Dgcc%E4%B8%8Emakefile/</loc>
     <lastmod>2023-02-12T20:57:53+08:00</lastmod>
   </url><url>
     <loc>https://frozen531.github.io/tags/git/</loc>

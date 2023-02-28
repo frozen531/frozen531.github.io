@@ -8,10 +8,10 @@
         <language>en-us</language>
         <lastBuildDate>Sun, 12 Feb 2023 21:11:06 +0800</lastBuildDate><atom:link href="https://frozen531.github.io/tags/gcc/index.xml" rel="self" type="application/rss+xml" /><item>
         <title>02_编译链接静态库与动态库</title>
-        <link>https://frozen531.github.io/post/linux/02_%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5%E9%9D%99%E6%80%81%E5%BA%93%E4%B8%8E%E5%8A%A8%E6%80%81%E5%BA%93/</link>
+        <link>https://frozen531.github.io/post/linux/gcc/02_%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5%E9%9D%99%E6%80%81%E5%BA%93%E4%B8%8E%E5%8A%A8%E6%80%81%E5%BA%93/</link>
         <pubDate>Sun, 12 Feb 2023 21:11:06 +0800</pubDate>
         
-        <guid>https://frozen531.github.io/post/linux/02_%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5%E9%9D%99%E6%80%81%E5%BA%93%E4%B8%8E%E5%8A%A8%E6%80%81%E5%BA%93/</guid>
+        <guid>https://frozen531.github.io/post/linux/gcc/02_%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5%E9%9D%99%E6%80%81%E5%BA%93%E4%B8%8E%E5%8A%A8%E6%80%81%E5%BA%93/</guid>
         <description>&lt;h2 id=&#34;环境说明&#34;&gt;环境说明&lt;/h2&gt;
 &lt;p&gt;环境说明：Centos6.3+gcc 4.4.6&lt;/p&gt;
 &lt;h2 id=&#34;1-编译&#34;&gt;1. 编译&lt;/h2&gt;
@@ -535,10 +535,10 @@
         </item>
         <item>
         <title>01_以helloworld为例简单介绍gcc与makefile</title>
-        <link>https://frozen531.github.io/post/linux/01_%E4%BB%A5helloworld%E4%B8%BA%E4%BE%8B%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8Dgcc%E4%B8%8Emakefile/</link>
+        <link>https://frozen531.github.io/post/linux/gcc/01_%E4%BB%A5helloworld%E4%B8%BA%E4%BE%8B%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8Dgcc%E4%B8%8Emakefile/</link>
         <pubDate>Sun, 12 Feb 2023 20:57:53 +0800</pubDate>
         
-        <guid>https://frozen531.github.io/post/linux/01_%E4%BB%A5helloworld%E4%B8%BA%E4%BE%8B%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8Dgcc%E4%B8%8Emakefile/</guid>
+        <guid>https://frozen531.github.io/post/linux/gcc/01_%E4%BB%A5helloworld%E4%B8%BA%E4%BE%8B%E7%AE%80%E5%8D%95%E4%BB%8B%E7%BB%8Dgcc%E4%B8%8Emakefile/</guid>
         <description>&lt;h2 id=&#34;1-helloc&#34;&gt;1. hello.c&lt;/h2&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
 &lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
