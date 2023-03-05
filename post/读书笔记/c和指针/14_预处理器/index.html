@@ -1,0 +1,864 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='预处理器 1. 预处理介绍 预处理是源代码编译之前进行的文本性质的操作 主要包括： 删除注释 插入#include包含的文件内容 定义和替换#define指令定义的符号 根据条件编译指令进行编译
+2. 预定义符号 由预处理器定义的符号 符号 样例 含义 __FILE__ &amp;quot;name.c&amp;quot; 进行编译的源文件名 __LINE__ 25 文件当前行的行号 __DATE__ &amp;quot;Jan 31 1997&amp;quot; 文件被编译的日期 __TIME__ &amp;quot;18:04:30&amp;quot; 文件被编译的时间 3. 预处理指令 🍉3.1 #define 命名约定全部使用大写字母 #define语句不加;，是因为在进行文本替换时，代码中会加; 将任何文本替换到程序中，包括： 数值字面值常量 #define MAX 15 以定义的类型名 #define REG register 语句 #define CASE break;case 1 2 3 4 5 6 7 8 9 10 // 下面的定义是用来调试打印 #define DEBUG_PRINT printf(&amp;#34;File %s line %d:&amp;#34; \ &amp;#34;x = %d, y = %d, z = %d&amp;#34;, \ __FILE__, __LINE__, \ z, y, z) x *= 2; y &#43;= x; z = x * y; DEBUG_PRINT; 宏定义，加入参数#define name(para-list) stuff 3.'>
+<title>14_预处理器</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/14_%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='14_预处理器'>
+<meta property='og:description' content='预处理器 1. 预处理介绍 预处理是源代码编译之前进行的文本性质的操作 主要包括： 删除注释 插入#include包含的文件内容 定义和替换#define指令定义的符号 根据条件编译指令进行编译
+2. 预定义符号 由预处理器定义的符号 符号 样例 含义 __FILE__ &amp;quot;name.c&amp;quot; 进行编译的源文件名 __LINE__ 25 文件当前行的行号 __DATE__ &amp;quot;Jan 31 1997&amp;quot; 文件被编译的日期 __TIME__ &amp;quot;18:04:30&amp;quot; 文件被编译的时间 3. 预处理指令 🍉3.1 #define 命名约定全部使用大写字母 #define语句不加;，是因为在进行文本替换时，代码中会加; 将任何文本替换到程序中，包括： 数值字面值常量 #define MAX 15 以定义的类型名 #define REG register 语句 #define CASE break;case 1 2 3 4 5 6 7 8 9 10 // 下面的定义是用来调试打印 #define DEBUG_PRINT printf(&amp;#34;File %s line %d:&amp;#34; \ &amp;#34;x = %d, y = %d, z = %d&amp;#34;, \ __FILE__, __LINE__, \ z, y, z) x *= 2; y &#43;= x; z = x * y; DEBUG_PRINT; 宏定义，加入参数#define name(para-list) stuff 3.'>
+<meta property='og:url' content='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/14_%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='C和指针' /><meta property='article:published_time' content='2023-03-05T21:22:13&#43;08:00'/><meta property='article:modified_time' content='2023-03-05T21:22:13&#43;08:00'/>
+<meta name="twitter:title" content="14_预处理器">
+<meta name="twitter:description" content="预处理器 1. 预处理介绍 预处理是源代码编译之前进行的文本性质的操作 主要包括： 删除注释 插入#include包含的文件内容 定义和替换#define指令定义的符号 根据条件编译指令进行编译
+2. 预定义符号 由预处理器定义的符号 符号 样例 含义 __FILE__ &amp;quot;name.c&amp;quot; 进行编译的源文件名 __LINE__ 25 文件当前行的行号 __DATE__ &amp;quot;Jan 31 1997&amp;quot; 文件被编译的日期 __TIME__ &amp;quot;18:04:30&amp;quot; 文件被编译的时间 3. 预处理指令 🍉3.1 #define 命名约定全部使用大写字母 #define语句不加;，是因为在进行文本替换时，代码中会加; 将任何文本替换到程序中，包括： 数值字面值常量 #define MAX 15 以定义的类型名 #define REG register 语句 #define CASE break;case 1 2 3 4 5 6 7 8 9 10 // 下面的定义是用来调试打印 #define DEBUG_PRINT printf(&amp;#34;File %s line %d:&amp;#34; \ &amp;#34;x = %d, y = %d, z = %d&amp;#34;, \ __FILE__, __LINE__, \ z, y, z) x *= 2; y &#43;= x; z = x * y; DEBUG_PRINT; 宏定义，加入参数#define name(para-list) stuff 3.">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-预处理介绍">1. 预处理介绍</a></li>
+    <li><a href="#2-预定义符号">2. 预定义符号</a></li>
+    <li><a href="#3-预处理指令">3. 预处理指令</a>
+      <ul>
+        <li><a href="#31-define">🍉3.1 #define</a></li>
+        <li><a href="#32-undef">🍉3.2 #undef</a></li>
+        <li><a href="#33-条件编译">🍉3.3 条件编译</a></li>
+        <li><a href="#34-include">🍉3.4 #include</a></li>
+        <li><a href="#35其他指令">🍉3.5其他指令</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="background-color: #c1c1f6; color: #fff;">
+                读书笔记
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/14_%E9%A2%84%E5%A4%84%E7%90%86%E5%99%A8/">14_预处理器</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 05, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    3 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="预处理器">预处理器</h1>
+<h2 id="1-预处理介绍">1. 预处理介绍</h2>
+<ul>
+<li>预处理是源代码编译之前进行的文本性质的操作</li>
+<li>主要包括：</li>
+</ul>
+<blockquote>
+<p>删除注释<!-- raw HTML omitted -->
+插入<code>#include</code>包含的文件内容<!-- raw HTML omitted -->
+定义和替换<code>#define</code>指令定义的符号<!-- raw HTML omitted -->
+根据条件编译指令进行编译</p>
+</blockquote>
+<h2 id="2-预定义符号">2. 预定义符号</h2>
+<ul>
+<li>由预处理器定义的符号</li>
+</ul>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>符号</th>
+<th>样例</th>
+<th>含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>__FILE__</code></td>
+<td><code>&quot;name.c&quot;</code></td>
+<td>进行编译的源文件名</td>
+</tr>
+<tr>
+<td><code>__LINE__</code></td>
+<td><code>25</code></td>
+<td>文件当前行的行号</td>
+</tr>
+<tr>
+<td><code>__DATE__</code></td>
+<td><code>&quot;Jan 31 1997&quot;</code></td>
+<td>文件被编译的日期</td>
+</tr>
+<tr>
+<td><code>__TIME__</code></td>
+<td><code>&quot;18:04:30&quot;</code></td>
+<td>文件被编译的时间</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="3-预处理指令">3. 预处理指令</h2>
+<h3 id="31-define">🍉3.1 #define</h3>
+<ul>
+<li>命名约定全部使用大写字母</li>
+<li><code>#define</code>语句不加<code>;</code>，是因为在进行文本替换时，代码中会加<code>;</code></li>
+<li>将任何文本替换到程序中，包括：</li>
+</ul>
+<blockquote>
+<ol>
+<li>数值字面值常量 <code>#define MAX 15</code></li>
+<li>以定义的类型名 <code>#define REG register</code></li>
+<li>语句 <code>#define CASE break;case</code></li>
+</ol>
+</blockquote>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 下面的定义是用来调试打印
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#999;font-weight:bold;font-style:italic">#define DEBUG_PRINT printf(&#34;File %s line %d:&#34; \
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">                        &#34;x = %d, y = %d, z = %d&#34;, \
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">                        __FILE__, __LINE__, \
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">                        z, y, z)
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>x <span style="color:#000;font-weight:bold">*=</span> <span style="color:#099">2</span>;
+</span></span><span style="display:flex;"><span>y <span style="color:#000;font-weight:bold">+=</span> x;
+</span></span><span style="display:flex;"><span>z <span style="color:#000;font-weight:bold">=</span> x <span style="color:#000;font-weight:bold">*</span> y;
+</span></span><span style="display:flex;"><span>DEBUG_PRINT;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<ol start="4">
+<li>宏定义，加入参数<code>#define name(para-list) stuff</code></li>
+</ol>
+</blockquote>
+<h4 id="311-宏">3.1.1 宏</h4>
+<ul>
+<li><!-- raw HTML omitted --><strong>对数值表达式求值的宏定义都应该加上括号</strong><!-- raw HTML omitted -->，避免在使用宏时，由于操作符的优先级导致不可预料的相互作用</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">/*
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">** 每个参数加():(x) * (x)
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">*/</span>
+</span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#define SQUARE(x) x * x
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>a <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">5</span>;
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">printf</span>(<span style="color:#d14">&#34;%d</span><span style="color:#d14">\n</span><span style="color:#d14">&#34;</span>, <span style="color:#900;font-weight:bold">SQUARE</span>(a <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">1</span>)); <span style="color:#998;font-style:italic">// a + 1 * a + 1 = 5 + 1 * 5 + 1 = 11
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#define SQUARE(x) (x) * (x)
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>a <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">5</span>;
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">printf</span>(<span style="color:#d14">&#34;%d</span><span style="color:#d14">\n</span><span style="color:#d14">&#34;</span>, <span style="color:#900;font-weight:bold">SQUARE</span>(a <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">1</span>)); <span style="color:#998;font-style:italic">// (a + 1) * (a + 1) = 6 * 6 = 36
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">/*
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">** 整个表达式加():((x) + (x))
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">*/</span>
+</span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#define DOUBLE(x) (x) + (x)
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>a <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">5</span>;
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">printf</span>(<span style="color:#d14">&#34;%d</span><span style="color:#d14">\n</span><span style="color:#d14">&#34;</span>, <span style="color:#099">10</span> <span style="color:#000;font-weight:bold">*</span> <span style="color:#900;font-weight:bold">DOUBLE</span>(a); <span style="color:#998;font-style:italic">// 10 * a + a = 10 * 5 + 5 = 55
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#define DOUBLE(x) ((x) + (x))
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>a <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">5</span>;
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">printf</span>(<span style="color:#d14">&#34;%d</span><span style="color:#d14">\n</span><span style="color:#d14">&#34;</span>, <span style="color:#099">10</span> <span style="color:#000;font-weight:bold">*</span> <span style="color:#900;font-weight:bold">DOUBLE</span>(a); <span style="color:#998;font-style:italic">// 10 * (a + a) = 10 * 10 = 100
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="312-宏与函数">3.1.2 宏与函数</h4>
+<ul>
+<li>宏也可以实现函数的功能</li>
+<li>宏与函数对比：</li>
+</ul>
+<blockquote>
+<ul>
+<li>宏相比函数的优点：</li>
+</ul>
+<blockquote>
+<ol>
+<li>相比调用函数，宏不用进行函数调用时的现场保存，在速度上更有优势</li>
+<li>函数的参数需要指明类型，但是宏并不需要声明类型，可以同时使用各种类型</li>
+<li>可以实现函数实现不了的任务，将类型作为参数传递，而函数则不行</li>
+</ol>
+</blockquote>
+</blockquote>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#define MALLOC(n, type) ((type *)malloc((n) * sizeof(type)))
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>pi <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">MALLOC</span>(<span style="color:#099">25</span>, <span style="color:#458;font-weight:bold">int</span>); 
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 预处理器做如下替换：
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>pi <span style="color:#000;font-weight:bold">=</span> ((<span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">*</span>)<span style="color:#900;font-weight:bold">malloc</span>((<span style="color:#099">25</span>) <span style="color:#000;font-weight:bold">*</span> <span style="color:#000;font-weight:bold">sizeof</span>(<span style="color:#458;font-weight:bold">int</span>))); 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<ul>
+<li>宏相比函数的缺点：</li>
+</ul>
+<blockquote>
+<ol>
+<li>需要在插入点处将代码拷贝到此处，会增加程序长度</li>
+<li>宏的参数在宏定义中出现的次数超过一次，如果这个参数具有副作用，会造成不可预料的结果</li>
+</ol>
+</blockquote>
+</blockquote>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#define MAX(a, b) ((a) &gt; (b) ? (a) : (b))
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>x <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">5</span>;
+</span></span><span style="display:flex;"><span>y <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">8</span>;
+</span></span><span style="display:flex;"><span>z <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">MAX</span>(x<span style="color:#000;font-weight:bold">++</span>, y<span style="color:#000;font-weight:bold">++</span>);
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">printf</span>(<span style="color:#d14">&#34;x = %d, y = %d, z = %d</span><span style="color:#d14">\n</span><span style="color:#d14">&#34;</span>, z, y, z);
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 预处理器做如下替换：
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#900;font-weight:bold">MAX</span>(x<span style="color:#000;font-weight:bold">++</span>, y<span style="color:#000;font-weight:bold">++</span>) ((x<span style="color:#000;font-weight:bold">++</span>) <span style="color:#000;font-weight:bold">&gt;</span> (y<span style="color:#000;font-weight:bold">++</span>) <span style="color:#000;font-weight:bold">?</span> (x<span style="color:#000;font-weight:bold">++</span>) <span style="color:#000;font-weight:bold">:</span> (y<span style="color:#000;font-weight:bold">++</span>))
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 结果
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>x <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">6</span>, y <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">10</span>, z <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">9</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="32-undef">🍉3.2 #undef</h3>
+<ul>
+<li>用于移除一个已有的宏定义</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#undef MALLOC
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="33-条件编译">🍉3.3 条件编译</h3>
+<ul>
+<li>🔸 选择某组语句进行翻译或被忽略</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#if constant-expression
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>    statements
+</span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#endif
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<ul>
+<li><code>constant-expression</code>为常量表达式</li>
+<li><code>constant-expression</code>为0，预处理器删除<code>statements</code></li>
+<li><code>constant-expression</code>为非0，<code>statements</code>被正常编译</li>
+</ul>
+</blockquote>
+<ul>
+<li>🔸 在编译时选择不同的代码部分</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#if constant-expression
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>    statements
+</span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#elif constant-expression
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>    statements
+</span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#else
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>    statements
+</span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#endif
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>🔸 测试一个符号是否被定义</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 如果定义
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#999;font-weight:bold;font-style:italic">#if defined(symbol) </span><span style="color:#998;font-style:italic">// 等价
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#999;font-weight:bold;font-style:italic">#ifdef symbol
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 如果未定义
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#999;font-weight:bold;font-style:italic">#if !defined(symbol) </span><span style="color:#998;font-style:italic">// 等价
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#999;font-weight:bold;font-style:italic">#ifndef symbol
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 包含多个条件
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#999;font-weight:bold;font-style:italic">#if defined(ABC) &amp;&amp; defined(BCD)
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>🔸 条件嵌套</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#if defined(ABC)
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>    <span style="color:#999;font-weight:bold;font-style:italic">#if defined(BCD)
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>    ...
+</span></span><span style="display:flex;"><span>    <span style="color:#999;font-weight:bold;font-style:italic">#endif
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#endif
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="34-include">🍉3.4 #include</h3>
+<ul>
+<li><code>#include &lt;&gt;</code>：包含标准库文件</li>
+<li><code>#include &quot;&quot;</code>：包含自定义头文件</li>
+<li>包含的头文件，预处理器会将头文件内容复制到文件中</li>
+<li>一个文件被多次包含会造成重定义，所以要避免</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#ifndef HEAD_H
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#define HEAD_H
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 头文件内容
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#endif
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="35其他指令">🍉3.5其他指令</h3>
+<h4 id="351-error">3.5.1 #error</h4>
+<h4 id="352-line">3.5.2 #line</h4>
+<h4 id="353-progma">3.5.3 #progma</h4>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/c%E5%92%8C%E6%8C%87%E9%92%88/">C和指针</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/13_%E9%AB%98%E7%BA%A7%E6%8C%87%E9%92%88/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">13_高级指针</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/11_%E5%8A%A8%E6%80%81%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">11_动态内存分配</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/10_%E7%BB%93%E6%9E%84%E5%92%8C%E8%81%94%E5%90%88/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">10_结构和联合</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/08_%E6%95%B0%E7%BB%84/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">08_数组</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/07_%E5%87%BD%E6%95%B0/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">07_函数</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

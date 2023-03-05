@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='1. 面向对象程序设计 第7章中介绍的是基于对象的程序设计，重点在于数据抽象（封装）；本章中介绍面向对象的程序设计，将着重介绍继承与动态绑定，有如下好处：
+更容易定义与其他类相似但不完全相同的新类 &amp;mdash; 继承 在一定程度上可以忽略相似类的区别，以统一的方式使用它们的对象 &amp;mdash; 动态绑定 2. 继承 通过继承联系在一起的类构成一种层次关系，层次根部为基类，其他类称之为派生类；多重继承会出现直接基类与间接基类。 🌟 2.1 基类 基类负责定义在层次关系中所有类共同拥有的成员。
+基类将成员函数分为两种： 基类希望派生类直接继承而不改变的函数，解析过程发生在编译时 &amp;mdash; 普通成员函数 基类希望其派生类进行覆盖的函数，解析过程发生在运行时 &amp;mdash; 虚函数virtual 基类通常定义一个虚析构函数，即使该函数不执行任何操作 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 class Quote { public: Quote() = default; Quote(const std::string &amp;amp;book, double sales_price): bookNo(book), price(sales_price){} std::string isbn() const { return bookNo; } // 虚函数 virtual double net_price(std::size_t n) const { return n * price; } // 虚析构函数 virtual ~Quote() = default; private: std::string bookNo; // 该成员对于派生类来说不能直接访问，只能通过isbn()函数获取 protected: double price = 0.'>
+<title>第15章 面向对象程序设计</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC15%E7%AB%A0_%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='第15章 面向对象程序设计'>
+<meta property='og:description' content='1. 面向对象程序设计 第7章中介绍的是基于对象的程序设计，重点在于数据抽象（封装）；本章中介绍面向对象的程序设计，将着重介绍继承与动态绑定，有如下好处：
+更容易定义与其他类相似但不完全相同的新类 &amp;mdash; 继承 在一定程度上可以忽略相似类的区别，以统一的方式使用它们的对象 &amp;mdash; 动态绑定 2. 继承 通过继承联系在一起的类构成一种层次关系，层次根部为基类，其他类称之为派生类；多重继承会出现直接基类与间接基类。 🌟 2.1 基类 基类负责定义在层次关系中所有类共同拥有的成员。
+基类将成员函数分为两种： 基类希望派生类直接继承而不改变的函数，解析过程发生在编译时 &amp;mdash; 普通成员函数 基类希望其派生类进行覆盖的函数，解析过程发生在运行时 &amp;mdash; 虚函数virtual 基类通常定义一个虚析构函数，即使该函数不执行任何操作 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 class Quote { public: Quote() = default; Quote(const std::string &amp;amp;book, double sales_price): bookNo(book), price(sales_price){} std::string isbn() const { return bookNo; } // 虚函数 virtual double net_price(std::size_t n) const { return n * price; } // 虚析构函数 virtual ~Quote() = default; private: std::string bookNo; // 该成员对于派生类来说不能直接访问，只能通过isbn()函数获取 protected: double price = 0.'>
+<meta property='og:url' content='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC15%E7%AB%A0_%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='C&#43;&#43;Primer' /><meta property='article:published_time' content='2023-03-05T21:21:03&#43;08:00'/><meta property='article:modified_time' content='2023-03-05T21:21:03&#43;08:00'/>
+<meta name="twitter:title" content="第15章 面向对象程序设计">
+<meta name="twitter:description" content="1. 面向对象程序设计 第7章中介绍的是基于对象的程序设计，重点在于数据抽象（封装）；本章中介绍面向对象的程序设计，将着重介绍继承与动态绑定，有如下好处：
+更容易定义与其他类相似但不完全相同的新类 &amp;mdash; 继承 在一定程度上可以忽略相似类的区别，以统一的方式使用它们的对象 &amp;mdash; 动态绑定 2. 继承 通过继承联系在一起的类构成一种层次关系，层次根部为基类，其他类称之为派生类；多重继承会出现直接基类与间接基类。 🌟 2.1 基类 基类负责定义在层次关系中所有类共同拥有的成员。
+基类将成员函数分为两种： 基类希望派生类直接继承而不改变的函数，解析过程发生在编译时 &amp;mdash; 普通成员函数 基类希望其派生类进行覆盖的函数，解析过程发生在运行时 &amp;mdash; 虚函数virtual 基类通常定义一个虚析构函数，即使该函数不执行任何操作 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 class Quote { public: Quote() = default; Quote(const std::string &amp;amp;book, double sales_price): bookNo(book), price(sales_price){} std::string isbn() const { return bookNo; } // 虚函数 virtual double net_price(std::size_t n) const { return n * price; } // 虚析构函数 virtual ~Quote() = default; private: std::string bookNo; // 该成员对于派生类来说不能直接访问，只能通过isbn()函数获取 protected: double price = 0.">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-面向对象程序设计">1. 面向对象程序设计</a></li>
+    <li><a href="#2-继承">2. 继承</a>
+      <ul>
+        <li><a href="#-21-基类">🌟 2.1 基类</a></li>
+        <li><a href="#-22-派生类">🌟 2.2 派生类</a></li>
+        <li><a href="#-23-继承与访问权限">🌟 2.3 继承与访问权限</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-虚函数">3. 虚函数</a></li>
+    <li><a href="#4-抽象基类">4. 抽象基类</a></li>
+    <li><a href="#5-继承中的类作用域">5. 继承中的类作用域</a></li>
+    <li><a href="#6-继承中的三五原则">6. 继承中的三/五原则</a>
+      <ul>
+        <li><a href="#-61-虚析构函数">🌟 6.1 虚析构函数</a></li>
+        <li><a href="#-62-继承中拷贝控制成员">🌟 6.2 继承中拷贝控制成员</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="background-color: #c1c1f6; color: #fff;">
+                读书笔记
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC15%E7%AB%A0_%E9%9D%A2%E5%90%91%E5%AF%B9%E8%B1%A1%E7%A8%8B%E5%BA%8F%E8%AE%BE%E8%AE%A1/">第15章 面向对象程序设计</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 05, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    3 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="1-面向对象程序设计">1. 面向对象程序设计</h2>
+<p>第7章中介绍的是基于对象的程序设计，重点在于数据抽象（<!-- raw HTML omitted --><!-- raw HTML omitted -->封装<!-- raw HTML omitted --><!-- raw HTML omitted -->）；本章中介绍面向对象的程序设计，将着重介绍继承与动态绑定，有如下好处：</p>
+<ul>
+<li>更容易定义与其他类相似但不完全相同的新类 &mdash; <!-- raw HTML omitted --><!-- raw HTML omitted -->继承<!-- raw HTML omitted --><!-- raw HTML omitted --></li>
+<li>在一定程度上可以忽略相似类的区别，以统一的方式使用它们的对象 &mdash; <!-- raw HTML omitted --><!-- raw HTML omitted -->动态绑定<!-- raw HTML omitted --><!-- raw HTML omitted --></li>
+</ul>
+<h2 id="2-继承">2. 继承</h2>
+<ul>
+<li>通过继承联系在一起的类构成一种<!-- raw HTML omitted --><!-- raw HTML omitted -->层次关系<!-- raw HTML omitted --><!-- raw HTML omitted -->，层次根部为基类，其他类称之为派生类；多重继承会出现直接基类与间接基类。</li>
+</ul>
+<h3 id="-21-基类">🌟 2.1 基类</h3>
+<p>基类负责定义在层次关系中所有类共同拥有的成员。</p>
+<ul>
+<li>基类将<strong>成员函数分为两种</strong>：</li>
+</ul>
+<blockquote>
+<ol>
+<li>基类希望派生类直接继承而不改变的函数，解析过程发生在编译时 &mdash; <strong>普通成员函数</strong></li>
+<li>基类希望其派生类进行覆盖的函数，解析过程发生在运行时 &mdash; <strong>虚函数</strong>virtual</li>
+</ol>
+</blockquote>
+<ul>
+<li>基类通常定义一个虚析构函数，即使该函数不执行任何操作</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Quote</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">public</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    Quote() <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">default</span>;
+</span></span><span style="display:flex;"><span>    Quote(<span style="color:#000;font-weight:bold">const</span> std<span style="color:#000;font-weight:bold">::</span>string <span style="color:#000;font-weight:bold">&amp;</span>book, <span style="color:#458;font-weight:bold">double</span> sales_price)<span style="color:#000;font-weight:bold">:</span> bookNo(book), price(sales_price){}
+</span></span><span style="display:flex;"><span>    std<span style="color:#000;font-weight:bold">::</span>string isbn() <span style="color:#000;font-weight:bold">const</span> { <span style="color:#000;font-weight:bold">return</span> bookNo; }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// 虚函数
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">virtual</span> <span style="color:#458;font-weight:bold">double</span> <span style="color:#900;font-weight:bold">net_price</span>(std<span style="color:#000;font-weight:bold">::</span>size_t n) <span style="color:#000;font-weight:bold">const</span> { <span style="color:#000;font-weight:bold">return</span> n <span style="color:#000;font-weight:bold">*</span> price; }
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// 虚析构函数
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">virtual</span> <span style="color:#000;font-weight:bold">~</span>Quote() <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">default</span>;
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">private</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    std<span style="color:#000;font-weight:bold">::</span>string bookNo; <span style="color:#998;font-style:italic">// 该成员对于派生类来说不能直接访问，只能通过isbn()函数获取
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">protected</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">double</span> price <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0.0</span>; <span style="color:#998;font-style:italic">// 可以被派生类访问，普通用户不可见
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>};
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="-22-派生类">🌟 2.2 派生类</h3>
+<ul>
+<li>派生类定义各自特有的成员</li>
+<li>派生类继承了基类中的成员，<!-- raw HTML omitted --><!-- raw HTML omitted -->在成员初始化时，每个类控制它自己的成员初始化过程，且派生类只初始化它的直接基类<!-- raw HTML omitted --><!-- raw HTML omitted -->。</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Bulk_quote</span> <span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">public</span> Quote <span style="color:#998;font-style:italic">// 派生类列表
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>{
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">public</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    Bulk_quote() <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">default</span>;
+</span></span><span style="display:flex;"><span>    Bulk_quote(<span style="color:#000;font-weight:bold">const</span> std<span style="color:#000;font-weight:bold">::</span>string <span style="color:#000;font-weight:bold">&amp;</span>book, <span style="color:#458;font-weight:bold">double</span> p, std<span style="color:#000;font-weight:bold">::</span>size_t qty, <span style="color:#458;font-weight:bold">double</span> disc) <span style="color:#000;font-weight:bold">:</span> 
+</span></span><span style="display:flex;"><span>        Quote(book, p), min_qty(qty), discount(disc){} <span style="color:#998;font-style:italic">// 每个类控制自己成员的初始化
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// 虚函数的覆盖
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#458;font-weight:bold">double</span> <span style="color:#900;font-weight:bold">net_price</span>(std<span style="color:#000;font-weight:bold">::</span>size_t) <span style="color:#000;font-weight:bold">const</span> <span style="color:#000;font-weight:bold">override</span>; <span style="color:#998;font-style:italic">// override显示说明派生类要覆盖基类的虚函数
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">private</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    std<span style="color:#000;font-weight:bold">::</span>size_t min_qty <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">double</span> discount <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0.0</span>;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 类外虚函数的定义
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">double</span> Bulk_quote<span style="color:#000;font-weight:bold">::</span>net_price(std<span style="color:#000;font-weight:bold">::</span>size_t) <span style="color:#000;font-weight:bold">const</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span>(cnt <span style="color:#000;font-weight:bold">&gt;=</span> min_qty) <span style="color:#000;font-weight:bold">return</span> cnt <span style="color:#000;font-weight:bold">*</span> (<span style="color:#099">1</span> <span style="color:#000;font-weight:bold">-</span> discount) <span style="color:#000;font-weight:bold">*</span> price;
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">else</span> <span style="color:#000;font-weight:bold">return</span> cnt <span style="color:#000;font-weight:bold">*</span> price;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><strong>派生类向基类的类型转换</strong>原因：<!-- raw HTML omitted --><!-- raw HTML omitted -->由于派生类对象中含有基类对应的组成部分，所以可以将派生类对象当成基类对象使用，也可以将基类的指针或引用绑定到派生类对象中的基类部分上<!-- raw HTML omitted --><!-- raw HTML omitted -->；</li>
+<li>不存在从基类向派生类的隐式转换，可以使用<code>dynamic_cast</code>进行显示转换，在运行时进行安全检查；如果确保可以转换，也可以使用<code>static_cast</code>进行强制类型转换；</li>
+<li><strong>继承与静态成员</strong>。<!-- raw HTML omitted --><!-- raw HTML omitted -->基类中的静态成员在继承体系中也只存在唯一的实例<!-- raw HTML omitted --><!-- raw HTML omitted -->，派生类遵循通用的访问权限设置。对静态成员的访问可以通过基类，也可以通过派生类使用；</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 类名访问
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>Base<span style="color:#000;font-weight:bold">::</span>statmem();
+</span></span><span style="display:flex;"><span>Derived<span style="color:#000;font-weight:bold">::</span>statmem();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 类对象访问
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>base_obj.statmem();
+</span></span><span style="display:flex;"><span>derived_obj.statmem();
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><strong>派生类的声明</strong>。<!-- raw HTML omitted --><!-- raw HTML omitted -->声明目的是令程序知晓某个名字的存在，以及该名字表示一个声明样的实体<!-- raw HTML omitted --><!-- raw HTML omitted -->；</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Derived</span>; <span style="color:#998;font-style:italic">// 不加派生列表
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><!-- raw HTML omitted --><!-- raw HTML omitted -->被作为基类的类必须已经定义而非仅仅声明<!-- raw HTML omitted --><!-- raw HTML omitted -->。因为派生类中会使用到基类的成员，如果基类尚未定义，那派生类就不知道基类中有什么，因此一个类也不能派生它本身；</li>
+<li><strong>防止继承</strong>。如果一个类不想被继承，则使用关键字final</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">NoDerived</span> <span style="color:#000;font-weight:bold">final</span> {...}; 
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Last</span> <span style="color:#000;font-weight:bold">final</span> <span style="color:#000;font-weight:bold">:</span> Base {...};
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><strong>静态类型与动态类型</strong></li>
+</ul>
+<blockquote>
+<ol>
+<li>表达式的静态类型在编译时是已知，就是它声明时的类型或表达式生成的类型；
+<!-- raw HTML omitted --></li>
+<li>动态类型是变量或表达式在内存中的对象的类型，直到运行时才可知； <!-- raw HTML omitted -->
+<!-- raw HTML omitted --><!-- raw HTML omitted -->一个基类类型的变量永远是一个基类类型的对象，对象间不存在类型转换；而基类的指针或引用的静态类型可能与其动态类型不一致<!-- raw HTML omitted --><!-- raw HTML omitted -->；</li>
+</ol>
+</blockquote>
+<h3 id="-23-继承与访问权限">🌟 2.3 继承与访问权限</h3>
+<ul>
+<li>三类人：</li>
+</ul>
+<blockquote>
+<ul>
+<li><strong>普通用户</strong>：普通用户编写代码使用类的对象，只能访问类的public成员</li>
+<li><strong>类的实现者</strong>：负责类的成员与友元的代码，可以访问public和private的成员</li>
+<li><strong>派生类</strong>：基类将希望派生类访问的成员设为protected，而普通用户不能访问protected成员，派生类也不能访问基类的private成员</li>
+</ul>
+</blockquote>
+<ul>
+<li>派生类继承了基类中的成员（<!-- raw HTML omitted --><!-- raw HTML omitted -->类派生列表中的访问说明符<!-- raw HTML omitted --><!-- raw HTML omitted -->），但是不代表派生类对其有访问权限（<!-- raw HTML omitted --><!-- raw HTML omitted -->类内访问说明符<!-- raw HTML omitted --><!-- raw HTML omitted -->，控制其成员对于派生类和其他用户来说是否可访问）</li>
+</ul>
+<blockquote>
+<ul>
+<li>派生类对基类成员的访问权限仅由基类的访问说明符确定</li>
+<li>派生列表中的访问说明符是针对的是派生类的用户及其再派生出的类。简单就是这些从基类中继承下来的成员，在派生类中给它们打了个访问说明符的标签</li>
+</ul>
+</blockquote>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>继承方式</th>
+<th>基类中的成员访问说明符</th>
+<th>在派生类中安放在的相应访问说明符下</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>public</td>
+<td>public <!-- raw HTML omitted --> protected <!-- raw HTML omitted --> private</td>
+<td>public <!-- raw HTML omitted --> protected <!-- raw HTML omitted --> private</td>
+</tr>
+<tr>
+<td>protected</td>
+<td>public <!-- raw HTML omitted --> protected <!-- raw HTML omitted --> private</td>
+<td>protected <!-- raw HTML omitted --> protected <!-- raw HTML omitted --> private</td>
+</tr>
+<tr>
+<td>private</td>
+<td>public <!-- raw HTML omitted --> protected <!-- raw HTML omitted --> private</td>
+<td>private <!-- raw HTML omitted --> private <!-- raw HTML omitted --> private</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><strong>改变个别成员的可访问性</strong>。改变派生类继承的某个名字的访问级别可用using</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Base</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">public</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    std<span style="color:#000;font-weight:bold">::</span>size_t size() <span style="color:#000;font-weight:bold">const</span> { <span style="color:#000;font-weight:bold">return</span> n; }
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">protected</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    std<span style="color:#000;font-weight:bold">::</span>size_t n;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Derived</span> <span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">private</span> Base
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">public</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">using</span> Base<span style="color:#000;font-weight:bold">::</span>size; <span style="color:#998;font-style:italic">// 将私有继承的size()函数的访问类型转换为public
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">protected</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">using</span> Base<span style="color:#000;font-weight:bold">::</span>n; 
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>默认的继承级别</li>
+</ul>
+<blockquote>
+<p>struct是public，class是private</p>
+</blockquote>
+<ul>
+<li><strong>protected</strong></li>
+</ul>
+<blockquote>
+<ol>
+<li>和private一样，不能被普通用户访问</li>
+<li>和public一样，对派生类的成员和友元来说是可访问的</li>
+<li><!-- raw HTML omitted --><!-- raw HTML omitted -->派生类的成员或友元只能通过派生类对象来访问基类的protected成员<!-- raw HTML omitted --><!-- raw HTML omitted --></li>
+</ol>
+</blockquote>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Base</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">protected</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">int</span> prot_mem;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Sn</span> <span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">public</span> Base
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">friend</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">clobber</span>(Sn<span style="color:#000;font-weight:bold">&amp;</span>); <span style="color:#998;font-style:italic">// 可以通过派生类对象访问访问基类中的protected成员
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">friend</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">clobber</span>(Base<span style="color:#000;font-weight:bold">&amp;</span>); <span style="color:#998;font-style:italic">// 错误，不能通过基类对象访问基类的protected成员
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">clobber</span>(Sn<span style="color:#000;font-weight:bold">&amp;</span> s)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    s.prot_mem <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">clobber</span>(Base<span style="color:#000;font-weight:bold">&amp;</span> b)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    b.prot_mem <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="3-虚函数">3. 虚函数</h2>
+<p>多态性：“多种形式”，在继承体系中，我们可以使用这“多种形式”而无须在意它们的差异。</p>
+<ul>
+<li>由于虚函数是为了<!-- raw HTML omitted --><!-- raw HTML omitted -->动态绑定，在运行时通过实参对象确定调用的函数版本<!-- raw HTML omitted --><!-- raw HTML omitted -->，因此虚函数与对象密切相关，所以<!-- raw HTML omitted --><!-- raw HTML omitted -->任何构造函数之外的非静态函数都可以是虚函数<!-- raw HTML omitted --><!-- raw HTML omitted -->；</li>
+<li>基类中的虚函数，在派生类中隐式地也是虚函数；</li>
+<li>派生类并不一定要覆盖从基类继承的虚函数，可以通过<strong>关键字override</strong>显示说明要覆盖基类的虚函数；如果没有override，则该虚函数如同普通函数，直接继承基类中的版本；</li>
+<li>使用<strong>final关键字</strong>说明之后不能进行覆盖；</li>
+<li>虚函数可以有默认实参，但是如果函数调用时使用默认实参，则该实参值由调用的静态类型决定，所以如果使用默认实参，则两者最好一致；</li>
+</ul>
+<h2 id="4-抽象基类">4. 抽象基类</h2>
+<ul>
+<li><!-- raw HTML omitted --><!-- raw HTML omitted -->拥有纯虚函数的类是抽象基类<!-- raw HTML omitted --><!-- raw HTML omitted -->。纯虚函数<code>virtual double net_price(std::size_t) const = 0;</code>是为了说明当前这个虚函数没有实际意义。</li>
+<li><!-- raw HTML omitted --><!-- raw HTML omitted -->不创建纯虚基类的对象<!-- raw HTML omitted --><!-- raw HTML omitted -->；</li>
+</ul>
+<h2 id="5-继承中的类作用域">5. 继承中的类作用域</h2>
+<ul>
+<li>派生类的作用域嵌套在基类中</li>
+<li>编译时的名字查找会一层层向外寻找</li>
+<li>当内层定义了与外层中重名的名字时，会隐藏外层作用域中的名字，除非使用作用域运算符来指明</li>
+<li>一如往常，名字查找先于类型检查，所以定义在派生类中的同名不同参的函数会隐藏掉基类中的同名函数</li>
+</ul>
+<h2 id="6-继承中的三五原则">6. 继承中的三/五原则</h2>
+<p>构造、拷贝、移动、赋值、销毁这五个操作，如果没有定义，则编译器会自动合成，或将其定义为删除的函数，包括继承中也如此。</p>
+<h3 id="-61-虚析构函数">🌟 6.1 虚析构函数</h3>
+<ul>
+<li>基类默认会定义虚析构函数</li>
+<li>继承中定义析构函数，可以使类释放动态分配的内存</li>
+<li>定义为虚函数，是为了确保执行正确的析构函数版本</li>
+<li>影响：即使使用<code>=default</code>，编译器也不会合成移动操作</li>
+</ul>
+<h3 id="-62-继承中拷贝控制成员">🌟 6.2 继承中拷贝控制成员</h3>
+<p>拷贝控制成员指：初始化(构造，拷贝)、赋值、销毁。</p>
+<h4 id="621-合成的">6.2.1 合成的</h4>
+<ul>
+<li><strong>构造</strong>：合成的派生类构造函数除了初始化自己的成员外，还将调用直接基类合成的构造函数，由<!-- raw HTML omitted --><!-- raw HTML omitted -->内而外构造<!-- raw HTML omitted --><!-- raw HTML omitted --></li>
+<li><strong>拷贝构造</strong>：同上</li>
+<li><strong>析构</strong>：除了销毁自己的成员，还将调用直接基类的析构函数，<!-- raw HTML omitted --><!-- raw HTML omitted -->由外而内析构<!-- raw HTML omitted --><!-- raw HTML omitted --></li>
+</ul>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted -->继承中的构造或析构函数内部调用虚函数时，编译器会执行与构造或析构所属类型相对应的虚函数版本<!-- raw HTML omitted --><!-- raw HTML omitted -->。因为由外而内构造时，此时执行基类的构造函数创建派生类中的基类部分，基类构造函数中的虚函数一定执行基类的版本，因为派生类成员尚未构造，析构函数同样如此。</p>
+<ul>
+<li><strong>移动</strong>：</li>
+</ul>
+<blockquote>
+<ul>
+<li>由于定义了析构函数，所以基类中不会有合成的移动操作；如果想要使用，则必须在基类中定义（可以是用默认的，但必须使用<code>=default</code>显示表述，也可以是自定义的）。</li>
+<li>一旦基类定义了移动操作，则必须显示定义拷贝操作。</li>
+</ul>
+</blockquote>
+<p><strong>前提</strong>：</p>
+<ul>
+<li><!-- raw HTML omitted --><!-- raw HTML omitted -->派生类必须能访问到相应的函数<!-- raw HTML omitted --><!-- raw HTML omitted -->。</li>
+<li><!-- raw HTML omitted --><!-- raw HTML omitted -->如果直接基类中的相应成员为删除的成员，则派生类中也无法合成对应的成员<!-- raw HTML omitted --><!-- raw HTML omitted -->。</li>
+</ul>
+<h4 id="622-派生类中的自定义">6.2.2 派生类中的自定义</h4>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted -->派生类中定义拷贝或移动时，同样需要基类来构造自己的那部分成员，不同之处必须指明，否则相对应的将会是基类的默认构造，而非拷贝与移动<!-- raw HTML omitted --><!-- raw HTML omitted -->。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Base</span> {...};
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">D</span> <span style="color:#000;font-weight:bold">:</span> <span style="color:#000;font-weight:bold">public</span> Base
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span> <span style="color:#000;font-weight:bold">public</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    D(<span style="color:#000;font-weight:bold">const</span> D <span style="color:#000;font-weight:bold">&amp;</span>d) <span style="color:#000;font-weight:bold">:</span> Base(d){...} <span style="color:#998;font-style:italic">// 基类部分需要显示拷贝
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    D(D <span style="color:#000;font-weight:bold">&amp;&amp;</span>d) <span style="color:#000;font-weight:bold">:</span> Base(std<span style="color:#000;font-weight:bold">::</span>move(d)){...}
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    D(<span style="color:#000;font-weight:bold">const</span> D <span style="color:#000;font-weight:bold">&amp;</span>d) {...} <span style="color:#998;font-style:italic">// 不显示指明，基类会默认初始化，而不是拷贝或移动
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    
+</span></span><span style="display:flex;"><span>    D<span style="color:#000;font-weight:bold">&amp;</span> D<span style="color:#000;font-weight:bold">::</span><span style="color:#000;font-weight:bold">operator</span><span style="color:#000;font-weight:bold">=</span> (<span style="color:#000;font-weight:bold">const</span> D <span style="color:#000;font-weight:bold">&amp;</span>rhs)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        Base<span style="color:#000;font-weight:bold">::</span><span style="color:#000;font-weight:bold">operator</span><span style="color:#000;font-weight:bold">=</span>(rhs); <span style="color:#998;font-style:italic">// 赋值也需要指明，不论是自定义还是合成的
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        ...
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">*</span><span style="color:#000;font-weight:bold">this</span>;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="623-继承的构造函数">6.2.3 继承的构造函数</h4>
+<ul>
+<li>派生类可以继承直接基类的构造函数</li>
+</ul>
+<blockquote>
+<ol>
+<li>若派生类中有与基类构造函数一样参数列表的构造函数，则这个构造函数不继承</li>
+<li>其他默认、拷贝、移动构造不可继承</li>
+</ol>
+</blockquote>
+<ul>
+<li>继承方式：<code>using Base::Base;</code></li>
+<li>构造函数的using声明不能改变其访问级别</li>
+<li>当基类构造函数中含有默认实参时，此实参不会被继承，因此派生类将获得多个构造函数，其中每个构造函数分别省略掉一个含有默认实参的形参</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/c&#43;&#43;primer/">C&#43;&#43;Primer</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC14%E7%AB%A0_%E8%BF%90%E7%AE%97%E7%AC%A6%E9%87%8D%E8%BD%BD%E5%92%8C%E7%B1%BB%E5%9E%8B%E8%BD%AC%E6%8D%A2/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第14章 运算符重载和类型转换</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC13%E7%AB%A0_bigthree%E5%92%8C%E7%A7%BB%E5%8A%A8/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第13章 BigThree和移动</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC12%E7%AB%A0_%E5%8A%A8%E6%80%81%E5%86%85%E5%AD%98%E4%B8%8E%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第12章 动态内存与智能指针</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC10%E7%AB%A0_%E6%B3%9B%E5%9E%8B%E7%AE%97%E6%B3%95/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第10章 泛型算法</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC911%E7%AB%A0_%E5%AE%B9%E5%99%A8/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第9、10章 容器</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

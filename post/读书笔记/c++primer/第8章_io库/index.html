@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='1. IO类 cpp通过定义IO定义输入输出，包括：
+头文件 类型 说明 iostream istream, wistream ostream, wostream iostream, wiostream 设备读取 fstream ifstream, wifstream ofstream, wofstream fstream, wfstream 文件读取 sstream istringstream, wistringstream ostringstream, wostringstream stringstream, wstringstream 内存读取 注意：
+使用继承和模板可以忽略不同类型的区别 基类 派生类 istream ifstream, istringstream ostream ofstream, ostringstream IO对象不能拷贝，因此进行IO操作的函数以非常量的引用传递和返回 1.1 IO库的条件状态 IO操作可能发生错误，所以IO库有条件状态： 条件状态 说明 strm::badbit 不可恢复的系统级错误 strm::failbit 可恢复的错误 strm::eofbit 文件结束，同时failbit置位 strm::goodbit 流未发生错误 strm::fail() 流s的failbit或badbit置位，则返回true strm::good() 流s处于有效状态，则返回true 1 while(cin &amp;gt;&amp;gt; word) // 成功，相当于转成bool，!fail() 1.2 管理输出缓存 每个输出流都管理一个缓冲区，用于保存程序读写的数据。会导致缓冲刷新的情况如下：
+程序结束。作为return操作的一部分 使用操纵符endl显示刷新缓冲区 缓冲区满时，需要刷新缓冲，而后数据才能继续写入 在每次输出操作后，用unitbuf设置流的内部状态，清空缓冲。cerr是设置unitbuf的，所以写到cerr的内容都是立即刷新 一个输出流被关联到另一个流时，例如当读写被关联的流时，关联到的流的缓冲区会被刷新。默认情况下，cin和cerr都关联道cout，因此读cin或写cerr都会导致cout的刷新 1 2 3 4 5 // 通过tie()关联两个流 cin.'>
+<title>第8章 IO库</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC8%E7%AB%A0_io%E5%BA%93/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='第8章 IO库'>
+<meta property='og:description' content='1. IO类 cpp通过定义IO定义输入输出，包括：
+头文件 类型 说明 iostream istream, wistream ostream, wostream iostream, wiostream 设备读取 fstream ifstream, wifstream ofstream, wofstream fstream, wfstream 文件读取 sstream istringstream, wistringstream ostringstream, wostringstream stringstream, wstringstream 内存读取 注意：
+使用继承和模板可以忽略不同类型的区别 基类 派生类 istream ifstream, istringstream ostream ofstream, ostringstream IO对象不能拷贝，因此进行IO操作的函数以非常量的引用传递和返回 1.1 IO库的条件状态 IO操作可能发生错误，所以IO库有条件状态： 条件状态 说明 strm::badbit 不可恢复的系统级错误 strm::failbit 可恢复的错误 strm::eofbit 文件结束，同时failbit置位 strm::goodbit 流未发生错误 strm::fail() 流s的failbit或badbit置位，则返回true strm::good() 流s处于有效状态，则返回true 1 while(cin &amp;gt;&amp;gt; word) // 成功，相当于转成bool，!fail() 1.2 管理输出缓存 每个输出流都管理一个缓冲区，用于保存程序读写的数据。会导致缓冲刷新的情况如下：
+程序结束。作为return操作的一部分 使用操纵符endl显示刷新缓冲区 缓冲区满时，需要刷新缓冲，而后数据才能继续写入 在每次输出操作后，用unitbuf设置流的内部状态，清空缓冲。cerr是设置unitbuf的，所以写到cerr的内容都是立即刷新 一个输出流被关联到另一个流时，例如当读写被关联的流时，关联到的流的缓冲区会被刷新。默认情况下，cin和cerr都关联道cout，因此读cin或写cerr都会导致cout的刷新 1 2 3 4 5 // 通过tie()关联两个流 cin.'>
+<meta property='og:url' content='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC8%E7%AB%A0_io%E5%BA%93/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='C&#43;&#43;Primer' /><meta property='article:published_time' content='2023-03-05T21:20:57&#43;08:00'/><meta property='article:modified_time' content='2023-03-05T21:20:57&#43;08:00'/>
+<meta name="twitter:title" content="第8章 IO库">
+<meta name="twitter:description" content="1. IO类 cpp通过定义IO定义输入输出，包括：
+头文件 类型 说明 iostream istream, wistream ostream, wostream iostream, wiostream 设备读取 fstream ifstream, wifstream ofstream, wofstream fstream, wfstream 文件读取 sstream istringstream, wistringstream ostringstream, wostringstream stringstream, wstringstream 内存读取 注意：
+使用继承和模板可以忽略不同类型的区别 基类 派生类 istream ifstream, istringstream ostream ofstream, ostringstream IO对象不能拷贝，因此进行IO操作的函数以非常量的引用传递和返回 1.1 IO库的条件状态 IO操作可能发生错误，所以IO库有条件状态： 条件状态 说明 strm::badbit 不可恢复的系统级错误 strm::failbit 可恢复的错误 strm::eofbit 文件结束，同时failbit置位 strm::goodbit 流未发生错误 strm::fail() 流s的failbit或badbit置位，则返回true strm::good() 流s处于有效状态，则返回true 1 while(cin &amp;gt;&amp;gt; word) // 成功，相当于转成bool，!fail() 1.2 管理输出缓存 每个输出流都管理一个缓冲区，用于保存程序读写的数据。会导致缓冲刷新的情况如下：
+程序结束。作为return操作的一部分 使用操纵符endl显示刷新缓冲区 缓冲区满时，需要刷新缓冲，而后数据才能继续写入 在每次输出操作后，用unitbuf设置流的内部状态，清空缓冲。cerr是设置unitbuf的，所以写到cerr的内容都是立即刷新 一个输出流被关联到另一个流时，例如当读写被关联的流时，关联到的流的缓冲区会被刷新。默认情况下，cin和cerr都关联道cout，因此读cin或写cerr都会导致cout的刷新 1 2 3 4 5 // 通过tie()关联两个流 cin.">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-io类">1. IO类</a>
+      <ul>
+        <li><a href="#11-io库的条件状态">1.1 IO库的条件状态</a></li>
+        <li><a href="#12-管理输出缓存">1.2 管理输出缓存</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-文件输入输出">2. 文件输入输出</a></li>
+    <li><a href="#3-string流">3. string流</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="background-color: #c1c1f6; color: #fff;">
+                读书笔记
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC8%E7%AB%A0_io%E5%BA%93/">第8章 IO库</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 05, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    2 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="1-io类">1. IO类</h2>
+<p><code>cpp</code>通过定义<code>IO</code>定义输入输出，包括：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>头文件</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>iostream</code></td>
+<td><code>istream, wistream</code> <!-- raw HTML omitted --> <code>ostream, wostream</code> <!-- raw HTML omitted --> <code>iostream, wiostream</code></td>
+<td>设备读取</td>
+</tr>
+<tr>
+<td><code>fstream</code></td>
+<td><code>ifstream, wifstream</code> <!-- raw HTML omitted --> <code>ofstream, wofstream</code> <!-- raw HTML omitted --> <code>fstream, wfstream</code></td>
+<td>文件读取</td>
+</tr>
+<tr>
+<td><code>sstream</code></td>
+<td><code>istringstream, wistringstream</code> <!-- raw HTML omitted --> <code>ostringstream, wostringstream</code> <!-- raw HTML omitted --> <code>stringstream, wstringstream</code></td>
+<td>内存读取</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>注意</strong>：</p>
+<ul>
+<li>使用继承和模板可以忽略不同类型的区别</li>
+</ul>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>基类</th>
+<th>派生类</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>istream</code></td>
+<td><code>ifstream, istringstream</code></td>
+</tr>
+<tr>
+<td><code>ostream</code></td>
+<td><code>ofstream, ostringstream</code></td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><!-- raw HTML omitted --><!-- raw HTML omitted -->IO对象不能拷贝，因此进行IO操作的函数以非常量的引用传递和返回<!-- raw HTML omitted --><!-- raw HTML omitted --></li>
+</ul>
+<h3 id="11-io库的条件状态">1.1 IO库的条件状态</h3>
+<ul>
+<li>IO操作可能发生错误，所以IO库有条件状态：</li>
+</ul>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>条件状态</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>strm::badbit</code></td>
+<td>不可恢复的系统级错误</td>
+</tr>
+<tr>
+<td><code>strm::failbit</code></td>
+<td>可恢复的错误</td>
+</tr>
+<tr>
+<td><code>strm::eofbit</code></td>
+<td>文件结束，同时<code>failbit</code>置位</td>
+</tr>
+<tr>
+<td><code>strm::goodbit</code></td>
+<td>流未发生错误</td>
+</tr>
+<tr>
+<td><code>strm::fail()</code></td>
+<td>流<code>s</code>的<code>failbit</code>或<code>badbit</code>置位，则返回<code>true</code></td>
+</tr>
+<tr>
+<td><code>strm::good()</code></td>
+<td>流<code>s</code>处于有效状态，则返回<code>true  </code></td>
+</tr>
+</tbody>
+</table></div>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">while</span>(cin <span style="color:#000;font-weight:bold">&gt;&gt;</span> word) <span style="color:#998;font-style:italic">// 成功，相当于转成bool，!fail()
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="12-管理输出缓存">1.2 管理输出缓存</h3>
+<p>每个输出流都管理一个缓冲区，用于保存程序读写的数据。会导致缓冲刷新的情况如下：</p>
+<blockquote>
+<ol>
+<li>程序结束。作为<code>return</code>操作的一部分</li>
+<li>使用操纵符<code>endl</code>显示刷新缓冲区</li>
+<li>缓冲区满时，需要刷新缓冲，而后数据才能继续写入</li>
+<li>在每次输出操作后，用<code>unitbuf</code>设置流的内部状态，清空缓冲。<code>cerr</code>是设置<code>unitbuf</code>的，所以写到<code>cerr</code>的内容都是立即刷新</li>
+<li>一个输出流被关联到另一个流时，例如当读写被关联的流时，关联到的流的缓冲区会被刷新。默认情况下，<code>cin</code>和<code>cerr</code>都关联道<code>cout</code>，因此读<code>cin</code>或写<code>cerr</code>都会导致<code>cout</code>的刷新</li>
+</ol>
+</blockquote>
+<blockquote>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 通过tie()关联两个流
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>cin.tie(<span style="color:#000;font-weight:bold">&amp;</span>cerr); <span style="color:#998;font-style:italic">// 将cin关联到cerr，读取cin时会刷新cerr
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>cin.tie(<span style="color:#000;font-weight:bold">nullptr</span>); <span style="color:#998;font-style:italic">// 解关联
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>ostream <span style="color:#000;font-weight:bold">*</span>old <span style="color:#000;font-weight:bold">=</span> cin.tie(); <span style="color:#998;font-style:italic">// 返回当前关联的流的指针，没有关联时，返回nullptr
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div></blockquote>
+<ul>
+<li>操纵符</li>
+</ul>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>操纵符</th>
+<th>说明</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>endl</code></td>
+<td>换行并刷新缓冲区</td>
+<td><code>cout &lt;&lt; endl;</code></td>
+</tr>
+<tr>
+<td><code>flush</code></td>
+<td>刷新缓冲区，但不输出任何字符</td>
+<td><code>cout &lt;&lt; flush; </code></td>
+</tr>
+<tr>
+<td><code>ends</code></td>
+<td>插入一个空字符，然后刷新缓冲区</td>
+<td><code>cout &lt;&lt; ends;    </code></td>
+</tr>
+<tr>
+<td><code>unitbuf</code></td>
+<td>设置是每次写操作后都进行<code>flush</code>操作</td>
+<td><code>cout &lt;&lt; unitbuf; </code></td>
+</tr>
+<tr>
+<td><code>nounitbuf</code></td>
+<td>恢复正常的刷新机制</td>
+<td><code>cout &lt;&lt; nounitbuf;</code></td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><!-- raw HTML omitted --><!-- raw HTML omitted -->如果程序崩溃，则输出缓冲区是不会被刷新的<!-- raw HTML omitted --><!-- raw HTML omitted -->，所以有时候输出语句实际已经执行，但由于缓冲区未被刷新，被挂起没有打印，就不会有结果显示在屏幕上</li>
+<li><code>string line; getline(cin, line); // 从输入流读取一整行</code></li>
+</ul>
+<h2 id="2-文件输入输出">2. 文件输入输出</h2>
+<ul>
+<li><!-- raw HTML omitted --><!-- raw HTML omitted -->一个文件流文件需要绑定到一个文件<!-- raw HTML omitted --><!-- raw HTML omitted --></li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 1. 打开文件方法一
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>fstream <span style="color:#900;font-weight:bold">fstrm</span>(s); <span style="color:#998;font-style:italic">// 创建一个fstream，并打开名为s的文件
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 打开文件同时设置打开模式
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>fstream <span style="color:#900;font-weight:bold">fstrm</span>(s, mode); <span style="color:#998;font-style:italic">// 按指定方式打开名为s的文件
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 1. 打开文件方法二
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>fstream fstrm;
+</span></span><span style="display:flex;"><span>fstrm.open(s); <span style="color:#998;font-style:italic">// 创建一个fstream，并打开名为s的文件
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 2. 关闭与fstrm绑定的文件，返回void，关闭后可以再与其他文件绑定
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>fstrm.close();
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 3. 检查是否正常打开
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">if</span>(fstrm) <span style="color:#998;font-style:italic">// 相当于!fail()
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><!-- raw HTML omitted --><!-- raw HTML omitted -->当一个fstream对象被销毁时，close会自动调用<!-- raw HTML omitted --><!-- raw HTML omitted -->。</li>
+<li>文件打开模式</li>
+</ul>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>文件模式</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>in</code></td>
+<td>以读方式打开</td>
+</tr>
+<tr>
+<td><code>ofstream::out </code></td>
+<td>以写方式打开，同时文件内容丢弃</td>
+</tr>
+<tr>
+<td><code>ofstream::app</code></td>
+<td>文末追加(<code>append</code>)</td>
+</tr>
+<tr>
+<td><code>ofstream::trunc</code></td>
+<td>打开文件被截断</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="3-string流">3. string流</h2>
+<ul>
+<li><!-- raw HTML omitted --><!-- raw HTML omitted -->一个string流需要绑定到一个string对象<!-- raw HTML omitted --><!-- raw HTML omitted --></li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>sstream strm; <span style="color:#998;font-style:italic">// 一个未绑定的流对象
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>sstream <span style="color:#900;font-weight:bold">strm</span>(s); <span style="color:#998;font-style:italic">// 绑定到一个string，保留其拷贝
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>strm.str(); <span style="color:#998;font-style:italic">// 返回strm锁保留的string的拷贝
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>strm.str(s); <span style="color:#998;font-style:italic">// 将string s拷贝到strm中，返回void
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>可以使用<code>istringstream</code>读取一整行的输入</li>
+<li>可以使用<code>ostringstream</code>整理一整行的输出</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/c&#43;&#43;primer/">C&#43;&#43;Primer</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC7%E7%AB%A0_%E7%B1%BB/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第7章 类</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

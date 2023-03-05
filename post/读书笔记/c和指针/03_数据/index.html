@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='数据 1. 基本数据类型 在C语言中仅有4类基本数据类型：
+整型 浮点型 指针 聚合类型（如数组和结构等） 其他类型均由这4类组合派生而来。
+🏳️‍🌈1.1 整型 整型家族包括：字符、短整型、整型和长整形，并分为有符号和无符号两个版本 综合上述，共9种不同类型： 字符 短整型 整型 长整形 char, signed char, unsigned char short int, unsigned short int int, unsigned int long int, unsigned long int 3 2 2 2 signed关键字一般只用于char，其他类型在缺省情况下都是有符号数 整型值相互间大小的规则：长整形至少应该和整型一样长，而整型至少应该和短整型一样长 在头文件limits.h中指明了不同整数类型的特点：位数、范围等，范围如下表： 类型 signed最小值 signed最大值 unsigned最大值 字符 SCHAR_MIN SCHAR_MAX UCHAR_MAX 短整型 SHRT_MIN SHRT_MAX USHRT_MAX 整型 INT_MIN INT_MAX UINT_MAX 长整型 LONG_MIN LONG_MAX ULONG_MAX 1.1.1 整型字面值 整型字面值是哪种类型取决于其书写方式，通常十进制使用为多，加L或l表示长整形，加U或u表示unsigned 十进制 八进制 十六进制 123 以0开头 以0x开头 1.'>
+<title>03_数据</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/03_%E6%95%B0%E6%8D%AE/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='03_数据'>
+<meta property='og:description' content='数据 1. 基本数据类型 在C语言中仅有4类基本数据类型：
+整型 浮点型 指针 聚合类型（如数组和结构等） 其他类型均由这4类组合派生而来。
+🏳️‍🌈1.1 整型 整型家族包括：字符、短整型、整型和长整形，并分为有符号和无符号两个版本 综合上述，共9种不同类型： 字符 短整型 整型 长整形 char, signed char, unsigned char short int, unsigned short int int, unsigned int long int, unsigned long int 3 2 2 2 signed关键字一般只用于char，其他类型在缺省情况下都是有符号数 整型值相互间大小的规则：长整形至少应该和整型一样长，而整型至少应该和短整型一样长 在头文件limits.h中指明了不同整数类型的特点：位数、范围等，范围如下表： 类型 signed最小值 signed最大值 unsigned最大值 字符 SCHAR_MIN SCHAR_MAX UCHAR_MAX 短整型 SHRT_MIN SHRT_MAX USHRT_MAX 整型 INT_MIN INT_MAX UINT_MAX 长整型 LONG_MIN LONG_MAX ULONG_MAX 1.1.1 整型字面值 整型字面值是哪种类型取决于其书写方式，通常十进制使用为多，加L或l表示长整形，加U或u表示unsigned 十进制 八进制 十六进制 123 以0开头 以0x开头 1.'>
+<meta property='og:url' content='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/03_%E6%95%B0%E6%8D%AE/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='C和指针' /><meta property='article:published_time' content='2023-03-05T21:22:04&#43;08:00'/><meta property='article:modified_time' content='2023-03-05T21:22:04&#43;08:00'/>
+<meta name="twitter:title" content="03_数据">
+<meta name="twitter:description" content="数据 1. 基本数据类型 在C语言中仅有4类基本数据类型：
+整型 浮点型 指针 聚合类型（如数组和结构等） 其他类型均由这4类组合派生而来。
+🏳️‍🌈1.1 整型 整型家族包括：字符、短整型、整型和长整形，并分为有符号和无符号两个版本 综合上述，共9种不同类型： 字符 短整型 整型 长整形 char, signed char, unsigned char short int, unsigned short int int, unsigned int long int, unsigned long int 3 2 2 2 signed关键字一般只用于char，其他类型在缺省情况下都是有符号数 整型值相互间大小的规则：长整形至少应该和整型一样长，而整型至少应该和短整型一样长 在头文件limits.h中指明了不同整数类型的特点：位数、范围等，范围如下表： 类型 signed最小值 signed最大值 unsigned最大值 字符 SCHAR_MIN SCHAR_MAX UCHAR_MAX 短整型 SHRT_MIN SHRT_MAX USHRT_MAX 整型 INT_MIN INT_MAX UINT_MAX 长整型 LONG_MIN LONG_MAX ULONG_MAX 1.1.1 整型字面值 整型字面值是哪种类型取决于其书写方式，通常十进制使用为多，加L或l表示长整形，加U或u表示unsigned 十进制 八进制 十六进制 123 以0开头 以0x开头 1.">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-基本数据类型">1. 基本数据类型</a>
+      <ul>
+        <li><a href="#11-整型">🏳️‍🌈1.1 整型</a></li>
+        <li><a href="#12-浮点型">🏳️‍🌈1.2 浮点型</a></li>
+        <li><a href="#13-指针">🏳️‍🌈1.3 指针</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-typedef-和-define">2. typedef 和 define</a>
+      <ul>
+        <li><a href="#21-typedef">🏳️‍🌈2.1 typedef</a></li>
+        <li><a href="#22-define">🏳️‍🌈2.2 define</a></li>
+        <li><a href="#23-typedef-和-define区别">🏳️‍🌈2.3 typedef 和 define区别</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-const">3. const</a>
+      <ul>
+        <li><a href="#31-修饰变量">🏳️‍🌈3.1 修饰变量</a></li>
+        <li><a href="#32-修饰指针">🏳️‍🌈3.2 修饰指针</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-声明与定义">4. 声明与定义</a></li>
+    <li><a href="#5-作用域链接属性和存储类型">5. 作用域、链接属性和存储类型</a>
+      <ul>
+        <li><a href="#41-extern">🏳️‍🌈4.1 extern</a></li>
+        <li><a href="#42-static">🏳️‍🌈4.2 static</a></li>
+        <li><a href="#43-总结">🏳️‍🌈4.3 总结</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="background-color: #c1c1f6; color: #fff;">
+                读书笔记
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/03_%E6%95%B0%E6%8D%AE/">03_数据</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 05, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    3 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="数据">数据</h1>
+<h2 id="1-基本数据类型">1. 基本数据类型</h2>
+<p>在C语言中仅有4类基本数据类型：</p>
+<ul>
+<li>整型</li>
+<li>浮点型</li>
+<li>指针</li>
+<li>聚合类型（如数组和结构等）</li>
+</ul>
+<p>其他类型均由这4类组合派生而来。</p>
+<h3 id="11-整型">🏳️‍🌈1.1 整型</h3>
+<ul>
+<li>整型家族包括：字符、短整型、整型和长整形，并分为有符号和无符号两个版本</li>
+<li>综合上述，共9种不同类型：</li>
+</ul>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>字符</th>
+<th>短整型</th>
+<th>整型</th>
+<th>长整形</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>char</code>, <code>signed char</code>, <code>unsigned char</code></td>
+<td><code>short int</code>, <code>unsigned short int</code></td>
+<td><code>int</code>, <code>unsigned int</code></td>
+<td><code>long int</code>, <code>unsigned long int</code></td>
+</tr>
+<tr>
+<td>3</td>
+<td>2</td>
+<td>2</td>
+<td>2</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li><code>signed</code>关键字一般只用于<code>char</code>，其他类型在缺省情况下都是有符号数</li>
+<li>整型值相互间大小的规则：<strong>长整形至少应该和整型一样长，而整型至少应该和短整型一样长</strong></li>
+<li>在头文件<code>limits.h</code>中指明了不同整数类型的特点：位数、范围等，范围如下表：</li>
+</ul>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>signed最小值</th>
+<th>signed最大值</th>
+<th>unsigned最大值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>字符</td>
+<td>SCHAR_MIN</td>
+<td>SCHAR_MAX</td>
+<td>UCHAR_MAX</td>
+</tr>
+<tr>
+<td>短整型</td>
+<td>SHRT_MIN</td>
+<td>SHRT_MAX</td>
+<td>USHRT_MAX</td>
+</tr>
+<tr>
+<td>整型</td>
+<td>INT_MIN</td>
+<td>INT_MAX</td>
+<td>UINT_MAX</td>
+</tr>
+<tr>
+<td>长整型</td>
+<td>LONG_MIN</td>
+<td>LONG_MAX</td>
+<td>ULONG_MAX</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="111-整型字面值">1.1.1 整型字面值</h4>
+<ul>
+<li>整型字面值是哪种类型取决于其书写方式，通常十进制使用为多，加<code>L</code>或<code>l</code>表示长整形，加<code>U</code>或<code>u</code>表示<code>unsigned</code></li>
+</ul>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>十进制</th>
+<th>八进制</th>
+<th>十六进制</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>123</code></td>
+<td>以<code>0</code>开头</td>
+<td>以<code>0x</code>开头</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="112-字符常量">1.1.2 字符常量</h4>
+<ul>
+<li>类型总是<code>int</code>，不能添加<code>unsigned</code>或<code>long</code></li>
+<li>使用单引号包围单个字符，如：<code>'M'</code>, <code>'\n'</code>, <code>'\377'</code></li>
+</ul>
+<h4 id="113-枚举类型">1.1.3 枚举类型</h4>
+<ul>
+<li>关键字<code>enum</code></li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 枚举类型声明
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">enum</span> Direction{ UP, DOWN};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 枚举变量声明
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>Direction d1, d2;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 上面也可以统一写为
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">enum</span> Direction{ UP, DOWN} d1, d2;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>枚举变量以整数形式存储，默认<code>UP=0</code>，也可以指定特定的整型值，其后没有指明的会依次递增，如<code>Thursday=21</code>&hellip;</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 枚举类型声明
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">enum</span> Day{ Monday <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">5</span>, Tuesday <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">7</span>, Wednesday <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">20</span>, Thursday, Friday, Saturday, Sunday };
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>很少有事是只能靠枚举而不能使用<code>define</code>来解决的</li>
+<li>枚举相比<code>define</code>的优点：</li>
+</ul>
+<blockquote>
+<p><code>#define</code>定义的名字在编译时丢弃，而枚举名字则一直在调试器中可见，可以在调试代码时使用它们</p>
+</blockquote>
+<h3 id="12-浮点型">🏳️‍🌈1.2 浮点型</h3>
+<ul>
+<li>浮点数家族包括<code>float</code>，<code>double</code>，<code>long double</code>。</li>
+<li>头文件<code>float.h</code>中定义了<code>FLT_MAX</code>，<code>DBL_MAX</code>和<code>LDBL_MAX</code>，对应<code>FLT_MIN</code>，<code>DBL_MIN</code>和<code>LDBL_MIN</code></li>
+<li>浮点数字面值默认为<code>double</code>，加<code>L</code>或<code>l</code>为<code>long double</code>，加<code>F</code>或<code>f</code>为<code>float</code></li>
+</ul>
+<h3 id="13-指针">🏳️‍🌈1.3 指针</h3>
+<ul>
+<li>指针变量存放内存地址的值</li>
+<li>相当于房子的门牌号</li>
+</ul>
+<h2 id="2-typedef-和-define">2. typedef 和 define</h2>
+<h3 id="21-typedef">🏳️‍🌈2.1 typedef</h3>
+<ul>
+<li><code>typedef</code>为各种数据类型创建别名，而不是创建新的数据类型</li>
+<li><code>typedef</code>声明格式与变量声明（参见<code>13-2.2.1</code>和<code>13-2.2.2</code>）完全一样，只不过加上关键字<code>typedef</code>，向你提醒它的实质</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 变量声明
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">char</span> <span style="color:#000;font-weight:bold">*</span>p;
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// typedef声明
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">typedef</span> <span style="color:#458;font-weight:bold">char</span> <span style="color:#000;font-weight:bold">*</span>ptr_to_char;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">char</span> <span style="color:#000;font-weight:bold">*</span>p;
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 等价于
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>ptr_to_char p;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>为结构创建别名，具体参见<code>10-1.1</code></li>
+</ul>
+<h4 id="211-注意">2.1.1 注意</h4>
+<ul>
+<li>不要在一个<code>typedef</code>中放入几个声明器</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">typedef</span> <span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">*</span>ptr, (<span style="color:#000;font-weight:bold">*</span>fun)(), arr[<span style="color:#099">5</span>];
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>不要把typedef嵌到声明的中间部分</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">unsigned</span> <span style="color:#000;font-weight:bold">const</span> <span style="color:#458;font-weight:bold">long</span> <span style="color:#000;font-weight:bold">typedef</span> <span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">volatile</span> <span style="color:#000;font-weight:bold">*</span>k;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>不要为了方便对结构使用<code>typedef</code></li>
+</ul>
+<blockquote>
+<p>对结构使用<code>typedef</code>顶多可以少些一个<code>struct</code>关键字，但是<code>struct</code>关键字可以起提示作用，使代码更为清晰</p>
+</blockquote>
+<h4 id="212-用途">2.1.2 用途</h4>
+<p>➰ 1. 应用于数组、结构、指针及函数的组合类型 <!-- raw HTML omitted -->
+➰ 2. 为强制类型转换提供一个简单的名字</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">typedef</span> <span style="color:#900;font-weight:bold">int</span> (<span style="color:#000;font-weight:bold">*</span>ptr_to_int_fun)(<span style="color:#458;font-weight:bold">void</span>);
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">char</span> <span style="color:#000;font-weight:bold">*</span>p; <span style="color:#998;font-style:italic">// 指针原先指向的是char类型变量
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>...
+</span></span><span style="display:flex;"><span>.. <span style="color:#000;font-weight:bold">=</span> (ptr_to_int_fun) p; <span style="color:#998;font-style:italic">// 强制类型转为指向函数的指针
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="22-define">🏳️‍🌈2.2 define</h3>
+<p>具体参见<code>14-3.1</code></p>
+<h3 id="23-typedef-和-define区别">🏳️‍🌈2.3 typedef 和 define区别</h3>
+<p>➰ 1. 可以用其他类型说明符对宏类型名进行扩展，而<code>typedef</code>所定义的类型名却不可以</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#define d_int int
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span><span style="color:#458;font-weight:bold">unsigned</span> d_int a ; <span style="color:#998;font-style:italic">// 正确
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">typedef</span> <span style="color:#458;font-weight:bold">int</span> t_int;
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">unsigned</span> t_int b ; <span style="color:#998;font-style:italic">// 非法
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>➰ 2. 在连续几个变量的声明中，用<code>typedef</code>可以保证声明中所有变量均为同种类型，而用<code>define</code>定义的类型则无法保证</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#define ptr_to_char char*
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>ptr_to_char p, q;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 预处理器将其替换如下：
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">char</span><span style="color:#000;font-weight:bold">*</span> p, q;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p><code>define</code>也可以定义新类型名，但是不能正确处理指针类型。如下：p被声明为指针<code>char *</code>，但是却被声明为字符<code>char</code></p>
+</blockquote>
+<h2 id="3-const">3. const</h2>
+<ul>
+<li><!-- raw HTML omitted --><strong><code>const</code>并不能将变量变为常量</strong><!-- raw HTML omitted --></li>
+<li><code>const</code>表示该符号不能被赋值，它的值对于这个符号来说是只读的</li>
+<li>但是不能保证通过其他方法修改这个值。例如函数传参中加入<code>const</code>只是说在该函数中不能修改对应值，但在函数外其他位置则不保证其值不会被修改</li>
+<li><code>const</code>最有用之处是限定函数参数</li>
+</ul>
+<h3 id="31-修饰变量">🏳️‍🌈3.1 修饰变量</h3>
+<ul>
+<li>const修饰的变量为常量：</li>
+</ul>
+<blockquote>
+<ol>
+<li>变量需要在声明时初始化；</li>
+<li>const类型的形参在函数调用时赋值</li>
+</ol>
+</blockquote>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">const</span> a;
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 等价
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">const</span> <span style="color:#458;font-weight:bold">int</span> a;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>对于创建名字常量，使用<code>define</code>会比<code>const</code>更好。因为允许使用字面值常量的地方都可以使用前者，比如数组的长度；<code>const</code>只能用于使用变量的地方</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#define MAX 50
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span><span style="color:#458;font-weight:bold">int</span> a[MAX];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">const</span> <span style="color:#458;font-weight:bold">int</span> max <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">50</span>;
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> a[max]; <span style="color:#998;font-style:italic">// 错误
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="32-修饰指针">🏳️‍🌈3.2 修饰指针</h3>
+<ul>
+<li>从右至左分析</li>
+<li>int * const p;</li>
+</ul>
+<blockquote>
+<p>p是一个指针常量，指向一个整型变量</p>
+</blockquote>
+<ul>
+<li>const int *p;</li>
+</ul>
+<blockquote>
+<p>p是一个指针变量，指向一个int常量</p>
+</blockquote>
+<ul>
+<li>const int * const p;</li>
+</ul>
+<blockquote>
+<p>p是一个指针常量，指向一个整型常量</p>
+</blockquote>
+<h2 id="4-声明与定义">4. 声明与定义</h2>
+<p>C语言中变量只能有一次定义，可以有多次声明</p>
+<ul>
+<li>定义：特殊的声明，为变量分配内存</li>
+<li>声明：普通的声明，用于描述在其他地方创建的对象.</li>
+</ul>
+<blockquote>
+<p>这里只是告知编译器，对象的类型和名字。<!-- raw HTML omitted -->
+由于声明中不分配内存，所以如果是数组，可以不提供数组长度信息，只要保证与要引用的数组声明类型和变量名一致即可，关键字为<code>extern</code></p>
+</blockquote>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 声明
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">extern</span> <span style="color:#458;font-weight:bold">int</span> arr[];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 别处的定义
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">int</span> arr[<span style="color:#099">100</span>];
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="5-作用域链接属性和存储类型">5. 作用域、链接属性和存储类型</h2>
+<ul>
+<li>作用域：文件作用域，函数作用域，代码块作用域和原型作用域</li>
+<li>链接属性：外部（external），内部（internal）和无（none）</li>
+</ul>
+<blockquote>
+<ol>
+<li><code>external</code>指标识符不论声明多少次，位于几个源文件都表示同一个实体</li>
+</ol>
+<blockquote>
+<ul>
+<li>函数和具有文件作用域的变量，链接属性为<code>external</code></li>
+</ul>
+</blockquote>
+<ol start="2">
+<li><code>internal</code>指同一源文件中多有声明中都指向同一个实体</li>
+</ol>
+<blockquote>
+<ul>
+<li><code>static</code>关键字可以将<code>external</code>链接属性的变量转变为<code>internal</code>属性</li>
+</ul>
+</blockquote>
+<ol start="3">
+<li><code>none</code>指标识符的多个声明都被当做独立不同的实体</li>
+</ol>
+<blockquote>
+<ul>
+<li>局部变量的链接属性为<code>none</code></li>
+</ul>
+</blockquote>
+</blockquote>
+<ul>
+<li>存储类型是指存储变量值的内存类型：普通内存，运行时堆栈和硬件寄存器</li>
+</ul>
+<blockquote>
+<p><code>register</code>关键字声明局部变量，提示编译器将变量存储与寄存器而非内存中，不过最终是否将其存放于寄存器又编译器决定</p>
+</blockquote>
+<h3 id="41-extern">🏳️‍🌈4.1 extern</h3>
+<ul>
+<li>作用：</li>
+</ul>
+<blockquote>
+<ol>
+<li>用于变量声明使用，<!-- raw HTML omitted --><strong>引用别处定义的变量，用于提示的其实是一个内存地址</strong><!-- raw HTML omitted -->，所以对于数组来说并不用指明元素个数</li>
+</ol>
+</blockquote>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 下面两个声明等价
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">extern</span> <span style="color:#458;font-weight:bold">int</span> arr[];
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">extern</span> <span style="color:#458;font-weight:bold">int</span> arr[<span style="color:#099">100</span>];
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<ol start="2">
+<li>为<strong>局部</strong>标识符指定<code>external</code>链接属性，这样就可以访问在其他任何位置定义的这个实体</li>
+</ol>
+</blockquote>
+<h3 id="42-static">🏳️‍🌈4.2 static</h3>
+<ul>
+<li>用于变量声明使用</li>
+<li>作用：</li>
+</ul>
+<blockquote>
+<ol>
+<li>修饰具有<code>external</code>链接属性的声明，<code>static</code>可以使它的链接属性变为internal，上述转换包括全局变量和函数</li>
+</ol>
+</blockquote>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">static</span> <span style="color:#458;font-weight:bold">int</span> a; <span style="color:#998;font-style:italic">// 全局变量
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">static</span> <span style="color:#458;font-weight:bold">int</span> <span style="color:#900;font-weight:bold">f</span>(<span style="color:#458;font-weight:bold">int</span> b); <span style="color:#998;font-style:italic">// 函数
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<ol start="2">
+<li>修饰局部变量，使其转变为静态变量，存放于静态存储区</li>
+</ol>
+</blockquote>
+<h3 id="43-总结">🏳️‍🌈4.3 总结</h3>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>变量类型</th>
+<th>声明的位置</th>
+<th>是否存于堆栈</th>
+<th>作用域</th>
+<th>链接属性</th>
+<th>如果声明为static</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>全局</td>
+<td>所有代码块之外</td>
+<td>否</td>
+<td>从声明处至文件尾</td>
+<td>external</td>
+<td>变为internal属性，不允许其他源文件访问</td>
+</tr>
+<tr>
+<td>局部</td>
+<td>代码块和函数内</td>
+<td>是</td>
+<td>代码块和函数内</td>
+<td>none</td>
+<td>变量不存储于堆栈中，它的值在整个执行期一直保持</td>
+</tr>
+<tr>
+<td>形式参数</td>
+<td>函数形参</td>
+<td>是</td>
+<td>整个函数内</td>
+<td>none</td>
+<td>不允许</td>
+</tr>
+</tbody>
+</table></div>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/c%E5%92%8C%E6%8C%87%E9%92%88/">C和指针</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/02_%E5%AD%97%E7%AC%A6%E4%B8%B2/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">02_字符串</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/01_%E6%A0%87%E5%87%86%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">01_标准输入输出</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/00_%E6%96%87%E4%BB%B6%E6%89%A7%E8%A1%8C/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">00_文件执行</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='操作符和表达式 1. 操作符 🔰1.0 操作符优先级 非真正意义运算符 &amp;gt; 单目运算符 &amp;gt; 算 &amp;gt; 移 &amp;gt; 关 &amp;gt; 位 &amp;gt; 逻 &amp;gt; 赋 &amp;gt; 三 结合性只用于表达式中出现两个以上相同优先级的操作符的情况，且相同优先级的操作符，结合性也相同 专家认为，除了乘除和加减的优先级，其他涉及其他操作符时一律加上括号 1.0.1 非真正意义上的运算符 ()：聚组作用 ()：函数调用 []：下标运算 ., -&amp;gt;：成员操作符 运算符 结合性 () () [] . -&amp;gt; 自左向右 1.0.2 单目运算符 &#43;&#43;, --：后缀 &#43;&#43;, --：前缀 *：间接访问 &amp;amp;：取地址 运算符 结合性 &#43;&#43; -- ! ~ - (type) * &amp;amp; sizeof 自右向左 1.0.3 算术运算符 运算符 结合性 * / % 自左向右 &#43; - 自左向右 1.'>
+<title>05_操作符和表达式</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/05_%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%92%8C%E8%A1%A8%E8%BE%BE%E5%BC%8F/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='05_操作符和表达式'>
+<meta property='og:description' content='操作符和表达式 1. 操作符 🔰1.0 操作符优先级 非真正意义运算符 &amp;gt; 单目运算符 &amp;gt; 算 &amp;gt; 移 &amp;gt; 关 &amp;gt; 位 &amp;gt; 逻 &amp;gt; 赋 &amp;gt; 三 结合性只用于表达式中出现两个以上相同优先级的操作符的情况，且相同优先级的操作符，结合性也相同 专家认为，除了乘除和加减的优先级，其他涉及其他操作符时一律加上括号 1.0.1 非真正意义上的运算符 ()：聚组作用 ()：函数调用 []：下标运算 ., -&amp;gt;：成员操作符 运算符 结合性 () () [] . -&amp;gt; 自左向右 1.0.2 单目运算符 &#43;&#43;, --：后缀 &#43;&#43;, --：前缀 *：间接访问 &amp;amp;：取地址 运算符 结合性 &#43;&#43; -- ! ~ - (type) * &amp;amp; sizeof 自右向左 1.0.3 算术运算符 运算符 结合性 * / % 自左向右 &#43; - 自左向右 1.'>
+<meta property='og:url' content='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/05_%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%92%8C%E8%A1%A8%E8%BE%BE%E5%BC%8F/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='C和指针' /><meta property='article:published_time' content='2023-03-05T21:22:06&#43;08:00'/><meta property='article:modified_time' content='2023-03-05T21:22:06&#43;08:00'/>
+<meta name="twitter:title" content="05_操作符和表达式">
+<meta name="twitter:description" content="操作符和表达式 1. 操作符 🔰1.0 操作符优先级 非真正意义运算符 &amp;gt; 单目运算符 &amp;gt; 算 &amp;gt; 移 &amp;gt; 关 &amp;gt; 位 &amp;gt; 逻 &amp;gt; 赋 &amp;gt; 三 结合性只用于表达式中出现两个以上相同优先级的操作符的情况，且相同优先级的操作符，结合性也相同 专家认为，除了乘除和加减的优先级，其他涉及其他操作符时一律加上括号 1.0.1 非真正意义上的运算符 ()：聚组作用 ()：函数调用 []：下标运算 ., -&amp;gt;：成员操作符 运算符 结合性 () () [] . -&amp;gt; 自左向右 1.0.2 单目运算符 &#43;&#43;, --：后缀 &#43;&#43;, --：前缀 *：间接访问 &amp;amp;：取地址 运算符 结合性 &#43;&#43; -- ! ~ - (type) * &amp;amp; sizeof 自右向左 1.0.3 算术运算符 运算符 结合性 * / % 自左向右 &#43; - 自左向右 1.">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-操作符">1. 操作符</a>
+      <ul>
+        <li><a href="#10-操作符优先级">🔰1.0 操作符优先级</a></li>
+        <li><a href="#11-算术操作符">🔰1.1 算术操作符</a></li>
+        <li><a href="#12-移位操作符">🔰1.2 移位操作符</a></li>
+        <li><a href="#13-位操作符">🔰1.3 位操作符</a></li>
+        <li><a href="#14-赋值操作符">🔰1.4 赋值操作符</a></li>
+        <li><a href="#15-单目操作符">🔰1.5 单目操作符</a></li>
+        <li><a href="#16-关系操作符">🔰1.6 关系操作符</a></li>
+        <li><a href="#17-逻辑操作符">🔰1.7 逻辑操作符</a></li>
+        <li><a href="#18-条件操作符">🔰1.8 条件操作符</a></li>
+        <li><a href="#19-逗号操作符">🔰1.9 逗号操作符</a></li>
+        <li><a href="#110-下标引用函数调用和结构成员">🔰1.10 下标引用、函数调用和结构成员</a></li>
+        <li><a href="#111-sizeof">🔰1.11 sizeof</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-布尔值">2. 布尔值</a></li>
+    <li><a href="#3-左值和右值">3. 左值和右值</a></li>
+    <li><a href="#4-表达式求值">4. 表达式求值</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="background-color: #c1c1f6; color: #fff;">
+                读书笔记
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/05_%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%92%8C%E8%A1%A8%E8%BE%BE%E5%BC%8F/">05_操作符和表达式</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 05, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    3 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="操作符和表达式">操作符和表达式</h1>
+<h2 id="1-操作符">1. 操作符</h2>
+<h3 id="10-操作符优先级">🔰1.0 操作符优先级</h3>
+<ul>
+<li><!-- raw HTML omitted --><strong>非真正意义运算符 &gt; 单目运算符 &gt; 算 &gt; 移 &gt; 关 &gt; 位 &gt; 逻 &gt; 赋 &gt; 三</strong><!-- raw HTML omitted --></li>
+<li>结合性只用于表达式中出现两个以上相同优先级的操作符的情况，且相同优先级的操作符，结合性也相同</li>
+<li>专家认为，除了乘除和加减的优先级，其他涉及其他操作符时一律加上括号</li>
+</ul>
+<h4 id="101-非真正意义上的运算符">1.0.1 非真正意义上的运算符</h4>
+<ul>
+<li><code>()</code>：聚组作用</li>
+<li><code>()</code>：函数调用</li>
+<li><code>[]</code>：下标运算</li>
+<li><code>., -&gt;</code>：成员操作符</li>
+</ul>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>结合性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>() () [] . -&gt;</code></td>
+<td>自左向右</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="102-单目运算符">1.0.2 单目运算符</h4>
+<ul>
+<li><code>++, --</code>：后缀</li>
+<li><code>++, --</code>：前缀</li>
+<li><code>*</code>：间接访问</li>
+<li><code>&amp;</code>：取地址</li>
+</ul>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>结合性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>++ -- ! ~ - (type) * &amp; sizeof</code></td>
+<td>自右向左</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="103-算术运算符">1.0.3 算术运算符</h4>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>结合性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>* / %</code></td>
+<td>自左向右</td>
+</tr>
+<tr>
+<td><code>+ -</code></td>
+<td>自左向右</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="104-移位运算符">1.0.4 移位运算符</h4>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>结合性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt;&lt; &gt;&gt;</code></td>
+<td>自左向右</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="105-关系运算符">1.0.5 关系运算符</h4>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>结合性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&lt; &lt;= &gt; &gt;=</code></td>
+<td>自左向右</td>
+</tr>
+<tr>
+<td><code>== !=</code></td>
+<td>自左向右</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="106-位运算符">1.0.6 位运算符</h4>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>结合性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&amp;</code></td>
+<td>自左向右</td>
+</tr>
+<tr>
+<td><code>^</code></td>
+<td>自左向右</td>
+</tr>
+<tr>
+<td><code>|</code></td>
+<td>自左向右</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="107-逻辑运算符">1.0.7 逻辑运算符</h4>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>结合性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>&amp;&amp;</code></td>
+<td>自左向右</td>
+</tr>
+<tr>
+<td><code>||</code></td>
+<td>自左向右</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="108-赋值运算符">1.0.8 赋值运算符</h4>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>结合性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>=</code></td>
+<td>自右向左</td>
+</tr>
+<tr>
+<td>复合赋值</td>
+<td>自右向左</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="109-三目运算符">1.0.9 三目运算符</h4>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>运算符</th>
+<th>结合性</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>? :</code></td>
+<td>自右向左</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="1010-逗号运算符">1.0.10 逗号运算符</h4>
+<ul>
+<li>所有运算符中优先级最低</li>
+</ul>
+<h3 id="11-算术操作符">🔰1.1 算术操作符</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">+</span>   <span style="color:#000;font-weight:bold">-</span>    <span style="color:#000;font-weight:bold">*</span>   <span style="color:#000;font-weight:bold">/</span>   <span style="color:#000;font-weight:bold">%</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>除了<code>%</code>外，其他既可用于整数类型也可用于浮点类型。<code>%</code>接收整型操作数</li>
+<li><code>/</code>的两个操作数都是整数时，执行整数除法；其他情况执行浮点除法</li>
+</ul>
+<h3 id="12-移位操作符">🔰1.2 移位操作符</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">&lt;&lt;</span>   <span style="color:#000;font-weight:bold">&gt;&gt;</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>对于左移和逻辑右移，移出的位舍弃，空出来的补<code>0</code></li>
+<li>对于算术右移，根据符号位填补空出位，正数填<code>0</code>，负数填<code>1</code></li>
+<li>对于无符号数，一律采用逻辑移位；有符号数的右移取决于编译器，因此如果<strong>代码中使用了有符号数的右移操作，就不可移植</strong></li>
+</ul>
+<h3 id="13-位操作符">🔰1.3 位操作符</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">&amp;</span>(<span style="color:#a61717;background-color:#e3d2d2">与</span>AND)    <span style="color:#000;font-weight:bold">|</span>(<span style="color:#a61717;background-color:#e3d2d2">或</span>OR)    <span style="color:#000;font-weight:bold">^</span>(<span style="color:#a61717;background-color:#e3d2d2">异或</span>XOR)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>^</code>两个位相同结果为<code>0</code>，不同为<code>1</code></li>
+</ul>
+<h3 id="14-赋值操作符">🔰1.4 赋值操作符</h3>
+<h4 id="heading">=</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">=</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>赋值操作符结合性从右到左</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>a <span style="color:#000;font-weight:bold">=</span> x <span style="color:#000;font-weight:bold">=</span> y <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">3</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 等价于
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>a <span style="color:#000;font-weight:bold">=</span> (x <span style="color:#000;font-weight:bold">=</span> y <span style="color:#000;font-weight:bold">+</span> <span style="color:#099">3</span>);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>说<code>a</code>和<code>x</code>被赋予了相同的值是不正确的。如果<code>x</code>为<code>char</code>型，则<code>y+3</code>的值会被截去一段，那么a被赋予的值是被截断后的值</li>
+</ul>
+<h4 id="复合赋值符">复合赋值符</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">+=</span>      <span style="color:#000;font-weight:bold">-=</span>      <span style="color:#000;font-weight:bold">*=</span>      <span style="color:#000;font-weight:bold">/=</span>      <span style="color:#000;font-weight:bold">%=</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">&lt;&lt;=</span>     <span style="color:#000;font-weight:bold">&gt;&gt;=</span>     <span style="color:#000;font-weight:bold">&amp;=</span>      <span style="color:#000;font-weight:bold">^=</span>      <span style="color:#000;font-weight:bold">|=</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>使用复合赋值符使程序更易于维护</li>
+</ul>
+<h3 id="15-单目操作符">🔰1.5 单目操作符</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">!</span><span style="color:#a61717;background-color:#e3d2d2">（逻辑取反）</span>      <span style="color:#000;font-weight:bold">++</span>      <span style="color:#000;font-weight:bold">-</span>      <span style="color:#000;font-weight:bold">&amp;</span><span style="color:#a61717;background-color:#e3d2d2">（取地址）</span>      <span style="color:#000;font-weight:bold">sizeof</span><span style="color:#a61717;background-color:#e3d2d2">（判断操作数长度）</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">~</span><span style="color:#a61717;background-color:#e3d2d2">（取补码）</span>      <span style="color:#000;font-weight:bold">--</span>      <span style="color:#000;font-weight:bold">+</span>      <span style="color:#000;font-weight:bold">*</span><span style="color:#a61717;background-color:#e3d2d2">（间接访问操作符）</span>      (<span style="color:#a61717;background-color:#e3d2d2">类型</span>)<span style="color:#a61717;background-color:#e3d2d2">（强制类型转换）</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>sizeof操作符判断操作数的类型长度，结果以字节为单位</li>
+</ul>
+<blockquote>
+<ol>
+<li>操作数为表达式：</li>
+</ol>
+<ul>
+<li>单个变量，<code>sizeof x</code>或<code>sizeof (x)</code>；</li>
+<li>为表达式时，判断表达式长度并不会对表达式进行求值，<code>sizeof(a = b + 1)</code></li>
+</ul>
+<ol start="2">
+<li>操作数为类型名。<code>sizeof (int)</code></li>
+<li>操作数为数组名，返回该数组的长度</li>
+</ol>
+</blockquote>
+<ul>
+<li>(类型)为强制类型转换符</li>
+</ul>
+<blockquote>
+<ul>
+<li>强制类型转黄放在表达式前面只会改变表达式的第1个项目的类型<code>long a = (long)b + c;</code></li>
+</ul>
+</blockquote>
+<ul>
+<li><code>++</code>，<code>--</code>只能操作变量</li>
+</ul>
+<h3 id="16-关系操作符">🔰1.6 关系操作符</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">&gt;</span>    <span style="color:#000;font-weight:bold">&gt;=</span>     <span style="color:#000;font-weight:bold">&lt;</span>    <span style="color:#000;font-weight:bold">&lt;=</span>     <span style="color:#000;font-weight:bold">!=</span>       <span style="color:#000;font-weight:bold">==</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>C中没有布尔类型，关系运算符的操作数用<code>0</code>表示假，非<code>0</code>表示真</li>
+<li>通过关系运算符得到的结果真为<code>1</code>，假为<code>0</code></li>
+</ul>
+<h3 id="17-逻辑操作符">🔰1.7 逻辑操作符</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">&amp;&amp;</span>    <span style="color:#000;font-weight:bold">||</span> 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>短路求值</li>
+</ul>
+<blockquote>
+<p><code>&amp;&amp;</code>：左操作数为假时，右操作数不再求值
+<code>||</code>：左操作数为真时，右操作数不再求值</p>
+</blockquote>
+<h3 id="18-条件操作符">🔰1.8 条件操作符</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>expression1 <span style="color:#000;font-weight:bold">?</span> <span style="color:#900;font-weight:bold">expression2</span> : expression3
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="19-逗号操作符">🔰1.9 逗号操作符</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>expression1, expression2, expression3...
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>上述表达式从左向右依次运算</li>
+<li>逗号操作符的结果为最后一个表达式的值</li>
+</ul>
+<h3 id="110-下标引用函数调用和结构成员">🔰1.10 下标引用、函数调用和结构成员</h3>
+<h4 id="下标引用">下标引用[]</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>array[<span style="color:#a61717;background-color:#e3d2d2">下标</span>] <span style="color:#998;font-style:italic">// 等价于
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">*</span>(array <span style="color:#000;font-weight:bold">+</span> <span style="color:#a61717;background-color:#e3d2d2">下标</span>)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>接受两个操作符：一个数组名，一个索引值</li>
+<li>下标引用实际上是通过<code>*(array + 下标)</code>实现</li>
+</ul>
+<h4 id="函数调用">函数调用()</h4>
+<ul>
+<li>接受一个或多个参数：第一个为函数名，剩余为函数的参数</li>
+<li>可以以表达式作为函数名</li>
+</ul>
+<h4 id="结构成员和-">结构成员.和-&gt;</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>s.a  <span style="color:#998;font-style:italic">// s为结构变量
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>s<span style="color:#000;font-weight:bold">-&gt;</span>a <span style="color:#998;font-style:italic">// s为指向结构变量的指针
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="111-sizeof">🔰1.11 sizeof</h3>
+<ul>
+<li>计算所占内存的多少</li>
+<li>操作数类型：</li>
+</ul>
+<blockquote>
+<ul>
+<li>类型名：需要加上括号</li>
+<li>变量：不必加括号</li>
+</ul>
+</blockquote>
+<ul>
+<li><code>sizeof(数组)</code>：数组所占的内存空间大小<code>=N*sizeof(type)</code></li>
+</ul>
+<h2 id="2-布尔值">2. 布尔值</h2>
+<ul>
+<li>C中没有布尔值，而使用整数代替，规则是：<strong>0为假，非0为真</strong></li>
+<li>应避免混合使用整型值和布尔值，如下<code>flag</code>必为整型，但是它的值不一定局限于<code>0</code>和<code>1</code>，则<code>if (flag == TRUE){}</code>就不等价</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#define FALSE 0
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#define TRUE  1
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>...
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">if</span> (flag <span style="color:#000;font-weight:bold">==</span> FALSE){}
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">if</span> (flag <span style="color:#000;font-weight:bold">==</span> TRUE){}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>如果一个变量用于表示布尔值，则应该把它的值始终设置为<code>0</code>或<code>1</code>，并不与特定的值进行比较判断是否为真</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>flag <span style="color:#000;font-weight:bold">=</span> value <span style="color:#000;font-weight:bold">&gt;=</span> <span style="color:#099">0</span>;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">if</span> (<span style="color:#000;font-weight:bold">!</span>flag){}
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">if</span> (flag){}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="3-左值和右值">3. 左值和右值</h2>
+<ul>
+<li>左值<!-- raw HTML omitted --><strong>标识了一个可以存储结果值的地点，该地址在编译时便可知，存储于符号表中</strong><!-- raw HTML omitted -->，可以位于<code>=</code>左边或右边</li>
+<li>右值<!-- raw HTML omitted --><strong>只提供一个值，直到运行时才知道</strong><!-- raw HTML omitted -->，这个值的结果不能预测存储在哪里</li>
+</ul>
+<h2 id="4-表达式求值">4. 表达式求值</h2>
+<ul>
+<li>整型算术运算的表达式在计算时至少以整型类型的精度进行，即“整形提升”</li>
+<li>下面的算术转换，a * b可能超出int范围，值会溢出，c为错误的值，所以需要修改为<code>long c = (long)a * b;</code></li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> a <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">5000</span>;
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> b <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">25</span>;
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">long</span> c <span style="color:#000;font-weight:bold">=</span> a <span style="color:#000;font-weight:bold">*</span> b; <span style="color:#998;font-style:italic">// =&gt; long c = (long)a * b;
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>操作符</li>
+</ul>
+<blockquote>
+<p>表达式求值顺序由操作符优先级、结合性和操作符是否控制执行顺序决定</p>
+<blockquote>
+<ol>
+<li>相邻操作符的执行顺序由优先级决定</li>
+<li>优先级相同时，由结合性决定</li>
+<li>编译器自由决定对表达式的求值顺序，只要遵守<code>,</code>，<code>&amp;&amp;</code>，<code>||</code>和<code>?:</code>操作符施加顺序限制</li>
+</ol>
+</blockquote>
+</blockquote>
+<ul>
+<li>各操作数的计算顺序是不确定的，它的目的是使编译器选区最合适的顺序产生最快的代码</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>a <span style="color:#000;font-weight:bold">*</span> b <span style="color:#000;font-weight:bold">+</span> c <span style="color:#000;font-weight:bold">*</span> d <span style="color:#000;font-weight:bold">+</span> e <span style="color:#000;font-weight:bold">*</span> f
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 1. 求值优先级肯定*高于+，*在它相邻的+之前执行
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 2. 加法的结合性要求从左到右
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 3. 乘法的计算顺序不一定，执行顺序可以如下：
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// a * b
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// c * d
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// (a * b) + (c * d)
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// e * f
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// (a * b) + (c * d) + (e * f)
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 或
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// c * d
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// e * f
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// a * b
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// (a * b) + (c * d)
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// (a * b) + (c * d) + (e * f)
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/c%E5%92%8C%E6%8C%87%E9%92%88/">C和指针</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/04_%E8%AF%AD%E5%8F%A5/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">04_语句</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/03_%E6%95%B0%E6%8D%AE/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">03_数据</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/02_%E5%AD%97%E7%AC%A6%E4%B8%B2/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">02_字符串</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/01_%E6%A0%87%E5%87%86%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">01_标准输入输出</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/00_%E6%96%87%E4%BB%B6%E6%89%A7%E8%A1%8C/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">00_文件执行</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

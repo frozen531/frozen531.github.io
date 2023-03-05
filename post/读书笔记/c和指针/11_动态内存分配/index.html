@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='动态内存分配 1. 为什么进行动态内存分配 以数组来说，很多时候我们并不知道实际数组中存放多少元素，所以会指定一个常量来提前说明数组的长度（编译时），但是这样很多情况下会造成内存浪费 动态内存分配可以在运行时分配内存 2. 动态内存分配 🎨2.1 动态内存分配的内存空间从哪里来 动态内存分配的维护一个可用的内存池 头文件#include &amp;lt;stdlib.h&amp;gt; 🎨2.2 malloc和free 2.2.1 malloc 1 void *malloc(size_t size); malloc函数从内存池中申请一块相应大小的内存，并返回指向该内存的指针 每次都应当对返回值进行检测，当系统无法为malloc提供相应多的内存时，返回NULL 1 2 3 4 5 6 int *p = malloc(100); if(p == NULL) { printf(&amp;#34;Out of memory!\n&amp;#34;); exit(1); } void *类型的指针可以转换为任何类型 malloc返回的内存起始位置始终满足边界对齐的要求 为提高代码的可移植性，malloc可以按照下面的方式计算所需内存大小 1 p = malloc(25 * sizeof(int)); 2.2.2 free 1 void free(void *pointer); free传入的指针是有malloc返回的指针 当传入参数为NULL，不会有任何效果 🎨2.3 calloc和realloc 2.3.1 calloc 1 void *calloc(size_t num_elements, size_t element_size); 与malloc的区别 calloc在返回指针之前把它初始化为0'>
+<title>11_动态内存分配</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/11_%E5%8A%A8%E6%80%81%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='11_动态内存分配'>
+<meta property='og:description' content='动态内存分配 1. 为什么进行动态内存分配 以数组来说，很多时候我们并不知道实际数组中存放多少元素，所以会指定一个常量来提前说明数组的长度（编译时），但是这样很多情况下会造成内存浪费 动态内存分配可以在运行时分配内存 2. 动态内存分配 🎨2.1 动态内存分配的内存空间从哪里来 动态内存分配的维护一个可用的内存池 头文件#include &amp;lt;stdlib.h&amp;gt; 🎨2.2 malloc和free 2.2.1 malloc 1 void *malloc(size_t size); malloc函数从内存池中申请一块相应大小的内存，并返回指向该内存的指针 每次都应当对返回值进行检测，当系统无法为malloc提供相应多的内存时，返回NULL 1 2 3 4 5 6 int *p = malloc(100); if(p == NULL) { printf(&amp;#34;Out of memory!\n&amp;#34;); exit(1); } void *类型的指针可以转换为任何类型 malloc返回的内存起始位置始终满足边界对齐的要求 为提高代码的可移植性，malloc可以按照下面的方式计算所需内存大小 1 p = malloc(25 * sizeof(int)); 2.2.2 free 1 void free(void *pointer); free传入的指针是有malloc返回的指针 当传入参数为NULL，不会有任何效果 🎨2.3 calloc和realloc 2.3.1 calloc 1 void *calloc(size_t num_elements, size_t element_size); 与malloc的区别 calloc在返回指针之前把它初始化为0'>
+<meta property='og:url' content='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/11_%E5%8A%A8%E6%80%81%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='C和指针' /><meta property='article:published_time' content='2023-03-05T21:22:11&#43;08:00'/><meta property='article:modified_time' content='2023-03-05T21:22:11&#43;08:00'/>
+<meta name="twitter:title" content="11_动态内存分配">
+<meta name="twitter:description" content="动态内存分配 1. 为什么进行动态内存分配 以数组来说，很多时候我们并不知道实际数组中存放多少元素，所以会指定一个常量来提前说明数组的长度（编译时），但是这样很多情况下会造成内存浪费 动态内存分配可以在运行时分配内存 2. 动态内存分配 🎨2.1 动态内存分配的内存空间从哪里来 动态内存分配的维护一个可用的内存池 头文件#include &amp;lt;stdlib.h&amp;gt; 🎨2.2 malloc和free 2.2.1 malloc 1 void *malloc(size_t size); malloc函数从内存池中申请一块相应大小的内存，并返回指向该内存的指针 每次都应当对返回值进行检测，当系统无法为malloc提供相应多的内存时，返回NULL 1 2 3 4 5 6 int *p = malloc(100); if(p == NULL) { printf(&amp;#34;Out of memory!\n&amp;#34;); exit(1); } void *类型的指针可以转换为任何类型 malloc返回的内存起始位置始终满足边界对齐的要求 为提高代码的可移植性，malloc可以按照下面的方式计算所需内存大小 1 p = malloc(25 * sizeof(int)); 2.2.2 free 1 void free(void *pointer); free传入的指针是有malloc返回的指针 当传入参数为NULL，不会有任何效果 🎨2.3 calloc和realloc 2.3.1 calloc 1 void *calloc(size_t num_elements, size_t element_size); 与malloc的区别 calloc在返回指针之前把它初始化为0">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-为什么进行动态内存分配">1. 为什么进行动态内存分配</a></li>
+    <li><a href="#2-动态内存分配">2. 动态内存分配</a>
+      <ul>
+        <li><a href="#21-动态内存分配的内存空间从哪里来">🎨2.1 动态内存分配的内存空间从哪里来</a></li>
+        <li><a href="#22-malloc和free">🎨2.2 malloc和free</a></li>
+        <li><a href="#23-calloc和realloc">🎨2.3 calloc和realloc</a></li>
+        <li><a href="#24-常见的动态内存错误">🎨2.4 常见的动态内存错误</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="background-color: #c1c1f6; color: #fff;">
+                读书笔记
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/11_%E5%8A%A8%E6%80%81%E5%86%85%E5%AD%98%E5%88%86%E9%85%8D/">11_动态内存分配</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 05, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    1 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="动态内存分配">动态内存分配</h1>
+<h2 id="1-为什么进行动态内存分配">1. 为什么进行动态内存分配</h2>
+<ul>
+<li>以数组来说，很多时候我们并不知道实际数组中存放多少元素，所以会指定一个常量来提前说明数组的长度（编译时），但是这样很多情况下会造成内存浪费</li>
+<li>动态内存分配可以在运行时分配内存</li>
+</ul>
+<h2 id="2-动态内存分配">2. 动态内存分配</h2>
+<h3 id="21-动态内存分配的内存空间从哪里来">🎨2.1 动态内存分配的内存空间从哪里来</h3>
+<ul>
+<li>动态内存分配的维护一个可用的<!-- raw HTML omitted --><strong>内存池</strong><!-- raw HTML omitted --></li>
+<li>头文件<code>#include &lt;stdlib.h&gt;</code></li>
+</ul>
+<h3 id="22-malloc和free">🎨2.2 malloc和free</h3>
+<h4 id="221-malloc">2.2.1 malloc</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> <span style="color:#000;font-weight:bold">*</span><span style="color:#900;font-weight:bold">malloc</span>(<span style="color:#458;font-weight:bold">size_t</span> size);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>malloc</code>函数从内存池中申请一块相应大小的内存，并返回指向该内存的指针</li>
+<li>每次都应当对返回值进行检测，当系统无法为<code>malloc</code>提供相应多的内存时，返回<code>NULL</code></li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">*</span>p <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">malloc</span>(<span style="color:#099">100</span>);
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">if</span>(p <span style="color:#000;font-weight:bold">==</span> <span style="color:#0086b3">NULL</span>)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">printf</span>(<span style="color:#d14">&#34;Out of memory!</span><span style="color:#d14">\n</span><span style="color:#d14">&#34;</span>);
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">exit</span>(<span style="color:#099">1</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>void *</code>类型的指针可以转换为任何类型</li>
+<li><code>malloc</code>返回的内存起始位置始终满足边界对齐的要求</li>
+<li>为提高代码的可移植性，malloc可以按照下面的方式计算所需内存大小</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>p <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">malloc</span>(<span style="color:#099">25</span> <span style="color:#000;font-weight:bold">*</span> <span style="color:#000;font-weight:bold">sizeof</span>(<span style="color:#458;font-weight:bold">int</span>)); 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="222-free">2.2.2 free</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">free</span>(<span style="color:#458;font-weight:bold">void</span> <span style="color:#000;font-weight:bold">*</span>pointer);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>free</code>传入的指针是有<code>malloc</code>返回的指针</li>
+<li>当传入参数为<code>NULL</code>，不会有任何效果</li>
+</ul>
+<h3 id="23-calloc和realloc">🎨2.3 calloc和realloc</h3>
+<h4 id="231-calloc">2.3.1 calloc</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> <span style="color:#000;font-weight:bold">*</span><span style="color:#900;font-weight:bold">calloc</span>(<span style="color:#458;font-weight:bold">size_t</span> num_elements, <span style="color:#458;font-weight:bold">size_t</span> element_size);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>与<code>malloc</code>的区别</li>
+</ul>
+<blockquote>
+<p><code>calloc</code>在返回指针之前把它初始化为<code>0</code></p>
+</blockquote>
+<h4 id="232-realloc">2.3.2 realloc</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">realloc</span>(<span style="color:#458;font-weight:bold">void</span> <span style="color:#000;font-weight:bold">*</span>ptr, <span style="color:#458;font-weight:bold">size_t</span> new_size);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>用于修改原先已经分配的内存块的大小，可以扩大或缩小</li>
+</ul>
+<blockquote>
+<ol>
+<li>扩大：新增加的内存添加到原有内存块的后面；若原先的内存块无法改变大小，则会重新申请另一块正确大小的内存，并将原有的内容拷贝过来，因此使用<code>realloc</code>后，要改用<code>realloc</code>返回的指针</li>
+<li>缩小：内存块尾部内存被释放</li>
+</ol>
+</blockquote>
+<h3 id="24-常见的动态内存错误">🎨2.4 常见的动态内存错误</h3>
+<ul>
+<li>不能对<code>NULL</code>解引用，所以要事先判断</li>
+<li>当多个指针指向同一块内存时，要确保所有指针都不使用该内存才能销毁内存</li>
+<li>试图释放一块动态内存中的一部分内存</li>
+<li>对分配的内存操作越界</li>
+<li>试图释放非动态分配的内存</li>
+<li>忘记对动态分配的内存进行释放，严重会造成<strong>内存泄漏</strong></li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/c%E5%92%8C%E6%8C%87%E9%92%88/">C和指针</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/10_%E7%BB%93%E6%9E%84%E5%92%8C%E8%81%94%E5%90%88/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">10_结构和联合</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/08_%E6%95%B0%E7%BB%84/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">08_数组</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/07_%E5%87%BD%E6%95%B0/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">07_函数</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/06_%E6%8C%87%E9%92%88/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">06_指针</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/05_%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%92%8C%E8%A1%A8%E8%BE%BE%E5%BC%8F/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">05_操作符和表达式</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

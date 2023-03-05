@@ -1,0 +1,1110 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='1. 析构函数 析构函数的 特点：
+没有返回值 没有参数，因此不可以重载 析构函数的 职责 是：
+函数体内，释放对象使用的资源 函数体执行后，销毁对象的非static数据成员，逆序释放（隐式） 隐式的销毁的对象的数据成员中，如果含有内置类型指针，不会销毁其所指向的对象，所以要用delete
+构造函数的 职责 是：
+函数体执行前，初始化对象的非static数据成员，按类中出想的顺序顺次初始化 函数体内，可以做些其他工作 在析构函数的函数体内可以执行其他操作，类对象销毁在析构函数
+2. 拷贝、移动与交换 用一个对象为另一个对象赋值或初始化的操作，分为 拷贝 和 移动 两种，区别在于：
+拷贝所得的两个对象间，彼此 互不影响 移动则是将右值的对象值 转嫁 给另一个对象，然后这个右值可以销毁。 2.1 三/五原则 我们通常将：拷贝构造函数、拷贝赋值函数、析构函数看成是一个 整体 (如果一个有需要自己定义，其他也应该一同定义)，统称其为 拷贝控制成员 。需要我们自己定义拷贝控制成员的 基本原则 是：
+原则一：先确定该类是否需要一个析构函数，需要的话，一定要同时自定义拷贝构造和拷贝赋值函数。 原则二：如果需要自定义一个拷贝构造函数，则一定同时需要自定义拷贝赋值函数，反之亦然 注意：无论需要拷贝构造还是拷贝赋值，都不意味着必然需要析构函数。
+何时需要析构函数呢？当一个类为 管理资源 的类时需要析构函数，即带有指针，要动态分配内存。
+加入移动构造函数和移动赋值函数，提升为五原则。
+🎃 2.2 拷贝 2.1.1 拷贝构造函数 拷贝构造函数特点：
+第一个参数必须是一个引用类型，且任何额外参数都有默认值。 1 Foo (const Foo&amp;amp;); 原因是：如果传值的话，参数的传递是一个拷贝过程，那么在还没有定义完拷贝构造函数的前提下，进行类类型的拷贝，会调用该类的拷贝构造函数，如此以往。
+直接初始化，通过函数参数匹配来选择使用最匹配的构造函数，包括：容器的emplace操作 1 2 string dots(10, &amp;#39;.&amp;#39;); // 使用最佳参数匹配的构造函数直接初始化 string s(dots); // 使用拷贝构造函数直接初始化 拷贝初始化，将右侧运算对象拷贝到正在创建的对象中，表现形式有： =，{}， 非引用类型的参数传入，非引用类型的函数返回，容器的insert和push操作 1 2 3 string s2 = dots; // 拷贝初始化，仍然使用拷贝构造函数 string null_book = &amp;#34;999-999-999&amp;#34; // 拷贝初始化，先在右侧构造一个string对象在拷贝初始化左侧，注意这里使用了构造函数的隐式转换 string nines = string(100, &amp;#39;9&amp;#39;) // 右侧直接初始化一个string对象，再拷贝初始化左侧对象 explicit构造函数只能用于直接初始化，所以隐式转换在拷贝初始化会受到限制。'>
+<title>第13章 BigThree和移动</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC13%E7%AB%A0_bigthree%E5%92%8C%E7%A7%BB%E5%8A%A8/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='第13章 BigThree和移动'>
+<meta property='og:description' content='1. 析构函数 析构函数的 特点：
+没有返回值 没有参数，因此不可以重载 析构函数的 职责 是：
+函数体内，释放对象使用的资源 函数体执行后，销毁对象的非static数据成员，逆序释放（隐式） 隐式的销毁的对象的数据成员中，如果含有内置类型指针，不会销毁其所指向的对象，所以要用delete
+构造函数的 职责 是：
+函数体执行前，初始化对象的非static数据成员，按类中出想的顺序顺次初始化 函数体内，可以做些其他工作 在析构函数的函数体内可以执行其他操作，类对象销毁在析构函数
+2. 拷贝、移动与交换 用一个对象为另一个对象赋值或初始化的操作，分为 拷贝 和 移动 两种，区别在于：
+拷贝所得的两个对象间，彼此 互不影响 移动则是将右值的对象值 转嫁 给另一个对象，然后这个右值可以销毁。 2.1 三/五原则 我们通常将：拷贝构造函数、拷贝赋值函数、析构函数看成是一个 整体 (如果一个有需要自己定义，其他也应该一同定义)，统称其为 拷贝控制成员 。需要我们自己定义拷贝控制成员的 基本原则 是：
+原则一：先确定该类是否需要一个析构函数，需要的话，一定要同时自定义拷贝构造和拷贝赋值函数。 原则二：如果需要自定义一个拷贝构造函数，则一定同时需要自定义拷贝赋值函数，反之亦然 注意：无论需要拷贝构造还是拷贝赋值，都不意味着必然需要析构函数。
+何时需要析构函数呢？当一个类为 管理资源 的类时需要析构函数，即带有指针，要动态分配内存。
+加入移动构造函数和移动赋值函数，提升为五原则。
+🎃 2.2 拷贝 2.1.1 拷贝构造函数 拷贝构造函数特点：
+第一个参数必须是一个引用类型，且任何额外参数都有默认值。 1 Foo (const Foo&amp;amp;); 原因是：如果传值的话，参数的传递是一个拷贝过程，那么在还没有定义完拷贝构造函数的前提下，进行类类型的拷贝，会调用该类的拷贝构造函数，如此以往。
+直接初始化，通过函数参数匹配来选择使用最匹配的构造函数，包括：容器的emplace操作 1 2 string dots(10, &amp;#39;.&amp;#39;); // 使用最佳参数匹配的构造函数直接初始化 string s(dots); // 使用拷贝构造函数直接初始化 拷贝初始化，将右侧运算对象拷贝到正在创建的对象中，表现形式有： =，{}， 非引用类型的参数传入，非引用类型的函数返回，容器的insert和push操作 1 2 3 string s2 = dots; // 拷贝初始化，仍然使用拷贝构造函数 string null_book = &amp;#34;999-999-999&amp;#34; // 拷贝初始化，先在右侧构造一个string对象在拷贝初始化左侧，注意这里使用了构造函数的隐式转换 string nines = string(100, &amp;#39;9&amp;#39;) // 右侧直接初始化一个string对象，再拷贝初始化左侧对象 explicit构造函数只能用于直接初始化，所以隐式转换在拷贝初始化会受到限制。'>
+<meta property='og:url' content='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC13%E7%AB%A0_bigthree%E5%92%8C%E7%A7%BB%E5%8A%A8/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='C&#43;&#43;Primer' /><meta property='article:published_time' content='2023-03-05T21:21:01&#43;08:00'/><meta property='article:modified_time' content='2023-03-05T21:21:01&#43;08:00'/>
+<meta name="twitter:title" content="第13章 BigThree和移动">
+<meta name="twitter:description" content="1. 析构函数 析构函数的 特点：
+没有返回值 没有参数，因此不可以重载 析构函数的 职责 是：
+函数体内，释放对象使用的资源 函数体执行后，销毁对象的非static数据成员，逆序释放（隐式） 隐式的销毁的对象的数据成员中，如果含有内置类型指针，不会销毁其所指向的对象，所以要用delete
+构造函数的 职责 是：
+函数体执行前，初始化对象的非static数据成员，按类中出想的顺序顺次初始化 函数体内，可以做些其他工作 在析构函数的函数体内可以执行其他操作，类对象销毁在析构函数
+2. 拷贝、移动与交换 用一个对象为另一个对象赋值或初始化的操作，分为 拷贝 和 移动 两种，区别在于：
+拷贝所得的两个对象间，彼此 互不影响 移动则是将右值的对象值 转嫁 给另一个对象，然后这个右值可以销毁。 2.1 三/五原则 我们通常将：拷贝构造函数、拷贝赋值函数、析构函数看成是一个 整体 (如果一个有需要自己定义，其他也应该一同定义)，统称其为 拷贝控制成员 。需要我们自己定义拷贝控制成员的 基本原则 是：
+原则一：先确定该类是否需要一个析构函数，需要的话，一定要同时自定义拷贝构造和拷贝赋值函数。 原则二：如果需要自定义一个拷贝构造函数，则一定同时需要自定义拷贝赋值函数，反之亦然 注意：无论需要拷贝构造还是拷贝赋值，都不意味着必然需要析构函数。
+何时需要析构函数呢？当一个类为 管理资源 的类时需要析构函数，即带有指针，要动态分配内存。
+加入移动构造函数和移动赋值函数，提升为五原则。
+🎃 2.2 拷贝 2.1.1 拷贝构造函数 拷贝构造函数特点：
+第一个参数必须是一个引用类型，且任何额外参数都有默认值。 1 Foo (const Foo&amp;amp;); 原因是：如果传值的话，参数的传递是一个拷贝过程，那么在还没有定义完拷贝构造函数的前提下，进行类类型的拷贝，会调用该类的拷贝构造函数，如此以往。
+直接初始化，通过函数参数匹配来选择使用最匹配的构造函数，包括：容器的emplace操作 1 2 string dots(10, &amp;#39;.&amp;#39;); // 使用最佳参数匹配的构造函数直接初始化 string s(dots); // 使用拷贝构造函数直接初始化 拷贝初始化，将右侧运算对象拷贝到正在创建的对象中，表现形式有： =，{}， 非引用类型的参数传入，非引用类型的函数返回，容器的insert和push操作 1 2 3 string s2 = dots; // 拷贝初始化，仍然使用拷贝构造函数 string null_book = &amp;#34;999-999-999&amp;#34; // 拷贝初始化，先在右侧构造一个string对象在拷贝初始化左侧，注意这里使用了构造函数的隐式转换 string nines = string(100, &amp;#39;9&amp;#39;) // 右侧直接初始化一个string对象，再拷贝初始化左侧对象 explicit构造函数只能用于直接初始化，所以隐式转换在拷贝初始化会受到限制。">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-析构函数">1. 析构函数</a></li>
+    <li><a href="#2-拷贝移动与交换">2. 拷贝、移动与交换</a>
+      <ul>
+        <li><a href="#21-三五原则">2.1 三/五原则</a></li>
+        <li><a href="#-22-拷贝">🎃 2.2 拷贝</a></li>
+        <li><a href="#-23-交换">🎃 2.3 交换</a></li>
+        <li><a href="#-24-移动">🎃 2.4 移动</a></li>
+        <li><a href="#-25-函数匹配问题">🎃 2.5 函数匹配问题</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-合成的函数">3 合成的函数</a>
+      <ul>
+        <li><a href="#-31-拷贝控制函数">🎃 3.1 拷贝控制函数</a></li>
+        <li><a href="#-32-移动操作">🎃 3.2 移动操作</a></li>
+        <li><a href="#-33-拷贝控制与移动操作的关系">🎃 3.3 拷贝控制与移动操作的关系</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="background-color: #c1c1f6; color: #fff;">
+                读书笔记
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC13%E7%AB%A0_bigthree%E5%92%8C%E7%A7%BB%E5%8A%A8/">第13章 BigThree和移动</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 05, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    4 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="1-析构函数">1. 析构函数</h2>
+<p>析构函数的 <strong>特点</strong>：</p>
+<ul>
+<li>没有返回值</li>
+<li>没有参数，因此不可以重载</li>
+</ul>
+<p>析构函数的 <strong>职责</strong> 是：</p>
+<ol>
+<li>函数体内，释放对象使用的资源</li>
+<li>函数体执行后，销毁对象的非static数据成员，逆序释放（隐式）</li>
+</ol>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted -->隐式的销毁的对象的数据成员中，如果含有内置类型指针，不会销毁其所指向的对象<!-- raw HTML omitted --><!-- raw HTML omitted -->，所以要用delete</p>
+<p>构造函数的 <strong>职责</strong> 是：</p>
+<ol>
+<li>函数体执行前，初始化对象的非static数据成员，按类中出想的顺序顺次初始化</li>
+<li>函数体内，可以做些其他工作</li>
+</ol>
+<p>在析构函数的函数体内可以执行其他操作，类对象销毁在析构函数</p>
+<h2 id="2-拷贝移动与交换">2. 拷贝、移动与交换</h2>
+<p>用一个对象为另一个对象赋值或初始化的操作，分为 <strong>拷贝</strong> 和 <strong>移动</strong> 两种，区别在于：</p>
+<ul>
+<li>拷贝所得的两个对象间，彼此 <strong>互不影响</strong></li>
+<li>移动则是将右值的对象值 <strong>转嫁</strong> 给另一个对象，然后这个右值可以销毁。</li>
+</ul>
+<h3 id="21-三五原则">2.1 三/五原则</h3>
+<p>我们通常将：拷贝构造函数、拷贝赋值函数、析构函数看成是一个 <strong>整体</strong> (如果一个有需要自己定义，其他也应该一同定义)，统称其为 <strong>拷贝控制成员</strong> 。需要我们自己定义拷贝控制成员的 <strong>基本原则</strong> 是：</p>
+<ul>
+<li>原则一：先确定该类是否需要一个析构函数，需要的话，一定要同时自定义拷贝构造和拷贝赋值函数。</li>
+<li>原则二：如果需要自定义一个拷贝构造函数，则一定同时需要自定义拷贝赋值函数，反之亦然</li>
+</ul>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted -->注意：无论需要拷贝构造还是拷贝赋值，都不意味着必然需要析构函数。<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<p>何时需要析构函数呢？当一个类为 <strong>管理资源</strong> 的类时需要析构函数，即带有指针，要动态分配内存。</p>
+<p>加入移动构造函数和移动赋值函数，提升为五原则。</p>
+<h3 id="-22-拷贝">🎃 2.2 拷贝</h3>
+<h4 id="211-拷贝构造函数">2.1.1 拷贝构造函数</h4>
+<p>拷贝构造函数特点：</p>
+<ul>
+<li>第一个参数必须是一个引用类型，且任何额外参数都有默认值。</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>Foo (<span style="color:#000;font-weight:bold">const</span> Foo<span style="color:#000;font-weight:bold">&amp;</span>);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><!-- raw HTML omitted --><!-- raw HTML omitted -->原因是：如果传值的话，参数的传递是一个拷贝过程，那么在还没有定义完拷贝构造函数的前提下，进行类类型的拷贝，会调用该类的拷贝构造函数，如此以往。<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<blockquote>
+<ol>
+<li>直接初始化，通过函数参数匹配来选择使用最匹配的构造函数，包括：容器的emplace操作</li>
+</ol>
+</blockquote>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>string <span style="color:#900;font-weight:bold">dots</span>(<span style="color:#099">10</span>, <span style="color:#d14">&#39;.&#39;</span>); <span style="color:#998;font-style:italic">// 使用最佳参数匹配的构造函数直接初始化
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>string <span style="color:#900;font-weight:bold">s</span>(dots);       <span style="color:#998;font-style:italic">// 使用拷贝构造函数直接初始化
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<ol start="2">
+<li>拷贝初始化，将右侧运算对象拷贝到正在创建的对象中，表现形式有： =，{}， 非引用类型的参数传入，非引用类型的函数返回，容器的insert和push操作</li>
+</ol>
+</blockquote>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>string s2 <span style="color:#000;font-weight:bold">=</span> dots;                <span style="color:#998;font-style:italic">// 拷贝初始化，仍然使用拷贝构造函数
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>string null_book <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;999-999-999&#34;</span> <span style="color:#998;font-style:italic">// 拷贝初始化，先在右侧构造一个string对象在拷贝初始化左侧，注意这里使用了构造函数的隐式转换
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>string nines <span style="color:#000;font-weight:bold">=</span> string(<span style="color:#099">100</span>, <span style="color:#d14">&#39;9&#39;</span>)  <span style="color:#998;font-style:italic">// 右侧直接初始化一个string对象，再拷贝初始化左侧对象
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p><!-- raw HTML omitted --><!-- raw HTML omitted -->explicit构造函数只能用于直接初始化，所以隐式转换在拷贝初始化会受到限制。<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="212-拷贝赋值函数">2.1.2 拷贝赋值函数</h4>
+<p>通过 <strong>重载operator=运算符</strong> 来完成。特点如下：</p>
+<ul>
+<li>一定是成员函数，其左侧运算对象绑定到隐式的this参数</li>
+<li>返回值为左侧运算对象的引用</li>
+</ul>
+<h4 id="213-拷贝语义">2.1.3 拷贝语义</h4>
+<p>有两种拷贝语义：</p>
+<ul>
+<li>使类的行为像一个值。拷贝时，副本与原对象完全独立。如string类</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">HasPtr</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">public</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    HasPtr(<span style="color:#000;font-weight:bold">const</span> std<span style="color:#000;font-weight:bold">::</span>string <span style="color:#000;font-weight:bold">&amp;</span>s <span style="color:#000;font-weight:bold">=</span> std<span style="color:#000;font-weight:bold">::</span>string())<span style="color:#000;font-weight:bold">:</span>ps(<span style="color:#000;font-weight:bold">new</span> std<span style="color:#000;font-weight:bold">::</span>string(s)),i(<span style="color:#099">0</span>){} <span style="color:#998;font-style:italic">// 构造函数
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    HasPtr(<span style="color:#000;font-weight:bold">const</span> HasPtr <span style="color:#000;font-weight:bold">&amp;</span>p)<span style="color:#000;font-weight:bold">:</span>ps(<span style="color:#000;font-weight:bold">new</span> std<span style="color:#000;font-weight:bold">::</span>string(<span style="color:#000;font-weight:bold">*</span>p.ps)),i(p.i){} <span style="color:#998;font-style:italic">// 拷贝构造函数
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    HasPtr<span style="color:#000;font-weight:bold">&amp;</span> <span style="color:#000;font-weight:bold">operator</span><span style="color:#000;font-weight:bold">=</span>(<span style="color:#000;font-weight:bold">const</span> HasPtr <span style="color:#000;font-weight:bold">&amp;</span>); <span style="color:#a61717;background-color:#e3d2d2">拷贝赋值函数</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">~</span>HasPtr() {<span style="color:#000;font-weight:bold">delete</span> ps;} <span style="color:#998;font-style:italic">// 析构函数
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">private</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    std<span style="color:#000;font-weight:bold">::</span>string <span style="color:#000;font-weight:bold">*</span>ps;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">int</span> i;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>HasPtr<span style="color:#000;font-weight:bold">&amp;</span> HasPtr<span style="color:#000;font-weight:bold">::</span><span style="color:#000;font-weight:bold">operator</span><span style="color:#000;font-weight:bold">=</span>(<span style="color:#000;font-weight:bold">const</span> HasPtr <span style="color:#000;font-weight:bold">&amp;</span>rhs) <span style="color:#998;font-style:italic">// 使用引用，区别于使用swap
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">auto</span> newp <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> string(<span style="color:#000;font-weight:bold">*</span>rhs.ps); <span style="color:#998;font-style:italic">// 拷贝底层string
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">delete</span> ps; <span style="color:#998;font-style:italic">// 释放旧内存
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    ps <span style="color:#000;font-weight:bold">=</span> newp; <span style="color:#998;font-style:italic">// 赋值
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    i <span style="color:#000;font-weight:bold">=</span> rhs.i; <span style="color:#998;font-style:italic">// 赋值
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">*</span><span style="color:#000;font-weight:bold">this</span>; <span style="color:#998;font-style:italic">// 返回本对象
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>注意：<!-- raw HTML omitted -->
+<!-- raw HTML omitted --><!-- raw HTML omitted -->拷贝赋值函数要处理好自赋值操作，所以最安全的就是先拷贝右侧对象到一个局部临时对象，再销毁左侧对象的原有内存。<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<ul>
+<li>使类的行为像一个指针。共享状态，副本与原对象使用相同的底层数据。如shared_ptr类</li>
+</ul>
+<p>使用shared_ptr或使用引用计数，使用引用技术如下：</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">33
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">34
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">35
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">36
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">37
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">HasPtr</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">public</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    HasPtr(<span style="color:#000;font-weight:bold">const</span> std<span style="color:#000;font-weight:bold">::</span>string <span style="color:#000;font-weight:bold">&amp;</span>s <span style="color:#000;font-weight:bold">=</span> std<span style="color:#000;font-weight:bold">::</span>string())<span style="color:#000;font-weight:bold">:</span>ps(<span style="color:#000;font-weight:bold">new</span> std<span style="color:#000;font-weight:bold">::</span>string(s)),i(<span style="color:#099">0</span>)<span style="color:#a61717;background-color:#e3d2d2">，</span> use(<span style="color:#000;font-weight:bold">new</span> std<span style="color:#000;font-weight:bold">::</span>size_t(<span style="color:#099">1</span>)){} <span style="color:#998;font-style:italic">// 构造函数，引用计数初始化为1
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    HasPtr(<span style="color:#000;font-weight:bold">const</span> HasPtr <span style="color:#000;font-weight:bold">&amp;</span>p)<span style="color:#000;font-weight:bold">:</span>ps(p.ps),i(p.i),use(p.use){ <span style="color:#000;font-weight:bold">++*</span>use;} <span style="color:#998;font-style:italic">// 拷贝构造函数，引用计数+1
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    HasPtr<span style="color:#000;font-weight:bold">&amp;</span> <span style="color:#000;font-weight:bold">operator</span><span style="color:#000;font-weight:bold">=</span>(<span style="color:#000;font-weight:bold">const</span> HasPtr <span style="color:#000;font-weight:bold">&amp;</span>); <span style="color:#a61717;background-color:#e3d2d2">拷贝赋值函数</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">~</span>HasPtr() <span style="color:#998;font-style:italic">// 析构函数
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">private</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    std<span style="color:#000;font-weight:bold">::</span>string <span style="color:#000;font-weight:bold">*</span>ps;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">int</span> i;
+</span></span><span style="display:flex;"><span>    std<span style="color:#000;font-weight:bold">::</span>size_t <span style="color:#000;font-weight:bold">*</span>use; <span style="color:#998;font-style:italic">// 使用动态内存来在多个对象间共享引用计数的数据
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>HasPtr<span style="color:#000;font-weight:bold">::~</span>HasPtr()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span>(<span style="color:#000;font-weight:bold">--*</span>use <span style="color:#000;font-weight:bold">==</span> <span style="color:#099">0</span>)
+</span></span><span style="display:flex;"><span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">delete</span> ps;
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">delete</span> use;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>HasPtr<span style="color:#000;font-weight:bold">&amp;</span> HasPtr<span style="color:#000;font-weight:bold">::</span><span style="color:#000;font-weight:bold">operator</span><span style="color:#000;font-weight:bold">=</span>(<span style="color:#000;font-weight:bold">const</span> HasPtr <span style="color:#000;font-weight:bold">&amp;</span>rhs)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">++*</span>rhs.use; <span style="color:#998;font-style:italic">// 先递增右侧计数，防止自赋值出错
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span>(<span style="color:#000;font-weight:bold">--*</span>use <span style="color:#000;font-weight:bold">==</span> <span style="color:#099">0</span>) <span style="color:#998;font-style:italic">// 左侧递减，如果为0，释放内存
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    {
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">delete</span> ps;
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">delete</span> use;
+</span></span><span style="display:flex;"><span>    }
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>    ps <span style="color:#000;font-weight:bold">=</span> rhs.ps; <span style="color:#998;font-style:italic">// 赋值
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    i <span style="color:#000;font-weight:bold">=</span> rhs.i; <span style="color:#998;font-style:italic">// 赋值
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    use <span style="color:#000;font-weight:bold">=</span> rhs.use;
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">*</span><span style="color:#000;font-weight:bold">this</span>; <span style="color:#998;font-style:italic">// 返回本对象
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="-23-交换">🎃 2.3 交换</h3>
+<p>管理资源的类除了需要定义拷贝控制成员，通常还要定义swap函数，这是一种很重要的优化手段。</p>
+<p>一般交换两个对象的值，如HasPtr类对象，要使用一个中间临时对象。如果是采用类值方式，则会将原v1中的string进行2次拷贝操作，这些内存分配是不必要的，我们更希望通过交换指针来完成。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">HasPtr</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">friend</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">swap</span>(HasPtr<span style="color:#000;font-weight:bold">&amp;</span>, HasPtr<span style="color:#000;font-weight:bold">&amp;</span>);
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">inline</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">swap</span>(HasPtr<span style="color:#000;font-weight:bold">&amp;</span> lhs, HasPtr<span style="color:#000;font-weight:bold">&amp;</span> rhs)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">using</span> std<span style="color:#000;font-weight:bold">::</span>swap; <span style="color:#998;font-style:italic">// 注意点
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    swap(lhs.ps, rhs.ps);
+</span></span><span style="display:flex;"><span>    swap(lhs.i, rhs.i);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>注意：<!-- raw HTML omitted --></p>
+<ul>
+<li>对于内置类型是没有特定版本的swap，所以使用标准库的swap</li>
+<li>如果类内成员有自定义的swap，则会使用类型特定的swap，所以不能指定成std::swap，这样不能最优匹配。</li>
+</ul>
+<h4 id="231-拷贝并交换">2.3.1 拷贝并交换</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>HasPtr<span style="color:#000;font-weight:bold">&amp;</span> HasPtr<span style="color:#000;font-weight:bold">::</span><span style="color:#000;font-weight:bold">operator</span><span style="color:#000;font-weight:bold">=</span>(HasPtr rhs) <span style="color:#998;font-style:italic">// 使用值传递
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>{
+</span></span><span style="display:flex;"><span>    swap(<span style="color:#000;font-weight:bold">*</span><span style="color:#000;font-weight:bold">this</span>, rhs);
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">*</span><span style="color:#000;font-weight:bold">this</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>注意：<!-- raw HTML omitted --></p>
+<ul>
+<li>参数值传递</li>
+<li>拷贝并交换是异常安全的，可以处理自赋值问题</li>
+<li>由于原来的方式是通过一个局部变量暂存，需要分配一次内存；这里使用swap，在实参传递时分配一次内存，两者这样来说是一样的</li>
+</ul>
+<h3 id="-24-移动">🎃 2.4 移动</h3>
+<p>新特性：移动而非拷贝，出现原因：</p>
+<ol>
+<li>很多局部或临时对象在拷贝完后就被销毁了</li>
+<li>有些类不能够拷贝，如IO类或unique_ptr类</li>
+</ol>
+<h4 id="241-左值引用和右值引用">2.4.1 左值引用和右值引用</h4>
+<p><strong>左值持久；右值要么是字面常量，要么是临时对象</strong>。</p>
+<p>本质：<!-- raw HTML omitted --><!-- raw HTML omitted -->引用是某个对象的别名。<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<ul>
+<li>左值引用&amp;</li>
+</ul>
+<blockquote>
+<p>可以绑定到：变量、返回左值引用的函数(赋值、下标、解引用、前置递增/递减运算符)
+因为变量是持久的，知道离开作用域才被销毁，所以是左值</p>
+</blockquote>
+<ul>
+<li>右值引用&amp;&amp;</li>
+</ul>
+<blockquote>
+<p>可以绑定到返回非引用类型的函数(算术、关系、位以及后置递增/递减运算符)</p>
+</blockquote>
+<p>特殊：<!-- raw HTML omitted --></p>
+<ol>
+<li>对于返回非引用类型的函数，除了可以绑定到右值引用，还可以绑定到const的左值引用</li>
+<li>不能将一个右值引用绑定到一个右值引用类型的变量上，如下rr3不能绑定到rr2</li>
+</ol>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> i <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">42</span>;
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">&amp;&amp;</span> rr1 <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">42</span>;        <span style="color:#998;font-style:italic">// 正确
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">&amp;&amp;</span>rr2 <span style="color:#000;font-weight:bold">=</span> i <span style="color:#000;font-weight:bold">*</span> <span style="color:#099">2</span>;      <span style="color:#998;font-style:italic">// 正确
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">const</span> <span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">&amp;</span>r2 <span style="color:#000;font-weight:bold">=</span> i <span style="color:#000;font-weight:bold">*</span> <span style="color:#099">2</span>;  <span style="color:#998;font-style:italic">// 正确
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">&amp;&amp;</span>rr3 <span style="color:#000;font-weight:bold">=</span> rr2;        <span style="color:#998;font-style:italic">// 错误，rr2是变量，是左值
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>std::move()</li>
+</ul>
+<p>可以显式的将一个左值转换为对应的额右值引用类型</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#include</span> <span style="color:#999;font-weight:bold;font-style:italic">&lt;utility&gt;</span><span style="color:#999;font-weight:bold;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span><span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">&amp;&amp;</span>rr4 <span style="color:#000;font-weight:bold">=</span> std<span style="color:#000;font-weight:bold">::</span>move(rr1); <span style="color:#998;font-style:italic">// 必须使用std::move，防止发生名字冲突
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>注意：<!-- raw HTML omitted --></p>
+<ol>
+<li>我们可以销毁一个移后源对象，可以赋予新值，但是不能够使用移后源对象的值，更不能妄加揣测值是什么</li>
+<li>必须使用std::move，防止发生名字冲突</li>
+</ol>
+<h4 id="242-移动构造函数">2.4.2 移动构造函数</h4>
+<ul>
+<li>移动构造函数必须确保销毁移后源对象是无害的，即要<!-- raw HTML omitted --><!-- raw HTML omitted -->切断移后源对象与内存间的联系，使其处于可析构状态。<!-- raw HTML omitted --><!-- raw HTML omitted --></li>
+<li>函数要声明为noexcept</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>StrVec<span style="color:#000;font-weight:bold">::</span>StrVec(StrVec <span style="color:#000;font-weight:bold">&amp;&amp;</span>s) <span style="color:#000;font-weight:bold">noexcept</span> <span style="color:#000;font-weight:bold">:</span> elements(s.elements), first_free(s.first_free), cap(s.cap)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    s.elements <span style="color:#000;font-weight:bold">=</span> s.first_free <span style="color:#000;font-weight:bold">=</span> s.cap <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">nullptr</span>; <span style="color:#998;font-style:italic">// 切断与原内存的联系，使其处于可析构状态
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>HasPtr<span style="color:#000;font-weight:bold">::</span>HasPtr(HasPtr <span style="color:#000;font-weight:bold">&amp;&amp;</span>p) <span style="color:#000;font-weight:bold">noexcept</span> <span style="color:#000;font-weight:bold">:</span> ps(p.ps), i(p.i)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    p.ps <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="243-移动赋值函数">2.4.3 移动赋值函数</h4>
+<ul>
+<li>移动赋值函数也要对自赋值进行判断，因为传入的值可能是std::move强制转换的左值。</li>
+<li>函数要声明为noexcept</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>StrVec<span style="color:#000;font-weight:bold">&amp;</span> StrVec<span style="color:#000;font-weight:bold">::</span><span style="color:#000;font-weight:bold">operator</span><span style="color:#000;font-weight:bold">=</span>(StrVec <span style="color:#000;font-weight:bold">&amp;&amp;</span>rhs) <span style="color:#000;font-weight:bold">noexcept</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span>(<span style="color:#000;font-weight:bold">this</span> <span style="color:#000;font-weight:bold">!=</span> <span style="color:#000;font-weight:bold">&amp;</span>rhs) <span style="color:#998;font-style:italic">// 自赋值判断，很可能rhs是std::move强制转换的左值
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    {
+</span></span><span style="display:flex;"><span>        free();
+</span></span><span style="display:flex;"><span>        elements <span style="color:#000;font-weight:bold">=</span> rhs.elements;
+</span></span><span style="display:flex;"><span>        first_free <span style="color:#000;font-weight:bold">=</span> rhs.first_free;
+</span></span><span style="display:flex;"><span>        cap <span style="color:#000;font-weight:bold">=</span> rhs.cap;
+</span></span><span style="display:flex;"><span>        
+</span></span><span style="display:flex;"><span>        rhs.elements <span style="color:#000;font-weight:bold">=</span> rhs.first_free <span style="color:#000;font-weight:bold">=</span> rhs.cap <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">nullptr</span>; <span style="color:#998;font-style:italic">// 切断与原内存的联系，使其处于可析构状态
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    }
+</span></span><span style="display:flex;"><span>    
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">*</span><span style="color:#000;font-weight:bold">this</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>拷贝并交换函数实际上既是拷贝赋值函数，也是移动赋值函数</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>HasPtr<span style="color:#000;font-weight:bold">&amp;</span> HasPtr<span style="color:#000;font-weight:bold">::</span><span style="color:#000;font-weight:bold">operator</span><span style="color:#000;font-weight:bold">=</span>(HasPtr rhs) <span style="color:#998;font-style:italic">// 使用值传递
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>{
+</span></span><span style="display:flex;"><span>    swap(<span style="color:#000;font-weight:bold">*</span><span style="color:#000;font-weight:bold">this</span>, rhs);
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">*</span><span style="color:#000;font-weight:bold">this</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="-25-函数匹配问题">🎃 2.5 函数匹配问题</h3>
+<h4 id="251-拷贝与移动">2.5.1 拷贝与移动</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>Foo(<span style="color:#000;font-weight:bold">const</span> Foo<span style="color:#000;font-weight:bold">&amp;</span>); <span style="color:#998;font-style:italic">// 适用于参数为任何值
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>Foo(Foo <span style="color:#000;font-weight:bold">&amp;&amp;</span>);     <span style="color:#998;font-style:italic">// 移动构造函数，只适用于参数为右值
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>既有拷贝构造也有移动构造</li>
+</ul>
+<blockquote>
+<p>左值拷贝，右值移动</p>
+</blockquote>
+<ul>
+<li>没有移动构造只有拷贝构造</li>
+</ul>
+<blockquote>
+<p>不论左值右值，均拷贝</p>
+</blockquote>
+<h4 id="252-右值引用和成员函数">2.5.2 右值引用和成员函数</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">push_back</span>(X <span style="color:#000;font-weight:bold">&amp;&amp;</span>);       <span style="color:#998;font-style:italic">// 只适用于传入右值
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">push_back</span>(<span style="color:#000;font-weight:bold">const</span> X <span style="color:#000;font-weight:bold">&amp;</span>);  <span style="color:#998;font-style:italic">// 适用于传入任何值
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="253-引用限定符">2.5.3 引用限定符&amp;</h4>
+<p>旧版本中可以向右值赋值</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>s1 <span style="color:#000;font-weight:bold">+</span> s1 <span style="color:#000;font-weight:bold">-</span> <span style="color:#d14">&#34;wow&#34;</span>;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>为了兼容，新版本也允许，但我们可以在自己的程序中阻止这种用法，使用 <strong>引用限定符:&amp;</strong>。特点：</p>
+<ul>
+<li>类似于const，在函数的声明和定义中都必须出现。</li>
+<li>如果和const一同出现，只能在const限定符之后</li>
+<li>当出现两个或以上具有相同名字和参数的成员函数时，必须对所有函数都加上引用限定符，或都不加</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 都加
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>Foo <span style="color:#900;font-weight:bold">sorted</span>() <span style="color:#000;font-weight:bold">&amp;&amp;</span>;           <span style="color:#998;font-style:italic">// 适用于右值，即右值可调用
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>Foo <span style="color:#900;font-weight:bold">sorted</span>() <span style="color:#000;font-weight:bold">const</span> <span style="color:#000;font-weight:bold">&amp;</span>;      <span style="color:#998;font-style:italic">// 适用于任何，即右值左值均可调用
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 都不加
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>Foo <span style="color:#900;font-weight:bold">sorted</span>(Comp<span style="color:#000;font-weight:bold">*</span>);         <span style="color:#998;font-style:italic">// 适用于右值
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>Foo <span style="color:#900;font-weight:bold">sorted</span>(Comp<span style="color:#000;font-weight:bold">*</span>) <span style="color:#000;font-weight:bold">const</span>;   <span style="color:#998;font-style:italic">// 适用于任何
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="3-合成的函数">3 合成的函数</h2>
+<h3 id="-31-拷贝控制函数">🎃 3.1 拷贝控制函数</h3>
+<h4 id="311-合成">3.1.1 合成</h4>
+<ul>
+<li>合成的拷贝构造函数：将对象的非static的成员逐个拷贝到另一个正在创建的对象中</li>
+<li>合成的拷贝赋值函数：将对象的非static的成员逐个赋予到另一个对象的对应成员中</li>
+<li>合成的析构函数执行的是：销毁对象的非static的数据成员</li>
+</ul>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted -->但合成的这些函数也可能是阻止相应操作的发生，即合成的函数可能是删除的。<!-- raw HTML omitted --><!-- raw HTML omitted -->其规则如下：</p>
+<ul>
+<li>如果一个类的数据成员不能够被默认构造、拷贝、复制或析构，则对应的成员函数将被定义为删除的</li>
+<li>如果一个成员有删除的或不可访问的析构函数，则对应的析构、构造和拷贝构造函数将被定义为删除，否则会出现无法销毁的对象</li>
+<li>如果一个具有引用成员或无法默认构造的const成员的类，其合成的默认构造函数是删除的</li>
+<li>如果一个具有引用成员或const成员的类，则它的拷贝赋值函数是删除的</li>
+</ul>
+<h4 id="312-手动定义拷贝控制函数">3.1.2 手动定义拷贝控制函数</h4>
+<p>手动定义函数为编译器合成的版本和删除函数</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">public</span><span style="color:#a61717;background-color:#e3d2d2">：</span>
+</span></span><span style="display:flex;"><span>    Foo() <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">default</span>;
+</span></span><span style="display:flex;"><span>    Foo(<span style="color:#000;font-weight:bold">const</span> Foo<span style="color:#000;font-weight:bold">&amp;</span>) <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">delete</span>; <span style="color:#998;font-style:italic">// 新标准
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">private</span><span style="color:#a61717;background-color:#e3d2d2">：</span>
+</span></span><span style="display:flex;"><span>    Foo(<span style="color:#000;font-weight:bold">const</span> Foo<span style="color:#000;font-weight:bold">&amp;</span>); <span style="color:#998;font-style:italic">// 以前，将想要删除的函数声明为私有，且只声明不定义
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>注意：</p>
+<ul>
+<li>default只能对于编译器可以合成的函数使用</li>
+<li>default可以在类内声明时使用，此时函数为内联函数；也可以在类外定义，此时非内联</li>
+<li>delete可以对任何函数使用</li>
+<li>delete只能出现在函数第一次声明的时候</li>
+<li>声明为private访问的函数但不定义，如果用户代码使用这种函数，则在编译时出错；友元和成员函数使用，则在链接时出错。</li>
+</ul>
+<h3 id="-32-移动操作">🎃 3.2 移动操作</h3>
+<h4 id="321-合成">3.2.1 合成</h4>
+<p>只有当类没有定义自己的任何版本的拷贝控制函数，且类中的每个非static数据成员都可以移动是，编译器才会合成它的移动构造和移动赋值运算符。</p>
+<h4 id="322-手动默认的移动操作">3.2.2 手动默认的移动操作</h4>
+<p>使用default，如果显式声明定义了移动操作为default，而类中有不可移动的成员，则该移动操作被删除。</p>
+<h3 id="-33-拷贝控制与移动操作的关系">🎃 3.3 拷贝控制与移动操作的关系</h3>
+<h4 id="331-合成的函数间相互作用关系">3.3.1 合成的函数间相互作用关系</h4>
+<p>相互作用关系：如果一个类定义了一个移动构造函数和/或移动赋值函数，则该类的合成拷贝构造函数和拷贝赋值运算符会被定义为删除的。</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/c&#43;&#43;primer/">C&#43;&#43;Primer</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC12%E7%AB%A0_%E5%8A%A8%E6%80%81%E5%86%85%E5%AD%98%E4%B8%8E%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第12章 动态内存与智能指针</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC10%E7%AB%A0_%E6%B3%9B%E5%9E%8B%E7%AE%97%E6%B3%95/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第10章 泛型算法</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC911%E7%AB%A0_%E5%AE%B9%E5%99%A8/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第9、10章 容器</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC8%E7%AB%A0_io%E5%BA%93/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第8章 IO库</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC7%E7%AB%A0_%E7%B1%BB/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第7章 类</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

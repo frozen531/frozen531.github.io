@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='1. 容器 容器是一些特定类型对象的集合。
+顺序容器：元素的位置与其加入容器的顺序相对应 关联容器：元素的位置与元素相关联的关键字决定 2. 顺序容器 顺序容器的特性：可以快速顺序访问容器
+类型 名称 元素访问 添加删除 存储空间是否连续 vector 可变大小数组 快速随机访问 在尾部之外的位置插入或删除元素可能很慢 是 deque 双端队列 快速随机访问 在头尾位置插入删除元素很快 分段连续 list 双向链表 支持双向顺序访问 任何位置插入删除都很快 否 forward_list 单向链表 支持单向顺序访问 任何位置插入删除都很快 否 array 固定大小数组 快速随机访问 不能删除或添加元素 是 string 类似vector，专门保存字符 快速随机访问 在尾部插入删除元素快 是 容器的选择：
+取决于访问元素和插入删除哪个占主导地位 通常vector是首选 不确定时尽量选用vector和list的共有操作，尽量使用迭代器而不是下标访问，这样可以方便选择其中之一 array与内置数组的区别：
+内置数组对象间不允许拷贝和赋值，只能一个元素一个元素的拷贝赋值 array可以直接去初始化另一个array 🚩 2.1 容器通用操作 2.1.1 类型别名(typedef) 类型别名 说明 使用 value_type 元素类型 同下 reference 元素的左值引用 同下 difference_type 两个迭代器间距离 同下 iterator 迭代器类型 list&amp;lt;int&amp;gt;::iterator ::作用域运算符'>
+<title>第9、10章 容器</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC911%E7%AB%A0_%E5%AE%B9%E5%99%A8/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='第9、10章 容器'>
+<meta property='og:description' content='1. 容器 容器是一些特定类型对象的集合。
+顺序容器：元素的位置与其加入容器的顺序相对应 关联容器：元素的位置与元素相关联的关键字决定 2. 顺序容器 顺序容器的特性：可以快速顺序访问容器
+类型 名称 元素访问 添加删除 存储空间是否连续 vector 可变大小数组 快速随机访问 在尾部之外的位置插入或删除元素可能很慢 是 deque 双端队列 快速随机访问 在头尾位置插入删除元素很快 分段连续 list 双向链表 支持双向顺序访问 任何位置插入删除都很快 否 forward_list 单向链表 支持单向顺序访问 任何位置插入删除都很快 否 array 固定大小数组 快速随机访问 不能删除或添加元素 是 string 类似vector，专门保存字符 快速随机访问 在尾部插入删除元素快 是 容器的选择：
+取决于访问元素和插入删除哪个占主导地位 通常vector是首选 不确定时尽量选用vector和list的共有操作，尽量使用迭代器而不是下标访问，这样可以方便选择其中之一 array与内置数组的区别：
+内置数组对象间不允许拷贝和赋值，只能一个元素一个元素的拷贝赋值 array可以直接去初始化另一个array 🚩 2.1 容器通用操作 2.1.1 类型别名(typedef) 类型别名 说明 使用 value_type 元素类型 同下 reference 元素的左值引用 同下 difference_type 两个迭代器间距离 同下 iterator 迭代器类型 list&amp;lt;int&amp;gt;::iterator ::作用域运算符'>
+<meta property='og:url' content='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC911%E7%AB%A0_%E5%AE%B9%E5%99%A8/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='C&#43;&#43;Primer' /><meta property='article:published_time' content='2023-03-05T21:20:58&#43;08:00'/><meta property='article:modified_time' content='2023-03-05T21:20:58&#43;08:00'/>
+<meta name="twitter:title" content="第9、10章 容器">
+<meta name="twitter:description" content="1. 容器 容器是一些特定类型对象的集合。
+顺序容器：元素的位置与其加入容器的顺序相对应 关联容器：元素的位置与元素相关联的关键字决定 2. 顺序容器 顺序容器的特性：可以快速顺序访问容器
+类型 名称 元素访问 添加删除 存储空间是否连续 vector 可变大小数组 快速随机访问 在尾部之外的位置插入或删除元素可能很慢 是 deque 双端队列 快速随机访问 在头尾位置插入删除元素很快 分段连续 list 双向链表 支持双向顺序访问 任何位置插入删除都很快 否 forward_list 单向链表 支持单向顺序访问 任何位置插入删除都很快 否 array 固定大小数组 快速随机访问 不能删除或添加元素 是 string 类似vector，专门保存字符 快速随机访问 在尾部插入删除元素快 是 容器的选择：
+取决于访问元素和插入删除哪个占主导地位 通常vector是首选 不确定时尽量选用vector和list的共有操作，尽量使用迭代器而不是下标访问，这样可以方便选择其中之一 array与内置数组的区别：
+内置数组对象间不允许拷贝和赋值，只能一个元素一个元素的拷贝赋值 array可以直接去初始化另一个array 🚩 2.1 容器通用操作 2.1.1 类型别名(typedef) 类型别名 说明 使用 value_type 元素类型 同下 reference 元素的左值引用 同下 difference_type 两个迭代器间距离 同下 iterator 迭代器类型 list&amp;lt;int&amp;gt;::iterator ::作用域运算符">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-容器">1. 容器</a></li>
+    <li><a href="#2-顺序容器">2. 顺序容器</a>
+      <ul>
+        <li><a href="#-21-容器通用操作">🚩 2.1 容器通用操作</a></li>
+        <li><a href="#-22-vector的扩展">🚩 2.2 vector的扩展</a></li>
+        <li><a href="#-23-string的额外操作">🚩 2.3 string的额外操作</a></li>
+        <li><a href="#-24-容器适配器">🚩 2.4 容器适配器</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-关联容器">3. 关联容器</a>
+      <ul>
+        <li><a href="#-31-map">🚩 3.1 map</a></li>
+        <li><a href="#-32-set">🚩 3.2 set</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="background-color: #c1c1f6; color: #fff;">
+                读书笔记
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC911%E7%AB%A0_%E5%AE%B9%E5%99%A8/">第9、10章 容器</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 05, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    2 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="1-容器">1. 容器</h2>
+<p>容器是一些<strong>特定类型对象</strong>的集合。</p>
+<ul>
+<li>顺序容器：元素的位置与其加入容器的顺序相对应</li>
+<li>关联容器：元素的位置与元素相关联的关键字决定</li>
+</ul>
+<h2 id="2-顺序容器">2. 顺序容器</h2>
+<p>顺序容器的特性：<!-- raw HTML omitted --><!-- raw HTML omitted -->可以快速顺序访问容器<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>名称</th>
+<th>元素访问</th>
+<th>添加删除</th>
+<th>存储空间是否连续</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>vector</code></td>
+<td>可变大小数组</td>
+<td>快速随机访问</td>
+<td>在尾部之外的位置插入或删除元素可能很慢</td>
+<td>是</td>
+</tr>
+<tr>
+<td><code>deque</code></td>
+<td>双端队列</td>
+<td>快速随机访问</td>
+<td>在头尾位置插入删除元素很快</td>
+<td>分段连续</td>
+</tr>
+<tr>
+<td><code>list</code></td>
+<td>双向链表</td>
+<td>支持双向顺序访问</td>
+<td>任何位置插入删除都很快</td>
+<td>否</td>
+</tr>
+<tr>
+<td><code>forward_list</code></td>
+<td>单向链表</td>
+<td>支持单向顺序访问</td>
+<td>任何位置插入删除都很快</td>
+<td>否</td>
+</tr>
+<tr>
+<td><code>array</code></td>
+<td>固定大小数组</td>
+<td>快速随机访问</td>
+<td>不能删除或添加元素</td>
+<td>是</td>
+</tr>
+<tr>
+<td><code>string</code></td>
+<td>类似<code>vector</code>，专门保存字符</td>
+<td>快速随机访问</td>
+<td>在尾部插入删除元素快</td>
+<td>是</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>容器的选择</strong>：</p>
+<ul>
+<li>取决于访问元素和插入删除哪个占主导地位</li>
+<li>通常<code>vector</code>是首选</li>
+<li>不确定时尽量选用<code>vector</code>和<code>list</code>的共有操作，尽量使用迭代器而不是下标访问，这样可以方便选择其中之一</li>
+</ul>
+<p><code>array</code>与内置数组的区别：</p>
+<ul>
+<li>内置数组对象间不允许拷贝和赋值，只能一个元素一个元素的拷贝赋值</li>
+<li><code>array</code>可以直接去初始化另一个<code>array</code></li>
+</ul>
+<h3 id="-21-容器通用操作">🚩 2.1 容器通用操作</h3>
+<h4 id="211-类型别名typedef">2.1.1 类型别名(typedef)</h4>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>类型别名</th>
+<th>说明</th>
+<th>使用</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>value_type</code></td>
+<td>元素类型</td>
+<td>同下</td>
+</tr>
+<tr>
+<td><code>reference</code></td>
+<td>元素的左值引用</td>
+<td>同下</td>
+</tr>
+<tr>
+<td><code>difference_type</code></td>
+<td>两个迭代器间距离</td>
+<td>同下</td>
+</tr>
+<tr>
+<td><code>iterator</code></td>
+<td>迭代器类型</td>
+<td><code>list&lt;int&gt;::iterator</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><code>::</code>作用域运算符</p>
+<h4 id="212-迭代器">2.1.2 迭代器</h4>
+<p>迭代器范围：<!-- raw HTML omitted --><!-- raw HTML omitted -->左闭右开<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>c.begin(), c.end()
+</span></span><span style="display:flex;"><span>c.cbegin(), c.cend()
+</span></span><span style="display:flex;"><span>c.rbegin(), c.rend()
+</span></span><span style="display:flex;"><span>c.crbegin(), c.crend()
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="213-容器初始化">2.1.3 容器初始化</h4>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>C c1(c2)</code></td>
+<td>两个容器类型必须相同</td>
+</tr>
+<tr>
+<td><code>C c(b, e) </code></td>
+<td><code>b</code>和<code>e</code>为迭代器，两个迭代器范围内元素的拷贝，类型只要能转化即可</td>
+</tr>
+<tr>
+<td><code>C c(n)</code> <!-- raw HTML omitted --> <code>C c(n, t)</code></td>
+<td><code>n</code>指定元素个数</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>注意</strong>：</p>
+<ul>
+<li>只有顺序容器可以接收大小这个参数</li>
+<li>如果元素类型为内置类型或有默认构造函数的类类型才可以采用<code>C c(n)</code>；没有默认构造函数的类类型必须显示提供元素初始值<code>C c(n, t)</code></li>
+</ul>
+<h4 id="214赋值与swap">2.1.4赋值与swap???</h4>
+<ul>
+<li>赋值相关运算会导致左边容器内部的迭代器、引用和指针失效。</li>
+<li><code>swap</code>将容器中内容交换，不会导致指向容器的迭代器、引用和指针失效.(<code>array</code>与<code>string</code>除外)</li>
+</ul>
+<h4 id="215-添加元素">2.1.5 添加元素</h4>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>操作</th>
+<th>说明</th>
+<th>插入的元素来源</th>
+<th>返回值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>c.insert(p, t)</code> <!-- raw HTML omitted --> <code>c.insert(p, n, t)</code> <!-- raw HTML omitted --> <code>c.insert(p, b, e)</code></td>
+<td>在p指向的元素之前插入一个值为t的元素 <!-- raw HTML omitted --> 在p指向的元素之前插入n个一个值为t的元素 <!-- raw HTML omitted --> 在p指向的元素之前插入b到e之间的元素</td>
+<td>拷贝</td>
+<td>插入元素当前的位置</td>
+</tr>
+<tr>
+<td><code>c.emplace(p, args) </code></td>
+<td>在p指向的元素之前插入一个值为t的元素</td>
+<td>构造</td>
+<td>插入元素当前的位置</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="216-访问元素">2.1.6 访问元素</h4>
+<ul>
+<li>迭代器访问元素，需要解引用使用</li>
+<li><code>front()</code>和<code>back()</code>返回引用，需要注意对空容器调用，会产生和下标越界一样的运行错误</li>
+<li><code>.at()</code>和下标也要注意越界问题</li>
+</ul>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted -->程序员需要保证下标有效<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="217-删除元素">2.1.7 删除元素</h4>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>操作</th>
+<th>说明</th>
+<th>返回值</th>
+<th>扩展</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>erase(iter)</code></td>
+<td>删除<code>iter</code>指向的元素</td>
+<td>删除后的下一个位置的迭代器</td>
+<td><code>pop_back()</code> <!-- raw HTML omitted --> <code>pop_front()</code> <!-- raw HTML omitted --> <code>clear()</code> <!-- raw HTML omitted --> <code>remove(T)</code></td>
+</tr>
+</tbody>
+</table></div>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted -->插入和删除元素可能会导致原来的迭代器失效，所以需要重新定位<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>list<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;</span> lst <span style="color:#000;font-weight:bold">=</span> {<span style="color:#099">1</span>,<span style="color:#099">2</span>,<span style="color:#099">3</span>,<span style="color:#099">4</span>,<span style="color:#099">5</span>,<span style="color:#099">5</span>};
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">auto</span> itb <span style="color:#000;font-weight:bold">=</span> lst.begin();
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">auto</span> ite <span style="color:#000;font-weight:bold">=</span> lst.end();
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">while</span>(itb <span style="color:#000;font-weight:bold">!=</span> ite) <span style="color:#998;font-style:italic">// 错误，因为删除导致end的定位失效，所以需要重新定位
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">if</span>(<span style="color:#000;font-weight:bold">*</span>itb <span style="color:#000;font-weight:bold">%</span> <span style="color:#099">2</span>) itb <span style="color:#000;font-weight:bold">=</span> lst.erase(itb);
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">else</span> <span style="color:#000;font-weight:bold">++</span>tib;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>修改为：</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>list<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;</span> lst <span style="color:#000;font-weight:bold">=</span> {<span style="color:#099">1</span>,<span style="color:#099">2</span>,<span style="color:#099">3</span>,<span style="color:#099">4</span>,<span style="color:#099">5</span>,<span style="color:#099">5</span>};
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">auto</span> itb <span style="color:#000;font-weight:bold">=</span> lst.begin();
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">while</span>(itb <span style="color:#000;font-weight:bold">!=</span> lst.end()) <span style="color:#998;font-style:italic">// 重新定位
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">if</span>(<span style="color:#000;font-weight:bold">*</span>itb <span style="color:#000;font-weight:bold">%</span> <span style="color:#099">2</span>) itb <span style="color:#000;font-weight:bold">=</span> lst.erase(itb);
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">else</span> <span style="color:#000;font-weight:bold">++</span>tib;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="-22-vector的扩展">🚩 2.2 vector的扩展</h3>
+<p>以两倍于原来内存大小扩展</p>
+<h3 id="-23-string的额外操作">🚩 2.3 string的额外操作</h3>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>操作</th>
+<th>说明</th>
+<th>返回</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>s.substr(pos, n) </code></td>
+<td>从<code>pos</code>的位置，拷贝长度为<code>n</code>的子串</td>
+<td><code>string</code>类型子串</td>
+</tr>
+<tr>
+<td><code>s.replace(range, args) </code></td>
+<td>删除<code>range</code>范围内元素，替换为<code>args</code>指定的字符</td>
+<td>修改了<code>s</code></td>
+</tr>
+<tr>
+<td><code>s.find(str, pos)</code></td>
+<td>从<code>pos</code>(默认为0)位置处搜索<code>str</code>出现的位置</td>
+<td><code>std::string::size_type</code>类型的值，表示匹配下标的位置 <!-- raw HTML omitted --> <code>std::string::npos</code>表示没找到</td>
+</tr>
+<tr>
+<td><code>s.find_first_of(str, pos)</code></td>
+<td>从<code>pos</code>(默认为0)位置处搜索<code>str</code>中人一个字符第一次出现的位置</td>
+<td>同上</td>
+</tr>
+<tr>
+<td><code>s.find_first_not_of(str, pos)</code></td>
+<td>从<code>pos</code>(默认为0)位置处搜索不在<code>str</code>中的字符首次出现的位置</td>
+<td>同上</td>
+</tr>
+<tr>
+<td><code>s = to_string(arg)</code></td>
+<td>整数转字符串</td>
+<td></td>
+</tr>
+<tr>
+<td><code>stoi</code> <!-- raw HTML omitted --> <code>stol</code></td>
+<td>字符串转整数</td>
+<td></td>
+</tr>
+<tr>
+<td><code>atoi</code> <!-- raw HTML omitted --> <code>atol</code></td>
+<td><code>char*</code>转整数</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="-24-容器适配器">🚩 2.4 容器适配器</h3>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>名称</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>stack</code></td>
+<td>栈</td>
+<td><code>.top()</code> <!-- raw HTML omitted --> <code>.push()</code> <!-- raw HTML omitted --> <code>.pop()</code></td>
+</tr>
+<tr>
+<td><code>queue</code></td>
+<td>队列</td>
+<td><code>.front()</code> <!-- raw HTML omitted --> <code>.push()</code> <!-- raw HTML omitted --> <code>.pop()</code></td>
+</tr>
+<tr>
+<td><code>priority_queue</code></td>
+<td>大根堆</td>
+<td><code>.top()</code> <!-- raw HTML omitted --> <code>.push()</code> <!-- raw HTML omitted --> <code>.pop()</code></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="3-关联容器">3. 关联容器</h2>
+<p>关联容器支持高效的查找与访问。</p>
+<h3 id="-31-map">🚩 3.1 map</h3>
+<p>不论是<code>map</code>还是<code>unordered_map</code>，都支持下标访问，但需要注意的是：<!-- raw HTML omitted --><strong>当关键字不存在于容器中时，会创建并对关联值进行值初始化</strong><!-- raw HTML omitted -->。</p>
+<p>关键字 - 值 ： <code>{key, data}</code></p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>pair<span style="color:#000;font-weight:bold">&lt;</span>string, <span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;</span>(<span style="color:#d14">&#34;author&#34;</span>, <span style="color:#099">5</span>);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="311-操作">3.1.1 操作</h4>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>操作</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>c.find(k)</code></td>
+<td>查找关键字k，返回对应的迭代器；若不存在，则返回<code>end()</code></td>
+</tr>
+<tr>
+<td><code>c.count(k)</code></td>
+<td>判断关键字k是否存在于容器中，不存在，返回0</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="-32-set">🚩 3.2 set</h3>
+<p>因为<code>set</code>的<code>key</code>就是<code>data</code>，所以<code>set</code>的迭代器也是<code>const</code>类型的</p>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/c&#43;&#43;primer/">C&#43;&#43;Primer</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC8%E7%AB%A0_io%E5%BA%93/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第8章 IO库</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC7%E7%AB%A0_%E7%B1%BB/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第7章 类</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

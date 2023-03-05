@@ -1,0 +1,1028 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='类
+类是一种自定义的类型，通过数据抽象和封装，将接口（对外提供的功能函数）和实现（包括数据成员、负责接口实现的函数体以及类的一些私有函数）分离。
+上面只是人为的划分开需要对外部提供和隐藏的成员，语言设计上，通过访问访问说明符强制性的封装隐藏。
+封装的好处：
+代码模块化，高内聚，低耦合 可以防止用户无意间修改类中数据 被封装的类接口实现可以随意更改，而无须调整调用者代码 1.类的组成和相关函数说明 数据成员 成员函数 ： 提供对外的类功能接口 私有成员函数 ： 辅助函数 ： 作为成员函数的实现部分，实际上不属于类本身 类型成员 ： 使用typedef或using定义，存在访问限制 🌂 1.1 数据成员 1.1.1 类成员编译过程 两步走：
+先所有成员的声明（整个类定义的内容class Name{};） 再成员函数体（函数的具体实现） 因此在函数体内不必在意成员出现的顺序，它们都已经记录在册了。
+但是要注意的是有一类类型成员，必须先定义后使用。因为在声明过程中需要类型，编译时，对应的类型必须能找到才可通过，所以有上述规定。
+1.1.2 类中数据成员初始化 三种方法：
+类内初始值 ： 声明数据成员时，给定初值，使用“=”或“{}” 构造函数初始化列表 没有上述两种的进行默认初始化，这里内置类型和复合类型会出现未定义 1.1.3 const和mutable 🔸 const
+const数据成员需要进行类内初始化或构造函数初始化列表赋值
+🔸 mutable
+mutable修饰的成员变量在常量成员函数中也是可以修改的。
+1.1.4 类的静态成员 static只能在类内声明时使用 静态成员不与对象绑定在一起 静态成员函数中没有this指针，因此函数内部不能使用类的非静态成员，并且静态成员函数不能声明为const，因为const是针对this指向的对象的限制 静态成员函数可以定义在类内，也可以定义在类外，类外定义时不能加关键字static 调用时可以使用如下方式： 1 2 3 类名::静态成员 类对象.静态成员 类对象-&amp;gt;静态成员 静态数据成员为确保只定义一次，将其定义在cpp文件中。如果定义在.h文件中，则多次对头文件的include会导致重定义问题 静态成员可以是不完整类型，同时也可以作为参数的默认实参 🌂 1.2 函数 1.2.1 成员函数this理解 类的成员函数是如何准确调用类对象的数据成员？
+类对象通过成员访问运算符调用成员函数时，由编译器负责传入隐式形参this。 this是一个指针常量，其指向的地址不可以修改，类型是类名 *const。 1.'>
+<title>第7章 类</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC7%E7%AB%A0_%E7%B1%BB/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='第7章 类'>
+<meta property='og:description' content='类
+类是一种自定义的类型，通过数据抽象和封装，将接口（对外提供的功能函数）和实现（包括数据成员、负责接口实现的函数体以及类的一些私有函数）分离。
+上面只是人为的划分开需要对外部提供和隐藏的成员，语言设计上，通过访问访问说明符强制性的封装隐藏。
+封装的好处：
+代码模块化，高内聚，低耦合 可以防止用户无意间修改类中数据 被封装的类接口实现可以随意更改，而无须调整调用者代码 1.类的组成和相关函数说明 数据成员 成员函数 ： 提供对外的类功能接口 私有成员函数 ： 辅助函数 ： 作为成员函数的实现部分，实际上不属于类本身 类型成员 ： 使用typedef或using定义，存在访问限制 🌂 1.1 数据成员 1.1.1 类成员编译过程 两步走：
+先所有成员的声明（整个类定义的内容class Name{};） 再成员函数体（函数的具体实现） 因此在函数体内不必在意成员出现的顺序，它们都已经记录在册了。
+但是要注意的是有一类类型成员，必须先定义后使用。因为在声明过程中需要类型，编译时，对应的类型必须能找到才可通过，所以有上述规定。
+1.1.2 类中数据成员初始化 三种方法：
+类内初始值 ： 声明数据成员时，给定初值，使用“=”或“{}” 构造函数初始化列表 没有上述两种的进行默认初始化，这里内置类型和复合类型会出现未定义 1.1.3 const和mutable 🔸 const
+const数据成员需要进行类内初始化或构造函数初始化列表赋值
+🔸 mutable
+mutable修饰的成员变量在常量成员函数中也是可以修改的。
+1.1.4 类的静态成员 static只能在类内声明时使用 静态成员不与对象绑定在一起 静态成员函数中没有this指针，因此函数内部不能使用类的非静态成员，并且静态成员函数不能声明为const，因为const是针对this指向的对象的限制 静态成员函数可以定义在类内，也可以定义在类外，类外定义时不能加关键字static 调用时可以使用如下方式： 1 2 3 类名::静态成员 类对象.静态成员 类对象-&amp;gt;静态成员 静态数据成员为确保只定义一次，将其定义在cpp文件中。如果定义在.h文件中，则多次对头文件的include会导致重定义问题 静态成员可以是不完整类型，同时也可以作为参数的默认实参 🌂 1.2 函数 1.2.1 成员函数this理解 类的成员函数是如何准确调用类对象的数据成员？
+类对象通过成员访问运算符调用成员函数时，由编译器负责传入隐式形参this。 this是一个指针常量，其指向的地址不可以修改，类型是类名 *const。 1.'>
+<meta property='og:url' content='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC7%E7%AB%A0_%E7%B1%BB/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='C&#43;&#43;Primer' /><meta property='article:published_time' content='2023-03-05T21:20:56&#43;08:00'/><meta property='article:modified_time' content='2023-03-05T21:20:56&#43;08:00'/>
+<meta name="twitter:title" content="第7章 类">
+<meta name="twitter:description" content="类
+类是一种自定义的类型，通过数据抽象和封装，将接口（对外提供的功能函数）和实现（包括数据成员、负责接口实现的函数体以及类的一些私有函数）分离。
+上面只是人为的划分开需要对外部提供和隐藏的成员，语言设计上，通过访问访问说明符强制性的封装隐藏。
+封装的好处：
+代码模块化，高内聚，低耦合 可以防止用户无意间修改类中数据 被封装的类接口实现可以随意更改，而无须调整调用者代码 1.类的组成和相关函数说明 数据成员 成员函数 ： 提供对外的类功能接口 私有成员函数 ： 辅助函数 ： 作为成员函数的实现部分，实际上不属于类本身 类型成员 ： 使用typedef或using定义，存在访问限制 🌂 1.1 数据成员 1.1.1 类成员编译过程 两步走：
+先所有成员的声明（整个类定义的内容class Name{};） 再成员函数体（函数的具体实现） 因此在函数体内不必在意成员出现的顺序，它们都已经记录在册了。
+但是要注意的是有一类类型成员，必须先定义后使用。因为在声明过程中需要类型，编译时，对应的类型必须能找到才可通过，所以有上述规定。
+1.1.2 类中数据成员初始化 三种方法：
+类内初始值 ： 声明数据成员时，给定初值，使用“=”或“{}” 构造函数初始化列表 没有上述两种的进行默认初始化，这里内置类型和复合类型会出现未定义 1.1.3 const和mutable 🔸 const
+const数据成员需要进行类内初始化或构造函数初始化列表赋值
+🔸 mutable
+mutable修饰的成员变量在常量成员函数中也是可以修改的。
+1.1.4 类的静态成员 static只能在类内声明时使用 静态成员不与对象绑定在一起 静态成员函数中没有this指针，因此函数内部不能使用类的非静态成员，并且静态成员函数不能声明为const，因为const是针对this指向的对象的限制 静态成员函数可以定义在类内，也可以定义在类外，类外定义时不能加关键字static 调用时可以使用如下方式： 1 2 3 类名::静态成员 类对象.静态成员 类对象-&amp;gt;静态成员 静态数据成员为确保只定义一次，将其定义在cpp文件中。如果定义在.h文件中，则多次对头文件的include会导致重定义问题 静态成员可以是不完整类型，同时也可以作为参数的默认实参 🌂 1.2 函数 1.2.1 成员函数this理解 类的成员函数是如何准确调用类对象的数据成员？
+类对象通过成员访问运算符调用成员函数时，由编译器负责传入隐式形参this。 this是一个指针常量，其指向的地址不可以修改，类型是类名 *const。 1.">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1类的组成和相关函数说明">1.类的组成和相关函数说明</a>
+      <ul>
+        <li><a href="#-11-数据成员">🌂 1.1 数据成员</a></li>
+        <li><a href="#-12-函数">🌂 1.2 函数</a></li>
+        <li><a href="#-13-类型成员">🌂 1.3 类型成员</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-类作用域与名字查找">2. 类作用域与名字查找</a>
+      <ul>
+        <li><a href="#-21-类外定义成员">🌂 2.1 类外定义成员</a></li>
+        <li><a href="#-22-不完全类型">🌂 2.2 不完全类型</a></li>
+        <li><a href="#-23-名字查找">🌂 2.3 名字查找</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-构造函数">3. 构造函数</a>
+      <ul>
+        <li><a href="#-31-构造函数初始化过程">🌂 3.1 构造函数初始化过程</a></li>
+        <li><a href="#-32-默认构造函数">🌂 3.2 默认构造函数</a></li>
+        <li><a href="#-33-隐式类型转换和explicit">🌂 3.3 隐式类型转换和explicit</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-友元">4. 友元</a>
+      <ul>
+        <li><a href="#-41-辅助函数友元化">🌂 4.1 辅助函数友元化</a></li>
+        <li><a href="#-42-友元类">🌂 4.2 友元类</a></li>
+        <li><a href="#-43-成员函数友元化">🌂 4.3 成员函数友元化</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="background-color: #c1c1f6; color: #fff;">
+                读书笔记
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC7%E7%AB%A0_%E7%B1%BB/">第7章 类</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 05, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    3 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>类</p>
+<p>类是一种自定义的类型，通过<strong>数据抽象</strong>和<strong>封装</strong>，将<strong>接口</strong>（对外提供的功能函数）和<strong>实现</strong>（包括数据成员、负责接口实现的函数体以及类的一些私有函数）分离。</p>
+<p>上面只是人为的划分开需要对外部提供和隐藏的成员，语言设计上，通过访问<!-- raw HTML omitted --><!-- raw HTML omitted -->访问说明符<!-- raw HTML omitted --><!-- raw HTML omitted -->强制性的封装隐藏。</p>
+<p><strong>封装的好处</strong>：</p>
+<ol>
+<li>代码模块化，高内聚，低耦合</li>
+<li>可以防止用户无意间修改类中数据</li>
+<li>被封装的类接口实现可以随意更改，而无须调整调用者代码</li>
+</ol>
+<h2 id="1类的组成和相关函数说明">1.类的组成和相关函数说明</h2>
+<ul>
+<li>数据成员</li>
+<li>成员函数 ： 提供对外的类功能接口</li>
+<li>私有成员函数 ：</li>
+<li>辅助函数 ： 作为成员函数的实现部分，实际上不属于类本身</li>
+</ul>
+<hr>
+<ul>
+<li>类型成员 ： 使用<code>typedef</code>或<code>using</code>定义，存在访问限制</li>
+</ul>
+<h3 id="-11-数据成员">🌂 1.1 数据成员</h3>
+<h4 id="111-类成员编译过程">1.1.1 类成员编译过程</h4>
+<p>两步走：</p>
+<ul>
+<li>先所有成员的声明（整个类定义的内容<code>class Name{};</code>）</li>
+<li>再成员函数体（函数的具体实现）</li>
+</ul>
+<p>因此在函数体内不必在意成员出现的顺序，它们都已经记录在册了。</p>
+<p>但是要注意的是有一类<!-- raw HTML omitted --><strong>类型成员，必须先定义后使用</strong><!-- raw HTML omitted -->。因为在声明过程中需要类型，编译时，对应的类型必须能找到才可通过，所以有上述规定。</p>
+<h4 id="112-类中数据成员初始化">1.1.2 类中数据成员初始化</h4>
+<p>三种方法：</p>
+<ul>
+<li>类内初始值 ： 声明数据成员时，给定初值，使用“=”或“{}”</li>
+<li>构造函数初始化列表</li>
+<li>没有上述两种的进行默认初始化，这里内置类型和复合类型会出现未定义</li>
+</ul>
+<h4 id="113-const和mutable">1.1.3 const和mutable</h4>
+<p>🔸 <code>const</code></p>
+<p><code>const</code>数据成员需要进行类内初始化或构造函数初始化列表赋值</p>
+<p>🔸 <code>mutable</code></p>
+<p><code>mutable</code>修饰的成员变量在常量成员函数中也是可以修改的。</p>
+<h4 id="114-类的静态成员">1.1.4 类的静态成员</h4>
+<ul>
+<li><code>static</code>只能在类内声明时使用</li>
+<li>静态成员不与对象绑定在一起</li>
+<li>静态成员函数中没有<code>this</code>指针，因此函数内部不能使用类的非静态成员，并且静态成员函数不能声明为<code>const</code>，因为<code>const</code>是针对<code>this</code>指向的对象的限制</li>
+<li>静态成员函数可以定义在类内，也可以定义在类外，类外定义时不能加关键字<code>static</code></li>
+<li>调用时可以使用如下方式：</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2">类名</span><span style="color:#000;font-weight:bold">::</span><span style="color:#a61717;background-color:#e3d2d2">静态成员</span>
+</span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2">类对象</span>.<span style="color:#a61717;background-color:#e3d2d2">静态成员</span>
+</span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2">类对象</span><span style="color:#000;font-weight:bold">-&gt;</span><span style="color:#a61717;background-color:#e3d2d2">静态成员</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>静态数据成员为确保只定义一次，将其<!-- raw HTML omitted --><!-- raw HTML omitted -->定义在cpp文件中<!-- raw HTML omitted --><!-- raw HTML omitted -->。如果定义在<code>.h</code>文件中，则多次对头文件的<code>include</code>会导致重定义问题</li>
+<li>静态成员可以是不完整类型，同时也可以作为参数的默认实参</li>
+</ul>
+<h3 id="-12-函数">🌂 1.2 函数</h3>
+<h4 id="121-成员函数this理解">1.2.1 成员函数<code>this</code>理解</h4>
+<p>类的成员函数是如何准确调用类对象的数据成员？</p>
+<ul>
+<li>类对象通过<strong>成员访问运算符</strong>调用成员函数时，由编译器负责传入<!-- raw HTML omitted --><!-- raw HTML omitted -->隐式形参<code>this</code><!-- raw HTML omitted --><!-- raw HTML omitted -->。</li>
+<li><code>this</code>是一个<strong>指针常量</strong>，其指向的地址不可以修改，类型是<!-- raw HTML omitted --><!-- raw HTML omitted -->类名 <code>*const</code><!-- raw HTML omitted --><!-- raw HTML omitted -->。</li>
+</ul>
+<h4 id="122-常量成员函数">1.2.2 常量成员函数</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Name</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">const</span> Name<span style="color:#000;font-weight:bold">&amp;</span> func() <span style="color:#000;font-weight:bold">const</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>所谓的常量成员函数，是通过<code>const</code>对<code>this</code>进行限定，将其类型修改为<!-- raw HTML omitted --><!-- raw HTML omitted --><code>const 类名 * const</code><!-- raw HTML omitted --><!-- raw HTML omitted --></li>
+<li>这也是为什么我们在常量成员函数中不能够修改数据成员的原因，此时的<code>this</code>不仅指向的地址不能修改，就连地址中指向的内容也无法修改。<!-- raw HTML omitted --></li>
+</ul>
+<p><strong>常量成员函数返回类引用时的区别</strong>：<!-- raw HTML omitted --></p>
+<ul>
+<li>非常量的成员函数返回的<code>this</code>是指向一个非常量的对象</li>
+<li>常量成员函数返回的<code>this</code>是指向一个常量对象</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Name</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    Name<span style="color:#000;font-weight:bold">&amp;</span> func() {...; <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">*</span><span style="color:#000;font-weight:bold">this</span>;}
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">const</span> Name<span style="color:#000;font-weight:bold">&amp;</span> func() <span style="color:#000;font-weight:bold">const</span> {...; <span style="color:#000;font-weight:bold">return</span> <span style="color:#000;font-weight:bold">*</span><span style="color:#000;font-weight:bold">this</span>;}
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="123-辅助函数">1.2.3 辅助函数</h4>
+<ul>
+<li>辅助函数是类的非成员函数。这些函数是类接口的组成部分。</li>
+<li><!-- raw HTML omitted --><!-- raw HTML omitted -->辅助函数的声明应该与类在同一个头文件中，定义要在cpp文件中，否则会出现“重定义”的错误<!-- raw HTML omitted --><!-- raw HTML omitted -->。</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Name</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// 如果辅助函数要访问类中私有成员，可以设为友元函数
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 辅助函数的声明
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">func</span>();
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="124-inline函数">1.2.4 inline函数</h4>
+<p>参考链接：<a class="link" href="http://blog.sina.com.cn/s/blog_4a0e545d01000c4e.html"  target="_blank" rel="noopener"
+    >cpp中内联函数的优点与缺点</a><!-- raw HTML omitted --></p>
+<p>🔸 内联函数是为了<strong>提高性能</strong>而设立的。内联函数的实现有以下3种：</p>
+<ul>
+<li>类内定义的函数：是隐式的内联函数</li>
+<li>类内声明时：加关键字<code>inline</code></li>
+<li>类外定义时：加关键字<code>inline</code></li>
+</ul>
+<blockquote>
+<ol>
+<li>不光成员函数可以内联，非成员函数也可以；</li>
+<li>虽然在写代码的时候，可以我们自己设定内联函数，但是能否成为内联函数，由编译器决定。</li>
+</ol>
+</blockquote>
+<p>🔸 <strong>优点</strong>：<!-- raw HTML omitted --></p>
+<ol>
+<li>内联函数是在编译时，在函数调用处展开，减少函数调用<code>call</code>带来的开销，包括栈帧开辟和回收，参数入栈，寄存器保护与恢复等。</li>
+<li>由于在调用处展开，所以编译器可以结合上下的代码对其进行优化</li>
+</ol>
+<p>🔸 <strong>函数体代码何去何从</strong>：<!-- raw HTML omitted --></p>
+<ul>
+<li>由于编译器在编译时通常以一个<code>cpp</code>文件为一个编译单元，在此过程中，预处理器会展开<code>#include</code>的头文件内容，同时编译器在编译时也会对内联函数在其调用处替换为函数体。<!-- raw HTML omitted --></li>
+<li>由于编译时不会涉及其他的<code>cpp</code>文件，只会有<code>h</code>头文件中的内容，所以为了保证内联函数在多个编译单元处展开的代码一致性，以及可以找到函数体，<!-- raw HTML omitted --><!-- raw HTML omitted -->内联函数必须声明并定义在h头文件中<!-- raw HTML omitted --><!-- raw HTML omitted -->。</li>
+</ul>
+<p>🔸 <strong>内联区别于宏</strong>：</p>
+<ul>
+<li>宏展开：预处理器行为，是由预处理器负责，不能对类型进行检查</li>
+<li>内联：编译期行为，由编译器负责，会对类型进行检查</li>
+</ul>
+<h3 id="-13-类型成员">🌂 1.3 类型成员</h3>
+<p>类型成员是在类中使用<code>typedef</code>或<code>using</code>定义的类型</p>
+<ul>
+<li>类外使用时要加域名</li>
+<li>作为类中成员，存在访问限制。</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Name</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">public</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">typedef</span> std<span style="color:#000;font-weight:bold">::</span>string<span style="color:#000;font-weight:bold">::</span>size_type pos;
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// 等价于
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">using</span> pos <span style="color:#000;font-weight:bold">=</span> std<span style="color:#000;font-weight:bold">::</span>string<span style="color:#000;font-weight:bold">::</span>size_type;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>区别于其他成员</strong>：</p>
+<ul>
+<li><!-- raw HTML omitted --><strong>通常定义于类开头处</strong><!-- raw HTML omitted --></li>
+<li>必须先定义后使用，因为类型成员通常用于声明变量，在编译整个类定义时，编译器会向上查找声明</li>
+</ul>
+<h2 id="2-类作用域与名字查找">2. 类作用域与名字查找</h2>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted -->每一个类都是一个作用域<!-- raw HTML omitted --><!-- raw HTML omitted -->。</p>
+<h3 id="-21-类外定义成员">🌂 2.1 类外定义成员</h3>
+<p>在类外定义这些成员时，要加上<strong>类名加::</strong></p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>SaleDate<span style="color:#000;font-weight:bold">&amp;</span> SaleDate<span style="color:#000;font-weight:bold">::</span>combine(<span style="color:#000;font-weight:bold">const</span> SaleDate<span style="color:#000;font-weight:bold">&amp;</span>)
+</span></span><span style="display:flex;"><span>{ ... }
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>函数名之前加上<code>SaleDate::</code>后，后面的函数参数和函数体都在这个作用域下。</li>
+<li>如果函数返回值也是在这个作用域下定义的成员，由于返回值不包括在该作用域下，所以需要自己加上作用域。</li>
+</ul>
+<h3 id="-22-不完全类型">🌂 2.2 不完全类型</h3>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted -->前向声明是指只声明却没有定义<!-- raw HTML omitted --><!-- raw HTML omitted -->。向程序中引入类的名字，指明其是一种<!-- raw HTML omitted --><!-- raw HTML omitted -->类类型<!-- raw HTML omitted --><!-- raw HTML omitted -->。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Screen</span>;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>对于<code>Screen</code>来说，声明之后定义之前是一个<!-- raw HTML omitted --><!-- raw HTML omitted -->不完全类型<!-- raw HTML omitted --><!-- raw HTML omitted -->。不完全类型由于没有定义，所以并不知道该类型需要多大的内存，所以不能够定义该种类型的对象。</li>
+<li><!-- raw HTML omitted --><!-- raw HTML omitted -->只有等类定义完整，才能定义其对象<!-- raw HTML omitted --><!-- raw HTML omitted -->。</li>
+<li>不完全类型的使用情景：</li>
+</ul>
+<blockquote>
+<ol>
+<li>可以指定这种类型的指针或引用</li>
+<li>声明（但是不能定义）以不完全类型为参数或返回值的函数</li>
+</ol>
+</blockquote>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Node</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">int</span> val;  <span style="color:#998;font-style:italic">// int作为内置类型，已经被定义过了，所以可以定义对象
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    Node<span style="color:#000;font-weight:bold">*</span> next; <span style="color:#998;font-style:italic">// 不完全类型的使用
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="-23-名字查找">🌂 2.3 名字查找</h3>
+<p>🔸 <strong>普通变量</strong>，包含成员函数声明中的参数和返回值：</p>
+<ul>
+<li>首先，在名字所在的块中寻找，<strong>只能在块中位置以上寻找</strong></li>
+<li>其次，外层作用域找，也是向上</li>
+</ul>
+<p>🔸 <strong>定义在类内部的成员函数内</strong>用的名字：</p>
+<ul>
+<li>首先，编译所有成员的声明，这里的声明中参数和返回值的类型按照普通名字寻找</li>
+<li>直到类全部可见后才编译函数体，可以使用类中的成员</li>
+</ul>
+<p>🔸 如果<strong>成员函数定义在类外部，则内部实现时</strong>要考虑：</p>
+<ul>
+<li>类定义前全局作用域下的声明</li>
+<li>类定义后，成员函数定义前的全局作用域下的声明</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 类定义前的全局作用域下的声明
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 类定义
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Name</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">func</span>();
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 类定义后，成员函数定义前的全局作用域下的声明
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>...
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 成员函数定义
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">void</span> Name<span style="color:#000;font-weight:bold">::</span>func(){}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>变量名在块内外可以同名，如果想指定的话：</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 使用类的成员
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">this</span><span style="color:#000;font-weight:bold">-&gt;</span>
+</span></span><span style="display:flex;"><span><span style="color:#a61717;background-color:#e3d2d2">类名</span><span style="color:#000;font-weight:bold">::</span> 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 全局作用域
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">::</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>类型成员名在块内外不可同名</li>
+</ul>
+<h2 id="3-构造函数">3. 构造函数</h2>
+<p>无论何时，只要创建对象就需要调用构造函数。</p>
+<p>🔸 <strong>特点</strong>：</p>
+<ul>
+<li>无返回值</li>
+<li>不能被声明成<code>const</code></li>
+</ul>
+<blockquote>
+<p>因为构造函数通常需要为成员变量初始化或赋值，若加上<code>const</code>，表示<code>this</code>指向的对象内容不可修改，违背了构造函数的初衷</p>
+</blockquote>
+<ul>
+<li>可重载</li>
+</ul>
+<p>🔸 <strong>什么情况下适合编译器生成的默认构造函数</strong>：</p>
+<ul>
+<li>只有类没有提供任何构造函数时，编译器才能生成合成默认构造函数</li>
+<li>只有类中的<strong>内置类型</strong>和<strong>复合类型</strong>都有类内初始值时，才能使用默认构造函数，否则会造成后续代码出现运行时不知道为什么的错误</li>
+</ul>
+<p>有些情况下，编译器是无法生成默认构造函数的，详细见13章介绍。</p>
+<p>🔸 <strong>什么情况下必须使用初始化列表</strong>：</p>
+<ul>
+<li>类有<code>const</code>、引用成员时必须将其初始化</li>
+<li>成员中有类类型，且该类没有定义默认构造函数时，必须将该成员初始化</li>
+</ul>
+<h3 id="-31-构造函数初始化过程">🌂 3.1 构造函数初始化过程</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>Name()
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 成员在构造函数体之前执行默认初始化
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// 这里是赋值
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><strong>成员初始化顺序</strong>：</p>
+<ul>
+<li>成员初始化的顺序与其在类中定义的顺序一致</li>
+<li>最好用构造函数的参数作为成员的初始值</li>
+</ul>
+<blockquote>
+<p>否则成员变量间的相互赋值可能会因为成员变量初始化顺序导致失败</p>
+</blockquote>
+<h3 id="-32-默认构造函数">🌂 3.2 默认构造函数</h3>
+<ul>
+<li>编译器提供的是合成的默认构造函数，我们如果想写一个一样的，可以使用<code>default</code>。</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>Name() <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">default</span>; <span style="color:#998;font-style:italic">// 默认构造
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>构造函数中参数都提供了默认实参的构造函数也称为是默认构造函数</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>Name(string s <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;&#34;</span>) {} <span style="color:#998;font-style:italic">// 默认构造
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>实际中，<!-- raw HTML omitted --><!-- raw HTML omitted -->如果定义了其他的构造函数，那么最好也提供一个默认构造函数<!-- raw HTML omitted --><!-- raw HTML omitted -->，可以使用上面两种方法</li>
+</ul>
+<blockquote>
+<p>否则编译器将不会提供默认构造函数，可能导致以该类作为类成员的类，如果进行默认初始化，必定会失败。</p>
+</blockquote>
+<h3 id="-33-隐式类型转换和explicit">🌂 3.3 隐式类型转换和explicit</h3>
+<h4 id="331-隐式类型转换">3.3.1 隐式类型转换</h4>
+<p>如果<strong>构造函数只接受一个实参</strong>，则它相当于定义了转换为此类型的隐式转换机制。</p>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted -->编译器只会自动执行一步类型转换<!-- raw HTML omitted --><!-- raw HTML omitted -->，所以类类型转换不总是有效的。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 隐式类型转换 char* -&gt; string 一步转换成功
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>string(<span style="color:#d14">&#34;999-999-999&#34;</span>); 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 需要(1)char* -&gt; string (2) string -&gt; Name两步转换，失败
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>Name(<span style="color:#d14">&#34;999-999-999&#34;</span>); 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="332-explicit">3.3.2 explicit</h4>
+<ul>
+<li><code>explicit</code>只对一个实参的构造函数有效</li>
+<li><code>explicit</code>只能在类内声明时使用</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">explicit</span> <span style="color:#900;font-weight:bold">Name</span>(string s <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;&#34;</span>) {}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>使用了<code>explicit</code>的构造函数不能够进行隐式类型转换，需要强制类型转换（显示转换）。</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">static_cast</span><span style="color:#000;font-weight:bold">&lt;</span>Name<span style="color:#000;font-weight:bold">&gt;</span>(<span style="color:#d14">&#34;999-999-999&#34;</span>);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>explicit</code>构造函数只能用于直接初始化（&quot;<code>=</code>&ldquo;初始化变量是拷贝初始化；其他是直接初始化）</li>
+</ul>
+<h2 id="4-友元">4. 友元</h2>
+<p>通过<strong>访问说明符</strong>强制限定后，非类内函数或其他类想使用类中的成员时，需要通过设置友元<code>friend</code>。</p>
+<p>需要注意的是：</p>
+<ol>
+<li><!-- raw HTML omitted --><!-- raw HTML omitted -->类中的友元声明仅仅是指定了访问权限，而并非通常意义上的声明，因此必须提供独立的声明后才能调用该友元<!-- raw HTML omitted --><!-- raw HTML omitted -->。</li>
+<li>友元并非类的成员，它仅是声明，因此<!-- raw HTML omitted --><!-- raw HTML omitted -->不会受到访问说明符权限的限制<!-- raw HTML omitted --><!-- raw HTML omitted -->，但通常集中放于类的开头或结尾处。</li>
+<li>友元关系是单方向的，不具有传递性，类中声明友元，<!-- raw HTML omitted --><!-- raw HTML omitted -->只能说明该类承认与所声明方的友元关系<!-- raw HTML omitted --><!-- raw HTML omitted -->，对方可以使用自己的私有成员，但是该类不能使用对方的私有成员。</li>
+<li><!-- raw HTML omitted --><!-- raw HTML omitted -->类和非成员函数的声明不是必须在他们的友元声明之前<!-- raw HTML omitted --><!-- raw HTML omitted -->。</li>
+</ol>
+<h3 id="-41-辅助函数友元化">🌂 4.1 辅助函数友元化</h3>
+<ul>
+<li>辅助函数的友元声明指定该辅助函数的访问权限，还需要提供该辅助函数真正意义上的声明</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">X</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">friend</span> <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">f</span>(); <span style="color:#998;font-style:italic">// 友元声明
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">g</span>(); <span style="color:#998;font-style:italic">// 成员函数
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">h</span>() { f(); } <span style="color:#998;font-style:italic">// 错误：编译器向上找不到f()的声明
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">b</span>();
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> X<span style="color:#000;font-weight:bold">::</span>g() { f(); } <span style="color:#998;font-style:italic">// 错误：编译器向上找不到f()的声明
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">f</span>() {} <span style="color:#998;font-style:italic">// 友元函数的定义
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> X<span style="color:#000;font-weight:bold">::</span>b() { f(); } <span style="color:#998;font-style:italic">// 正确的函数定义
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="-42-友元类">🌂 4.2 友元类</h3>
+<p><code>Screen.h</code></p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Screen</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">friend</span> <span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Win_mgr</span>; <span style="color:#998;font-style:italic">// Screen承认与Win_mgr的友元关系，Win_mgr可以使用Screen中的私有成员
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>};
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><code>Win_mgr.h</code></p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#include</span> <span style="color:#999;font-weight:bold;font-style:italic">&#34;screen.h&#34;</span><span style="color:#999;font-weight:bold;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span><span style="color:#000;font-weight:bold">class</span> <span style="color:#458;font-weight:bold">Win_mgr</span>
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#998;font-style:italic">// Win_mgr可以使用Screen中的私有成员
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>};
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>分析：</p>
+<ul>
+<li>在<code>Screen.h</code>中并没有<code>#include &quot;Win_mgr.h&quot;</code>，仅仅是友元声明，这时还没有<code>Win_mgr</code>类的声明。</li>
+<li>在<code>Win_mgr.h</code>中因为要用到<code>Screen.h</code>中的私有成员，一定需要包含类<code>Screen</code>的定义内容，所以要<code>#include &quot;Screen.h&quot;</code>。这时预处理器会将<code>Screen.h</code>展开，这时在<code>Win_mgr.h</code>中既有了友元声明，又有了类<code>Win_mgr</code>的声明和定义</li>
+</ul>
+<h3 id="-43-成员函数友元化">🌂 4.3 成员函数友元化</h3>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/c&#43;&#43;primer/">C&#43;&#43;Primer</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

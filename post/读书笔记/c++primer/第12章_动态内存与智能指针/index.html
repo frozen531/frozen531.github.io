@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='1. 对象、存储位置与生存期 对象类型 存储位置 生存期 全局变量 全局数据段 程序启动时分配，程序结束时销毁 局部static变量 全局数据段 第一次使用时分配，程序结束时销毁 局部变量 栈 进入其所在的程序块时创建，离开块时销毁 动态分配的对象 堆(自由空间) 人工显式释放内存 动态分配内存的对象与其他对象的区别：
+全局变量、局部static变量、局部变量都可以通过系统释放内存空间 动态对象需要手动释放内存 2. 动态分配内存 注意：销毁一个对象是销毁其数据成员；释放是指释放内存给系统。
+🔆 2.1 易出的问题 忘记释放内存 时，产生内存泄漏问题 提早释放内存 时，如果此时该内存仍存在其他指针指向，这些指针称为空悬指针，解引用会产生引用非法内存的错误 同一块内存释放两次，可能破坏堆空间 🔆 2.2 何时使用动态内存分配 不知道自己需要使用多少对象 &amp;mdash; 标准库中的容器类 我们创建一个vector对象，属于局部变量，离开程序块时，栈中的vector对象被销毁，其在堆内存中的空间也释放，这个操作由标准库完成，有一个allocator类，做了一个内存池
+不知道所需对象的准确类型 &amp;mdash; 类继承 派生类和基类对象的数据成员多少往往不相同，所以内存大小不确定
+需要多个对象间共享底层数据 &amp;mdash; shared_ptr间共享数据 🔆 2.3 动态内存管理方法 直接管理 智能指针 3. 直接管理动态内存new与delete 🔆 3.1 new动态分配与初始化 1 2 3 int* p1 = new int; // 默认初始化 *p1的值未定义，因为int为内置类型，没有默认构造函数；如果是string，则执行默认初始化函数，值为“” int* p2 = new int(); // 值初始化，*p2 = 0 int* p3 = new int(5); // 值初始化，*p3 = 5 🔆 3.'>
+<title>第12章 动态内存与智能指针</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC12%E7%AB%A0_%E5%8A%A8%E6%80%81%E5%86%85%E5%AD%98%E4%B8%8E%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='第12章 动态内存与智能指针'>
+<meta property='og:description' content='1. 对象、存储位置与生存期 对象类型 存储位置 生存期 全局变量 全局数据段 程序启动时分配，程序结束时销毁 局部static变量 全局数据段 第一次使用时分配，程序结束时销毁 局部变量 栈 进入其所在的程序块时创建，离开块时销毁 动态分配的对象 堆(自由空间) 人工显式释放内存 动态分配内存的对象与其他对象的区别：
+全局变量、局部static变量、局部变量都可以通过系统释放内存空间 动态对象需要手动释放内存 2. 动态分配内存 注意：销毁一个对象是销毁其数据成员；释放是指释放内存给系统。
+🔆 2.1 易出的问题 忘记释放内存 时，产生内存泄漏问题 提早释放内存 时，如果此时该内存仍存在其他指针指向，这些指针称为空悬指针，解引用会产生引用非法内存的错误 同一块内存释放两次，可能破坏堆空间 🔆 2.2 何时使用动态内存分配 不知道自己需要使用多少对象 &amp;mdash; 标准库中的容器类 我们创建一个vector对象，属于局部变量，离开程序块时，栈中的vector对象被销毁，其在堆内存中的空间也释放，这个操作由标准库完成，有一个allocator类，做了一个内存池
+不知道所需对象的准确类型 &amp;mdash; 类继承 派生类和基类对象的数据成员多少往往不相同，所以内存大小不确定
+需要多个对象间共享底层数据 &amp;mdash; shared_ptr间共享数据 🔆 2.3 动态内存管理方法 直接管理 智能指针 3. 直接管理动态内存new与delete 🔆 3.1 new动态分配与初始化 1 2 3 int* p1 = new int; // 默认初始化 *p1的值未定义，因为int为内置类型，没有默认构造函数；如果是string，则执行默认初始化函数，值为“” int* p2 = new int(); // 值初始化，*p2 = 0 int* p3 = new int(5); // 值初始化，*p3 = 5 🔆 3.'>
+<meta property='og:url' content='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC12%E7%AB%A0_%E5%8A%A8%E6%80%81%E5%86%85%E5%AD%98%E4%B8%8E%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='C&#43;&#43;Primer' /><meta property='article:published_time' content='2023-03-05T21:21:00&#43;08:00'/><meta property='article:modified_time' content='2023-03-05T21:21:00&#43;08:00'/>
+<meta name="twitter:title" content="第12章 动态内存与智能指针">
+<meta name="twitter:description" content="1. 对象、存储位置与生存期 对象类型 存储位置 生存期 全局变量 全局数据段 程序启动时分配，程序结束时销毁 局部static变量 全局数据段 第一次使用时分配，程序结束时销毁 局部变量 栈 进入其所在的程序块时创建，离开块时销毁 动态分配的对象 堆(自由空间) 人工显式释放内存 动态分配内存的对象与其他对象的区别：
+全局变量、局部static变量、局部变量都可以通过系统释放内存空间 动态对象需要手动释放内存 2. 动态分配内存 注意：销毁一个对象是销毁其数据成员；释放是指释放内存给系统。
+🔆 2.1 易出的问题 忘记释放内存 时，产生内存泄漏问题 提早释放内存 时，如果此时该内存仍存在其他指针指向，这些指针称为空悬指针，解引用会产生引用非法内存的错误 同一块内存释放两次，可能破坏堆空间 🔆 2.2 何时使用动态内存分配 不知道自己需要使用多少对象 &amp;mdash; 标准库中的容器类 我们创建一个vector对象，属于局部变量，离开程序块时，栈中的vector对象被销毁，其在堆内存中的空间也释放，这个操作由标准库完成，有一个allocator类，做了一个内存池
+不知道所需对象的准确类型 &amp;mdash; 类继承 派生类和基类对象的数据成员多少往往不相同，所以内存大小不确定
+需要多个对象间共享底层数据 &amp;mdash; shared_ptr间共享数据 🔆 2.3 动态内存管理方法 直接管理 智能指针 3. 直接管理动态内存new与delete 🔆 3.1 new动态分配与初始化 1 2 3 int* p1 = new int; // 默认初始化 *p1的值未定义，因为int为内置类型，没有默认构造函数；如果是string，则执行默认初始化函数，值为“” int* p2 = new int(); // 值初始化，*p2 = 0 int* p3 = new int(5); // 值初始化，*p3 = 5 🔆 3.">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-对象存储位置与生存期">1. 对象、存储位置与生存期</a></li>
+    <li><a href="#2-动态分配内存">2. 动态分配内存</a>
+      <ul>
+        <li><a href="#-21-易出的问题">🔆 2.1 易出的问题</a></li>
+        <li><a href="#-22-何时使用动态内存分配">🔆 2.2 何时使用动态内存分配</a></li>
+        <li><a href="#-23-动态内存管理方法">🔆 2.3 动态内存管理方法</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-直接管理动态内存new与delete">3. 直接管理动态内存new与delete</a>
+      <ul>
+        <li><a href="#-31-new动态分配与初始化">🔆 3.1 new动态分配与初始化</a></li>
+        <li><a href="#-32-释放动态内存delete">🔆 3.2 释放动态内存delete</a></li>
+      </ul>
+    </li>
+    <li><a href="#4-智能指针">4. 智能指针</a>
+      <ul>
+        <li><a href="#-41-shared_ptr">🔆 4.1 shared_ptr</a></li>
+        <li><a href="#-42-unique_ptr">🔆 4.2 unique_ptr</a></li>
+        <li><a href="#-43-weak_ptr">🔆 4.3 weak_ptr</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-动态数组">5. 动态数组</a>
+      <ul>
+        <li><a href="#-51-array-new-与array-delete">🔆 5.1 array new 与array delete</a></li>
+        <li><a href="#-52-allocator类">🔆 5.2 allocator类</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="background-color: #c1c1f6; color: #fff;">
+                读书笔记
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC12%E7%AB%A0_%E5%8A%A8%E6%80%81%E5%86%85%E5%AD%98%E4%B8%8E%E6%99%BA%E8%83%BD%E6%8C%87%E9%92%88/">第12章 动态内存与智能指针</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 05, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    3 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="1-对象存储位置与生存期">1. 对象、存储位置与生存期</h2>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>对象类型</th>
+<th>存储位置</th>
+<th>生存期</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>全局变量</td>
+<td>全局数据段</td>
+<td>程序启动时分配，程序结束时销毁</td>
+</tr>
+<tr>
+<td>局部<code>static</code>变量</td>
+<td>全局数据段</td>
+<td>第一次使用时分配，程序结束时销毁</td>
+</tr>
+<tr>
+<td>局部变量</td>
+<td>栈</td>
+<td>进入其所在的程序块时创建，离开块时销毁</td>
+</tr>
+<tr>
+<td>动态分配的对象</td>
+<td>堆(自由空间)</td>
+<td>人工显式释放内存</td>
+</tr>
+</tbody>
+</table></div>
+<p>动态分配内存的对象与其他对象的区别：</p>
+<ul>
+<li>全局变量、局部<code>static</code>变量、局部变量都可以通过<strong>系统释放内存</strong>空间</li>
+<li>动态对象需要<strong>手动释放内存</strong></li>
+</ul>
+<h2 id="2-动态分配内存">2. 动态分配内存</h2>
+<p>注意：<!-- raw HTML omitted --><!-- raw HTML omitted -->销毁一个对象是销毁其数据成员；释放是指释放内存给系统<!-- raw HTML omitted --><!-- raw HTML omitted -->。</p>
+<h3 id="-21-易出的问题">🔆 2.1 易出的问题</h3>
+<ul>
+<li><strong>忘记释放内存</strong> 时，产生内存泄漏问题</li>
+<li><strong>提早释放内存</strong> 时，如果此时该内存仍存在其他指针指向，这些指针称为空悬指针，解引用会产生引用非法内存的错误</li>
+<li><strong>同一块内存释放两次</strong>，可能破坏堆空间</li>
+</ul>
+<h3 id="-22-何时使用动态内存分配">🔆 2.2 何时使用动态内存分配</h3>
+<ul>
+<li>不知道自己需要使用多少对象 &mdash; 标准库中的容器类</li>
+</ul>
+<blockquote>
+<p>我们创建一个<code>vector</code>对象，属于局部变量，离开程序块时，栈中的<code>vector</code>对象被销毁，其在堆内存中的空间也释放，这个操作由标准库完成，有一个<code>allocator</code>类，做了一个内存池</p>
+</blockquote>
+<ul>
+<li>不知道所需对象的准确类型   &mdash; 类继承</li>
+</ul>
+<blockquote>
+<p>派生类和基类对象的数据成员多少往往不相同，所以内存大小不确定</p>
+</blockquote>
+<ul>
+<li>需要多个对象间共享底层数据     &mdash; <code>shared_ptr</code>间共享数据</li>
+</ul>
+<h3 id="-23-动态内存管理方法">🔆 2.3 动态内存管理方法</h3>
+<ul>
+<li>直接管理</li>
+<li>智能指针</li>
+</ul>
+<h2 id="3-直接管理动态内存new与delete">3. 直接管理动态内存new与delete</h2>
+<h3 id="-31-new动态分配与初始化">🔆 3.1 new动态分配与初始化</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">*</span> p1 <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> <span style="color:#458;font-weight:bold">int</span>;      <span style="color:#998;font-style:italic">// 默认初始化 *p1的值未定义，因为int为内置类型，没有默认构造函数；如果是string，则执行默认初始化函数，值为“”
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">*</span> p2 <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> <span style="color:#458;font-weight:bold">int</span>();    <span style="color:#998;font-style:italic">// 值初始化，*p2 = 0
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">*</span> p3 <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> <span style="color:#458;font-weight:bold">int</span>(<span style="color:#099">5</span>);   <span style="color:#998;font-style:italic">// 值初始化，*p3 = 5
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="-32-释放动态内存delete">🔆 3.2 释放动态内存delete</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">delete</span> p1; <span style="color:#998;font-style:italic">// delete一个指针
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">delete</span> p2;
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">delete</span> p3;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>释放内存后，要将指针置<code>nullptr</code>。</p>
+<h2 id="4-智能指针">4. 智能指针</h2>
+<p><strong>作用</strong>：智能指针可以<strong>自动释放</strong>指向的内存</p>
+<p><strong>头文件</strong>：<code>#include &lt;memory&gt;</code></p>
+<h3 id="-41-shared_ptr">🔆 4.1 shared_ptr</h3>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted -->允许多个指针指向同一个对象<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<p>类中有一个<strong>引用计数</strong>，在对<code>shared_ptr</code>对象的<strong>拷贝</strong>和<strong>赋值</strong>的过程中会改变引用计数。一旦引用计数为0，则自动释放自己所管理的内存。</p>
+<h4 id="411-创建shared_ptr对象">4.1.1 创建shared_ptr对象</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>shared_ptr<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;</span> p <span style="color:#000;font-weight:bold">=</span> make_shared<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;</span>(<span style="color:#099">42</span>); <span style="color:#998;font-style:italic">// 创建一个shared_ptr对象 : 推荐
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">auto</span> <span style="color:#900;font-weight:bold">s</span>(p); <span style="color:#998;font-style:italic">// 引用计数+1
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">auto</span> t <span style="color:#000;font-weight:bold">=</span> p; <span style="color:#998;font-style:italic">// 引用计数+1
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>shared_ptr<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;</span> m(<span style="color:#000;font-weight:bold">new</span> <span style="color:#458;font-weight:bold">int</span>(<span style="color:#099">42</span>)); <span style="color:#998;font-style:italic">// 必须使用直接初始化，因为shared_ptr类的构造函数为explicit
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>上面推荐使用<code>makd_shared</code>，防止使用<code>new</code>直接初始化，将一块内存绑定到多个独立创建的<code>shared_ptr</code>上</p>
+<h4 id="412-销毁或释放shared_ptr对象">4.1.2 销毁或释放shared_ptr对象</h4>
+<ul>
+<li>销毁：是析构函数的基础职责，销毁类中数据成员</li>
+<li>释放：当引用计数为0，释放指针指向的内存</li>
+</ul>
+<h4 id="413-重载自己的删除器">4.1.3 重载自己的删除器</h4>
+<p>一个函数退出有两种情况：</p>
+<ul>
+<li>函数正常结束</li>
+<li>发生异常。</li>
+</ul>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted -->当发生异常退出时，会销毁局部变量，如果是动态申请的，则无法释放内存。对于网络连接的对象，则无法断开连接。<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<p><code>shared_ptr</code>的这种析构方式不止应用于对动态内存的管理，还可以应用于对一些<strong>类对象的释放</strong>，如网络连接的断开连接。</p>
+<p>需要定义一个函数，用来执行断开连接操作，传入参数必须是<strong>指针类型</strong>，当创建<code>shared_ptr</code>时，添加第二参数(处理断开连接的函数)。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">struct</span> <span style="color:#458;font-weight:bold">destination</span>;
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">struct</span> <span style="color:#458;font-weight:bold">connection</span>;
+</span></span><span style="display:flex;"><span>connection <span style="color:#900;font-weight:bold">connect</span>(destination<span style="color:#000;font-weight:bold">*</span>); <span style="color:#998;font-style:italic">// 打开连接
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">disconnect</span>(connection);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">end_connection</span>(connection <span style="color:#000;font-weight:bold">*</span>p) {disconnect(<span style="color:#000;font-weight:bold">*</span>p);}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">f</span>(destination <span style="color:#000;font-weight:bold">&amp;</span>d)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    connection c <span style="color:#000;font-weight:bold">=</span> connect(<span style="color:#000;font-weight:bold">&amp;</span>d); <span style="color:#998;font-style:italic">// 创建连接
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    shared_ptr<span style="color:#000;font-weight:bold">&lt;</span>connection<span style="color:#000;font-weight:bold">&gt;</span> p(<span style="color:#000;font-weight:bold">&amp;</span>c, end_connection); <span style="color:#998;font-style:italic">// 当发生异常时，连接可以被释放
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="-42-unique_ptr">🔆 4.2 unique_ptr</h3>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted -->独占所指向的对象，不支持普通的拷贝和赋值<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="421-创建对象">4.2.1 创建对象</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>unique_ptr<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;</span> p(<span style="color:#000;font-weight:bold">new</span> <span style="color:#458;font-weight:bold">int</span>(<span style="color:#099">42</span>)); <span style="color:#998;font-style:italic">// 必须采用直接初始化
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="422-转移unique_ptr的所有权">4.2.2 转移unique_ptr的所有权</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>u.release() <span style="color:#998;font-style:italic">// 切断与内存块的联系，返回内置指针，u置为nullptr
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>u.reset()   <span style="color:#998;font-style:italic">// 释放内存块并将u置为nullptr；如果有参数(内存块指针)，则赋值给u
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span>unique_ptr<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;</span> p1(<span style="color:#000;font-weight:bold">new</span> <span style="color:#458;font-weight:bold">int</span>(<span style="color:#099">31</span>));
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>unique_ptr<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;</span> p2(p.release()); <span style="color:#998;font-style:italic">// p指向的内存块的所有权转移给p2
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>p1.reset(p2.release()); <span style="color:#998;font-style:italic">// p1释放原内存资源，p2将内存块的所有权转移给p1
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>注意：</p>
+<ul>
+<li><!-- raw HTML omitted --><!-- raw HTML omitted -->这里的release只是解除对内存的所有权，而并没有释放内存<!-- raw HTML omitted --><!-- raw HTML omitted --></li>
+<li><!-- raw HTML omitted --><!-- raw HTML omitted -->unique_ptr虽然不能被拷贝，但是可以拷贝或赋值一个将要被销毁的unique_ptr，其实是移动，可以用于函数返回<!-- raw HTML omitted --><!-- raw HTML omitted --></li>
+</ul>
+<p>区别于<code>auto_ptr</code>：</p>
+<ul>
+<li><code>auto_ptr</code>不能存放在容器中，入容器<code>push_back</code>是一个拷贝过程</li>
+<li>函数不能返回<code>auto_ptr</code>，因为没有移动机制吧</li>
+</ul>
+<h4 id="423-重载自己的删除器">4.2.3 重载自己的删除器</h4>
+<p>与<code>shared_ptr</code>的有区别，模板需要传两个类型，第二个类型为函数指针，使用<code>decltype</code>获取</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">struct</span> <span style="color:#458;font-weight:bold">destination</span>;
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">struct</span> <span style="color:#458;font-weight:bold">connection</span>;
+</span></span><span style="display:flex;"><span>connection <span style="color:#900;font-weight:bold">connect</span>(destination<span style="color:#000;font-weight:bold">*</span>); <span style="color:#998;font-style:italic">// 打开连接
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">disconnect</span>(connection);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">end_connection</span>(connection <span style="color:#000;font-weight:bold">*</span>p) {disconnect(<span style="color:#000;font-weight:bold">*</span>p);}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">f</span>(destination <span style="color:#000;font-weight:bold">&amp;</span>d)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    connection c <span style="color:#000;font-weight:bold">=</span> connect(<span style="color:#000;font-weight:bold">&amp;</span>d); <span style="color:#998;font-style:italic">// 创建连接
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    unique_ptr<span style="color:#000;font-weight:bold">&lt;</span>connection, <span style="color:#000;font-weight:bold">decltype</span>(end_connection)<span style="color:#000;font-weight:bold">*&gt;</span> p(<span style="color:#000;font-weight:bold">&amp;</span>c, end_connection); <span style="color:#998;font-style:italic">// 当发生异常时，连接可以被释放
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="-43-weak_ptr">🔆 4.3 weak_ptr</h3>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted -->伴随类，一种弱引用，指向shared_ptr所管理的对象<!-- raw HTML omitted --><!-- raw HTML omitted -->，将<code>weak_ptr</code>绑定到一个<code>shared_ptr</code>上不会改变<code>shared_ptr</code>的引用计数，因此它不控制所指向对象的生存期。</p>
+<h4 id="431-创建一个weak_ptr对象">4.3.1 创建一个weak_ptr对象</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>shared_ptr<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;</span> p <span style="color:#000;font-weight:bold">=</span> make_ptr<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;</span>(<span style="color:#099">42</span>);
+</span></span><span style="display:flex;"><span>weak_ptr<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;</span> wp(p); <span style="color:#998;font-style:italic">// 使用shared_ptr赋值
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>weak_ptr<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;</span> wp1(wp); <span style="color:#998;font-style:italic">// 使用weak_ptr赋值
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="432-weak_ptr对象的使用">4.3.2 weak_ptr对象的使用</h4>
+<p>由于<code>weak_ptr</code>指向的对象可能不存在，所以不能直接使用，而要通过<code>lock</code>函数，返回一个<code>shared_ptr</code>对象；如果所指的对象已经销毁，则返回为<code>nullptr</code></p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">if</span>(shared_ptr<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;</span> sp <span style="color:#000;font-weight:bold">=</span> wp.lock()) 
+</span></span><span style="display:flex;"><span>{}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="5-动态数组">5. 动态数组</h2>
+<p>动态数组是指一次性可以为很多元素分配内存，由两种方法：</p>
+<ul>
+<li><code>array new</code>，分配并初始化一个对象数组</li>
+<li>标准库的<code>allocator</code>类，将分配与初始化分离</li>
+</ul>
+<p>但其实<!-- raw HTML omitted --><!-- raw HTML omitted -->大多是使用的是标准库容器而非动态分配数组<!-- raw HTML omitted --><!-- raw HTML omitted -->。原因：</p>
+<ul>
+<li>容器更简单，同时自动释放内存</li>
+<li>在新标准中，容器操作加入了移动语义，比以前的版本要更快</li>
+</ul>
+<h3 id="-51-array-new-与array-delete">🔆 5.1 array new 与array delete</h3>
+<p><!-- raw HTML omitted --><!-- raw HTML omitted -->array new分配的动态数组并不是一个数组类型的对象，返回的是数组元素类型的指针。<!-- raw HTML omitted --><!-- raw HTML omitted --></p>
+<h4 id="511-创建">5.1.1 创建</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#998;font-style:italic">//方式一：
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">*</span> p <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> <span style="color:#458;font-weight:bold">int</span>[get_size()];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">//方式二：
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">typedef</span> <span style="color:#458;font-weight:bold">int</span> arrT[<span style="color:#099">42</span>];
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">*</span> p <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> arrT;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li><code>[]</code>中指定分配的个数(不必是常量)，返回为指向第一个对象的指针</li>
+<li>可以动态分配一个空数组，返回的是一个合法的非空指针，但是不能对指针解引用；但是分配一个空数组是错误的</li>
+</ul>
+<h4 id="512-初始化">5.1.2 初始化</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">*</span>p1 <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> <span style="color:#458;font-weight:bold">int</span>[<span style="color:#099">10</span>]; <span style="color:#998;font-style:italic">// 默认初始化
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">*</span>p2 <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> <span style="color:#458;font-weight:bold">int</span>[<span style="color:#099">10</span>](); <span style="color:#998;font-style:italic">// 值初始化为0
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">*</span>p3 <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">new</span> <span style="color:#458;font-weight:bold">int</span>[<span style="color:#099">10</span>]{<span style="color:#099">0</span>, <span style="color:#099">1</span>, <span style="color:#099">2</span>}; <span style="color:#998;font-style:italic">// 前面元素使用初始化器初始化，后面值初始化
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="513-释放内存给系统">5.1.3 释放内存给系统</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">delete</span> [] p; <span style="color:#998;font-style:italic">// 逆序销毁
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="514-智能指针与array-new">5.1.4 智能指针与array new</h4>
+<p>标准库中定义了管理<code>array new</code>分配数组的<code>unique_ptr</code>的版本，模板必须指明是数组</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>unique_ptr<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#458;font-weight:bold">int</span>[]<span style="color:#000;font-weight:bold">&gt;</span> up(<span style="color:#000;font-weight:bold">new</span> <span style="color:#458;font-weight:bold">int</span>[<span style="color:#099">10</span>]); <span style="color:#998;font-style:italic">// 释放内存时自动调用delete[]
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><p>注意：</p>
+<ul>
+<li>因为<code>unique_ptr</code>指向一个数组，所以不能用成员访问运算符(., -&gt;)</li>
+<li>可以用下标运算发来访问数组中的元素</li>
+</ul>
+<p><code>shared_ptr</code>不能直接管理动态数组，否则需要注意：</p>
+<ul>
+<li>需要自己定义删除器</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>shared_ptr<span style="color:#000;font-weight:bold">&lt;</span><span style="color:#458;font-weight:bold">int</span><span style="color:#000;font-weight:bold">&gt;</span> sp(<span style="color:#000;font-weight:bold">new</span> <span style="color:#458;font-weight:bold">int</span>[<span style="color:#099">10</span>], [](<span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">*</span>p){<span style="color:#000;font-weight:bold">delete</span> [] p;})
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>未定义下标运算符</li>
+<li>智能指针类型不支持指针算术运算，只能通过<code>get</code>获取内置指针访问元素</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">for</span>(<span style="color:#458;font-weight:bold">int</span> i <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">0</span>; i <span style="color:#000;font-weight:bold">&lt;</span> <span style="color:#099">10</span>; <span style="color:#000;font-weight:bold">++</span>i)
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">*</span>(sp.get() <span style="color:#000;font-weight:bold">+</span> i) <span style="color:#000;font-weight:bold">=</span> i;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="-52-allocator类">🔆 5.2 allocator类</h3>
+<p><code>allocator</code>类将分配内存与构造对象分离开来，避免了<code>array new</code>中创建一个可能永远也用不到的对象。</p>
+<h4 id="521-分配与释放内存">5.2.1 分配与释放内存</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span>allocator<span style="color:#000;font-weight:bold">&lt;</span>string<span style="color:#000;font-weight:bold">&gt;</span> alloc;
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">auto</span> <span style="color:#000;font-weight:bold">const</span> p <span style="color:#000;font-weight:bold">=</span> alloc.allocate(n); <span style="color:#998;font-style:italic">// 分配了n个未初始化的string，p为const类型的指针，指向首个元素的位置
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>...
+</span></span><span style="display:flex;"><span>alloc.deallocate(p, n); <span style="color:#998;font-style:italic">// 释放内存给系统
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="522-构造与析构对象">5.2.2 构造与析构对象</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">auto</span> p <span style="color:#000;font-weight:bold">=</span> q;
+</span></span><span style="display:flex;"><span>alloc.construct(q<span style="color:#000;font-weight:bold">++</span>);
+</span></span><span style="display:flex;"><span>alloc.construct(q<span style="color:#000;font-weight:bold">++</span>, <span style="color:#099">10</span>, <span style="color:#d14">&#39;c&#39;</span>);
+</span></span><span style="display:flex;"><span>...
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">while</span>(q <span style="color:#000;font-weight:bold">!=</span> p)
+</span></span><span style="display:flex;"><span>    alloc.destory(<span style="color:#000;font-weight:bold">--</span>q);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>注意：</p>
+<ul>
+<li><!-- raw HTML omitted --><!-- raw HTML omitted -->使用未构造的内存，其行为是未定义的<!-- raw HTML omitted --><!-- raw HTML omitted -->。</li>
+<li>只对真正构造了的元素进行<code>destory</code></li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/c&#43;&#43;primer/">C&#43;&#43;Primer</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC10%E7%AB%A0_%E6%B3%9B%E5%9E%8B%E7%AE%97%E6%B3%95/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第10章 泛型算法</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC911%E7%AB%A0_%E5%AE%B9%E5%99%A8/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第9、10章 容器</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC8%E7%AB%A0_io%E5%BA%93/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第8章 IO库</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c&#43;&#43;primer/%E7%AC%AC7%E7%AB%A0_%E7%B1%BB/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">第7章 类</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

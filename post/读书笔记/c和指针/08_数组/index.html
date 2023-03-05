@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='指针 1. 一维数组 🎀1.1 初始化 数值初始化 1 2 3 4 5 6 // 完整初始化 int a[] = {1, 2, 3, 4, 5}; int b[5] = {1, 2, 3, 4, 5}; // 不完整初始化 int c[5] = {1, 2, 3}; 完整初始化可以在[]中不写数组长度，编译器自动计算 不完整初始化中只初始化前几个元素的值，后面的元素初始化为0 初始化： 局部的数组如果不初始化，值为随机未定义； 静态数组在程序开始执行前已初始化，未避免每次的重新初始化，可声明为static 字符数组初始化 1 2 3 4 5 6 7 // 字符数组 char message[] = {&amp;#39;h&amp;#39;, &amp;#39;e&amp;#39;, &amp;#39;l&amp;#39;, &amp;#39;l&amp;#39;, &amp;#39;o&amp;#39;, 0}; // 等价于 char message[] = &amp;#34;hello&amp;#34;; // 推荐使用 // 字符常量 char *message1 = &amp;#34;hello&amp;#34;; 🎀1.'>
+<title>08_数组</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/08_%E6%95%B0%E7%BB%84/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='08_数组'>
+<meta property='og:description' content='指针 1. 一维数组 🎀1.1 初始化 数值初始化 1 2 3 4 5 6 // 完整初始化 int a[] = {1, 2, 3, 4, 5}; int b[5] = {1, 2, 3, 4, 5}; // 不完整初始化 int c[5] = {1, 2, 3}; 完整初始化可以在[]中不写数组长度，编译器自动计算 不完整初始化中只初始化前几个元素的值，后面的元素初始化为0 初始化： 局部的数组如果不初始化，值为随机未定义； 静态数组在程序开始执行前已初始化，未避免每次的重新初始化，可声明为static 字符数组初始化 1 2 3 4 5 6 7 // 字符数组 char message[] = {&amp;#39;h&amp;#39;, &amp;#39;e&amp;#39;, &amp;#39;l&amp;#39;, &amp;#39;l&amp;#39;, &amp;#39;o&amp;#39;, 0}; // 等价于 char message[] = &amp;#34;hello&amp;#34;; // 推荐使用 // 字符常量 char *message1 = &amp;#34;hello&amp;#34;; 🎀1.'>
+<meta property='og:url' content='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/08_%E6%95%B0%E7%BB%84/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='C和指针' /><meta property='article:published_time' content='2023-03-05T21:22:09&#43;08:00'/><meta property='article:modified_time' content='2023-03-05T21:22:09&#43;08:00'/>
+<meta name="twitter:title" content="08_数组">
+<meta name="twitter:description" content="指针 1. 一维数组 🎀1.1 初始化 数值初始化 1 2 3 4 5 6 // 完整初始化 int a[] = {1, 2, 3, 4, 5}; int b[5] = {1, 2, 3, 4, 5}; // 不完整初始化 int c[5] = {1, 2, 3}; 完整初始化可以在[]中不写数组长度，编译器自动计算 不完整初始化中只初始化前几个元素的值，后面的元素初始化为0 初始化： 局部的数组如果不初始化，值为随机未定义； 静态数组在程序开始执行前已初始化，未避免每次的重新初始化，可声明为static 字符数组初始化 1 2 3 4 5 6 7 // 字符数组 char message[] = {&amp;#39;h&amp;#39;, &amp;#39;e&amp;#39;, &amp;#39;l&amp;#39;, &amp;#39;l&amp;#39;, &amp;#39;o&amp;#39;, 0}; // 等价于 char message[] = &amp;#34;hello&amp;#34;; // 推荐使用 // 字符常量 char *message1 = &amp;#34;hello&amp;#34;; 🎀1.">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-一维数组">1. 一维数组</a>
+      <ul>
+        <li><a href="#11-初始化">🎀1.1 初始化</a></li>
+        <li><a href="#12-指针与下标的联系">🎀1.2 指针与下标的联系</a></li>
+        <li><a href="#13-指针与数组名区别">🎀1.3 指针与数组名区别</a></li>
+        <li><a href="#14-数组名作为函数参数传入">🎀1.4 数组名作为函数参数传入</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-多维数组">2. 多维数组</a>
+      <ul>
+        <li><a href="#21-存储方式">🎀2.1 存储方式</a></li>
+        <li><a href="#22初始化">🎀2.2初始化</a></li>
+        <li><a href="#23-数组名下标与指针">🎀2.3 数组名、下标与指针</a></li>
+        <li><a href="#24-作为函数参数">🎀2.4 作为函数参数</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-指针数组">3. 指针数组</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="background-color: #c1c1f6; color: #fff;">
+                读书笔记
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/08_%E6%95%B0%E7%BB%84/">08_数组</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 05, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    2 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="指针">指针</h1>
+<h2 id="1-一维数组">1. 一维数组</h2>
+<h3 id="11-初始化">🎀1.1 初始化</h3>
+<h4 id="数值初始化">数值初始化</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 完整初始化
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">int</span> a[] <span style="color:#000;font-weight:bold">=</span> {<span style="color:#099">1</span>, <span style="color:#099">2</span>, <span style="color:#099">3</span>, <span style="color:#099">4</span>, <span style="color:#099">5</span>};
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> b[<span style="color:#099">5</span>] <span style="color:#000;font-weight:bold">=</span> {<span style="color:#099">1</span>, <span style="color:#099">2</span>, <span style="color:#099">3</span>, <span style="color:#099">4</span>, <span style="color:#099">5</span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 不完整初始化
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">int</span> c[<span style="color:#099">5</span>] <span style="color:#000;font-weight:bold">=</span> {<span style="color:#099">1</span>, <span style="color:#099">2</span>, <span style="color:#099">3</span>};
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>完整初始化可以在<code>[]</code>中不写数组长度，编译器自动计算</li>
+<li>不完整初始化中只初始化前几个元素的值，后面的元素初始化为<code>0</code></li>
+<li>初始化：</li>
+</ul>
+<blockquote>
+<ol>
+<li>局部的数组如果不初始化，值为随机未定义；<!-- raw HTML omitted --></li>
+<li>静态数组在程序开始执行前已初始化，未避免每次的重新初始化，可声明为<code>static</code></li>
+</ol>
+</blockquote>
+<h4 id="字符数组初始化">字符数组初始化</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 字符数组
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">char</span> message[] <span style="color:#000;font-weight:bold">=</span> {<span style="color:#d14">&#39;h&#39;</span>, <span style="color:#d14">&#39;e&#39;</span>, <span style="color:#d14">&#39;l&#39;</span>, <span style="color:#d14">&#39;l&#39;</span>, <span style="color:#d14">&#39;o&#39;</span>, <span style="color:#099">0</span>};
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 等价于
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">char</span> message[] <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;hello&#34;</span>; <span style="color:#998;font-style:italic">// 推荐使用
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 字符常量
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">char</span> <span style="color:#000;font-weight:bold">*</span>message1 <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#34;hello&#34;</span>;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="12-指针与下标的联系">🎀1.2 指针与下标的联系</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>array[subscript]
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">*</span>(array <span style="color:#000;font-weight:bold">+</span> subscript)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>除了优先级之外，下标引用与间接访问完全相同</li>
+<li>下标引用可以作用于任意的指针，而不仅仅是数组名</li>
+</ul>
+<h3 id="13-指针与数组名区别">🎀1.3 指针与数组名区别</h3>
+<ul>
+<li>说明</li>
+</ul>
+<blockquote>
+<ol>
+<li>指针：<!-- raw HTML omitted --><strong>指向一个内存地址</strong><!-- raw HTML omitted -->，类型由所指向内存存放的数据类型决定</li>
+<li>数组名：是一个指针常量，指向数组中第一个元素，也就是<!-- raw HTML omitted --><strong>数组第一个元素的地址</strong><!-- raw HTML omitted -->，类型由所指向的元素类型决定</li>
+</ol>
+</blockquote>
+<ul>
+<li>内存分配</li>
+</ul>
+<blockquote>
+<ol>
+<li>指针：声明一个指针变量，只为指针本身保留内存空间，它为自动变量</li>
+<li>数组名：声明一个数组，则会根据数组元素数量保留内存空间，然后再创建数组名</li>
+</ol>
+</blockquote>
+<ul>
+<li>计算</li>
+</ul>
+<blockquote>
+<ol>
+<li>指针：是变量，可以移动运算</li>
+<li>数组名：是一个指针常量，不可以更改其值，只有在两种场合中不表此意：</li>
+</ol>
+<blockquote>
+<ul>
+<li><code>sizeof(数组名)</code>，结果为整个数组所占字节数</li>
+<li><code>&amp;数组名</code>，返回一个指向数组的指针，而不是一个指向指针常量的指针</li>
+</ul>
+</blockquote>
+</blockquote>
+<ul>
+<li>赋值复制</li>
+</ul>
+<blockquote>
+<ol>
+<li>指针：一个指针可以给另一个指针赋值</li>
+<li>数组名：一个数组名赋值给另一个数组名，不能实现数组中元素全部复制给另一个数组</li>
+</ol>
+</blockquote>
+<h3 id="14-数组名作为函数参数传入">🎀1.4 数组名作为函数参数传入</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">//函数形参，以下两条语句等价：
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">int</span> <span style="color:#900;font-weight:bold">strlen</span>(<span style="color:#458;font-weight:bold">char</span> <span style="color:#000;font-weight:bold">*</span>string);
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> <span style="color:#900;font-weight:bold">strlen</span>(<span style="color:#458;font-weight:bold">char</span> string[]);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>上面两个中使用指针更为准确</li>
+</ul>
+<blockquote>
+<ol>
+<li>形参使用<strong>指针</strong>形式：因为数组名实际为一个<!-- raw HTML omitted --><strong>指针常量</strong><!-- raw HTML omitted -->，所以形参使用指针接收</li>
+<li>形参使用<strong>数组</strong>形式：函数并不为数组形参分配内存，所以不需要指明数组中数组元素数量，<!-- raw HTML omitted --><strong>实质传递的是指向数组第一个元素的指针</strong><!-- raw HTML omitted --></li>
+</ol>
+</blockquote>
+<h2 id="2-多维数组">2. 多维数组</h2>
+<h3 id="21-存储方式">🎀2.1 存储方式</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> a[<span style="color:#099">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> b[<span style="color:#099">3</span>][<span style="color:#099">2</span>];
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> c[<span style="color:#099">3</span>][<span style="color:#099">2</span>][<span style="color:#099">4</span>];
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>数组中的元素是顺序存储的，称之为“行主序”</li>
+</ul>
+<blockquote>
+<p><img src="/00_picture/%e5%a4%9a%e7%bb%b4%e6%95%b0%e7%bb%84%e5%ad%98%e5%82%a8%e6%96%b9%e5%bc%8f.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="多维数组存储方式"
+	
+	
+></p>
+</blockquote>
+<ul>
+<li>多维数组要从左往右层层看：</li>
+</ul>
+<blockquote>
+<ul>
+<li>数组<code>b[3][2]</code>可以看作是数组元素个数为<code>3</code>，元素内容为（一个包含<code>2</code>个<code>int</code>元素的一维数组）的一维数组</li>
+<li>数组<code>c[3][2][4]</code>可以看作是数组元素个数为<code>3</code>，元素内容为（一个数组元素个数为<code>2</code>，元素为（一个包含<code>4</code>个<code>int</code>元素的一维数组）的一维数组）的一维数组</li>
+</ul>
+</blockquote>
+<h3 id="22初始化">🎀2.2初始化</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 直接没有任何区分的写
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">int</span> a[<span style="color:#099">2</span>][<span style="color:#099">3</span>] <span style="color:#000;font-weight:bold">=</span> {<span style="color:#099">0</span>, <span style="color:#099">1</span>, <span style="color:#099">2</span>, <span style="color:#099">3</span>, <span style="color:#099">4</span>, <span style="color:#099">5</span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 区分每一维数组元素
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">int</span> a[<span style="color:#099">2</span>][<span style="color:#099">3</span>] <span style="color:#000;font-weight:bold">=</span> 
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    {<span style="color:#099">0</span>, <span style="color:#099">1</span>, <span style="color:#099">2</span>},
+</span></span><span style="display:flex;"><span>    {<span style="color:#099">3</span>, <span style="color:#099">4</span>, <span style="color:#099">5</span>}
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 部分初始化，为初始化部分为0
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">int</span> a[<span style="color:#099">2</span>][<span style="color:#099">3</span>] <span style="color:#000;font-weight:bold">=</span> 
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    {<span style="color:#099">0</span>, <span style="color:#099">1</span>},
+</span></span><span style="display:flex;"><span>    {<span style="color:#099">3</span>}
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="23-数组名下标与指针">🎀2.3 数组名、下标与指针</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> matrix[<span style="color:#099">3</span>][<span style="color:#099">10</span>];
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="数组名">数组名</h4>
+<ul>
+<li>多维数组的数组名是：指向第一维元素的指针常量，而第一维元素实际上是一个数组</li>
+</ul>
+<h4 id="下标">下标</h4>
+<ul>
+<li>下标表示多维数组第二行第3列的元素：<code>matrix[1][2]</code></li>
+<li>数组名表示多维数组第二行第3列的元素：<code>*(*(matrix + 1) + 2)</code></li>
+</ul>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>表达式</th>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>matrix</code></td>
+<td><code>int (*)[10]</code></td>
+<td>指向多维数组第一维元素的指针常量，是一个指向整型数组的指针</td>
+</tr>
+<tr>
+<td><code>*matrix</code></td>
+<td><code>int *</code></td>
+<td>间接方法多维数组的第一维元素，由于该元素是一个一维数组，所以它的类型为<code>int *</code></td>
+</tr>
+<tr>
+<td><code>*(matrix + 1)</code></td>
+<td><code>int *</code></td>
+<td>间接方法多维数组的第二维元素。仍然是一个一维数组，指向该一维数组的第一个元素</td>
+</tr>
+<tr>
+<td><code>*(matrix + 1) + 2</code></td>
+<td><code>int *</code></td>
+<td>计算第3个元素位置</td>
+</tr>
+<tr>
+<td><code>*(*(matrix + 1) + 2)</code></td>
+<td><code>int </code></td>
+<td>间接访问取第3个元素的值</td>
+</tr>
+</tbody>
+</table></div>
+<h4 id="指针-1">指针</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> matrix[<span style="color:#099">3</span>][<span style="color:#099">10</span>];
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>指向多维数组的指针</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> (<span style="color:#000;font-weight:bold">*</span>p)[<span style="color:#099">10</span>] <span style="color:#000;font-weight:bold">=</span> matrix; 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p><strong>因为数组名表示的是指向第一维元素（10个元素的一维数组）的指针，所以当定义等价的指针时，必须写清楚p是一个指向拥有10个整型元素的数组的指针</strong></p>
+</blockquote>
+<ul>
+<li>指向第一个整型元素的指针</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">*</span> p1 <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">&amp;</span>matrix[<span style="color:#099">0</span>][<span style="color:#099">0</span>]; <span style="color:#998;font-style:italic">// 1
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 或
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">*</span>p1 <span style="color:#000;font-weight:bold">=</span> matrix[<span style="color:#099">0</span>]; <span style="color:#998;font-style:italic">// 2 
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<ol>
+<li>直接定位到第一个元素，求其地址</li>
+<li>多维数组的第一维元素就是指向该一维数组的指针</li>
+</ol>
+</blockquote>
+<h3 id="24-作为函数参数">🎀2.4 作为函数参数</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> matrix[<span style="color:#099">3</span>][<span style="color:#099">10</span>];
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">func</span>(matrix);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">func</span>(<span style="color:#458;font-weight:bold">int</span> (<span style="color:#000;font-weight:bold">*</span>mat)[<span style="color:#099">10</span>]); <span style="color:#998;font-style:italic">// 指针形式
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">func</span>(<span style="color:#458;font-weight:bold">int</span> mat[][<span style="color:#099">10</span>]); <span style="color:#998;font-style:italic">// 数组形式
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>对比，下面是完全不相同的</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">func</span>(<span style="color:#458;font-weight:bold">int</span> <span style="color:#000;font-weight:bold">**</span>mat); <span style="color:#998;font-style:italic">// 数组形式
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<ol>
+<li><code>int **mat</code>：指向整型指针的指针</li>
+<li><code>int (*mat)[10]</code>：指向整型数组的指针</li>
+</ol>
+</blockquote>
+<h2 id="3-指针数组">3. 指针数组</h2>
+<ul>
+<li>数组元素内容为指针</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">const</span> <span style="color:#458;font-weight:bold">char</span> <span style="color:#000;font-weight:bold">*</span>country[] <span style="color:#000;font-weight:bold">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;China&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;France&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;England&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#d14">&#34;Canada&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#0086b3">NULL</span>
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>表末添加NULL指针，有助于检测表的结尾</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">for</span>(c <span style="color:#000;font-weight:bold">=</span> country; <span style="color:#000;font-weight:bold">*</span>c <span style="color:#000;font-weight:bold">!=</span> <span style="color:#0086b3">NULL</span>; c<span style="color:#000;font-weight:bold">++</span>)
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/c%E5%92%8C%E6%8C%87%E9%92%88/">C和指针</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/07_%E5%87%BD%E6%95%B0/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">07_函数</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/06_%E6%8C%87%E9%92%88/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">06_指针</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/05_%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%92%8C%E8%A1%A8%E8%BE%BE%E5%BC%8F/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">05_操作符和表达式</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/04_%E8%AF%AD%E5%8F%A5/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">04_语句</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/03_%E6%95%B0%E6%8D%AE/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">03_数据</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

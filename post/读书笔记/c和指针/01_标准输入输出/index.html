@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='01 标准输入输出 1. scanf和printf 头文件
+1 #include &amp;lt;stdio.h&amp;gt; 1.1 scanf 1 while(num &amp;lt; max &amp;amp;&amp;amp; scanf(&amp;#34;%d&amp;#34;, &amp;amp;columns[num]) == 1) 读取字符并根据格式字符串转换，参数介绍： 第一个参数：格式字符串； 其他参数：写入地址。对于标量，前面需要加&amp;amp;
+返回值介绍： 成功读取并转换，返回1； 失败，返回0
+对于输入如：3 5 7 9，通过上述代码读取，前导空白被跳过，后面的空格表示该值的结束 第一个参数的常用格式码如下： 格式 变量类型 %d int %ld long %f float %lf double %c char %s char型数组 前五个格式码用于读取标量，前面须加上&amp;amp; 读取%s的在输入字符串时，中间不能有空格 1.2 printf 1 printf(&amp;#34;第%d的值为：%d\n&amp;#34;, num, columns[num]); 格式化输出，参数介绍： 第一个参数：输出字符串格式； 其他参数：对应的输出值
+常用格式代码 格式 含义 %d 十进制整型 %o 八进制整型 %x 十六进制整型 %f float %c char %s 字符串 \n 换行 2.'>
+<title>01_标准输入输出</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/01_%E6%A0%87%E5%87%86%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='01_标准输入输出'>
+<meta property='og:description' content='01 标准输入输出 1. scanf和printf 头文件
+1 #include &amp;lt;stdio.h&amp;gt; 1.1 scanf 1 while(num &amp;lt; max &amp;amp;&amp;amp; scanf(&amp;#34;%d&amp;#34;, &amp;amp;columns[num]) == 1) 读取字符并根据格式字符串转换，参数介绍： 第一个参数：格式字符串； 其他参数：写入地址。对于标量，前面需要加&amp;amp;
+返回值介绍： 成功读取并转换，返回1； 失败，返回0
+对于输入如：3 5 7 9，通过上述代码读取，前导空白被跳过，后面的空格表示该值的结束 第一个参数的常用格式码如下： 格式 变量类型 %d int %ld long %f float %lf double %c char %s char型数组 前五个格式码用于读取标量，前面须加上&amp;amp; 读取%s的在输入字符串时，中间不能有空格 1.2 printf 1 printf(&amp;#34;第%d的值为：%d\n&amp;#34;, num, columns[num]); 格式化输出，参数介绍： 第一个参数：输出字符串格式； 其他参数：对应的输出值
+常用格式代码 格式 含义 %d 十进制整型 %o 八进制整型 %x 十六进制整型 %f float %c char %s 字符串 \n 换行 2.'>
+<meta property='og:url' content='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/01_%E6%A0%87%E5%87%86%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='C和指针' /><meta property='article:published_time' content='2023-03-05T21:22:02&#43;08:00'/><meta property='article:modified_time' content='2023-03-05T21:22:02&#43;08:00'/>
+<meta name="twitter:title" content="01_标准输入输出">
+<meta name="twitter:description" content="01 标准输入输出 1. scanf和printf 头文件
+1 #include &amp;lt;stdio.h&amp;gt; 1.1 scanf 1 while(num &amp;lt; max &amp;amp;&amp;amp; scanf(&amp;#34;%d&amp;#34;, &amp;amp;columns[num]) == 1) 读取字符并根据格式字符串转换，参数介绍： 第一个参数：格式字符串； 其他参数：写入地址。对于标量，前面需要加&amp;amp;
+返回值介绍： 成功读取并转换，返回1； 失败，返回0
+对于输入如：3 5 7 9，通过上述代码读取，前导空白被跳过，后面的空格表示该值的结束 第一个参数的常用格式码如下： 格式 变量类型 %d int %ld long %f float %lf double %c char %s char型数组 前五个格式码用于读取标量，前面须加上&amp;amp; 读取%s的在输入字符串时，中间不能有空格 1.2 printf 1 printf(&amp;#34;第%d的值为：%d\n&amp;#34;, num, columns[num]); 格式化输出，参数介绍： 第一个参数：输出字符串格式； 其他参数：对应的输出值
+常用格式代码 格式 含义 %d 十进制整型 %o 八进制整型 %x 十六进制整型 %f float %c char %s 字符串 \n 换行 2.">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-scanf和printf">1. scanf和printf</a>
+      <ul>
+        <li><a href="#11-scanf">1.1 scanf</a></li>
+        <li><a href="#12-printf">1.2 printf</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-gets和puts">2. gets和puts</a>
+      <ul>
+        <li><a href="#21-gets">2.1 gets</a></li>
+        <li><a href="#22-puts">2.2 puts</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-fgets">3. fgets</a></li>
+    <li><a href="#4-getchar和putchar">4. getchar和putchar</a>
+      <ul>
+        <li><a href="#41-getchar">4.1 getchar</a></li>
+        <li><a href="#42-putchar">4.2 putchar</a></li>
+      </ul>
+    </li>
+    <li><a href="#注意">注意</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="background-color: #c1c1f6; color: #fff;">
+                读书笔记
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/01_%E6%A0%87%E5%87%86%E8%BE%93%E5%85%A5%E8%BE%93%E5%87%BA/">01_标准输入输出</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 05, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    2 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="01-标准输入输出">01 标准输入输出</h1>
+<h2 id="1-scanf和printf">1. scanf和printf</h2>
+<p>头文件</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#include</span> <span style="color:#999;font-weight:bold;font-style:italic">&lt;stdio.h&gt;</span><span style="color:#999;font-weight:bold;font-style:italic">
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="11-scanf">1.1 scanf</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">while</span>(num <span style="color:#000;font-weight:bold">&lt;</span> max <span style="color:#000;font-weight:bold">&amp;&amp;</span> <span style="color:#900;font-weight:bold">scanf</span>(<span style="color:#d14">&#34;%d&#34;</span>, <span style="color:#000;font-weight:bold">&amp;</span>columns[num]) <span style="color:#000;font-weight:bold">==</span> <span style="color:#099">1</span>)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<ol>
+<li>读取字符并根据格式字符串转换，参数介绍：</li>
+</ol>
+</li>
+</ul>
+<blockquote>
+<p>第一个参数：格式字符串；<!-- raw HTML omitted -->
+其他参数：写入地址。对于标量，前面需要加<code>&amp;</code></p>
+</blockquote>
+<ul>
+<li>
+<ol start="2">
+<li>返回值介绍：</li>
+</ol>
+</li>
+</ul>
+<blockquote>
+<p>成功读取并转换，返回1；<!-- raw HTML omitted -->
+失败，返回0</p>
+</blockquote>
+<ul>
+<li>
+<ol start="3">
+<li>对于输入如：<code>3 5 7 9</code>，通过上述代码读取，前导空白被跳过，后面的空格表示该值的结束</li>
+</ol>
+</li>
+<li>
+<ol start="4">
+<li>第一个参数的常用格式码如下：</li>
+</ol>
+</li>
+</ul>
+<blockquote>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align:center">格式</th>
+<th style="text-align:center">变量类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">%d</td>
+<td style="text-align:center">int</td>
+</tr>
+<tr>
+<td style="text-align:center">%ld</td>
+<td style="text-align:center">long</td>
+</tr>
+<tr>
+<td style="text-align:center">%f</td>
+<td style="text-align:center">float</td>
+</tr>
+<tr>
+<td style="text-align:center">%lf</td>
+<td style="text-align:center">double</td>
+</tr>
+<tr>
+<td style="text-align:center">%c</td>
+<td style="text-align:center">char</td>
+</tr>
+<tr>
+<td style="text-align:center">%s</td>
+<td style="text-align:center">char型数组</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>前五个格式码用于读取标量，前面须加上<code>&amp;</code></li>
+<li>读取<code>%s</code>的在输入字符串时，中间不能有空格</li>
+</ul>
+</blockquote>
+<h3 id="12-printf">1.2 printf</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">printf</span>(<span style="color:#d14">&#34;第%d的值为：%d</span><span style="color:#d14">\n</span><span style="color:#d14">&#34;</span>, num, columns[num]);
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<ol>
+<li>格式化输出，参数介绍：</li>
+</ol>
+</li>
+</ul>
+<blockquote>
+<p>第一个参数：输出字符串格式；<!-- raw HTML omitted -->
+其他参数：对应的输出值</p>
+</blockquote>
+<ul>
+<li>
+<ol start="2">
+<li>常用格式代码</li>
+</ol>
+</li>
+</ul>
+<blockquote>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th style="text-align:center">格式</th>
+<th style="text-align:center">含义</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:center">%d</td>
+<td style="text-align:center">十进制整型</td>
+</tr>
+<tr>
+<td style="text-align:center">%o</td>
+<td style="text-align:center">八进制整型</td>
+</tr>
+<tr>
+<td style="text-align:center">%x</td>
+<td style="text-align:center">十六进制整型</td>
+</tr>
+<tr>
+<td style="text-align:center">%f</td>
+<td style="text-align:center">float</td>
+</tr>
+<tr>
+<td style="text-align:center">%c</td>
+<td style="text-align:center">char</td>
+</tr>
+<tr>
+<td style="text-align:center">%s</td>
+<td style="text-align:center">字符串</td>
+</tr>
+<tr>
+<td style="text-align:center">\n</td>
+<td style="text-align:center">换行</td>
+</tr>
+</tbody>
+</table></div>
+</blockquote>
+<h2 id="2-gets和puts">2. gets和puts</h2>
+<h3 id="21-gets">2.1 gets</h3>
+<ul>
+<li>gets由于不限制读入长度，存在不安全性，强烈建议使用<code>fgets</code>代替<code>gets</code></li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">char</span> input[MAX];
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">while</span>(<span style="color:#900;font-weight:bold">gets</span>(input) <span style="color:#000;font-weight:bold">!=</span> <span style="color:#0086b3">NULL</span>)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<ol>
+<li>从标准输入读取一行文本并将其存入参数数组中</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>操作：将一行文本丢弃换行符，并在行末存储<code>NUL</code>字符常量。<code>NUL</code>指字节模式全0的字节，类似<code>\0</code></li>
+</ol>
+</li>
+<li>
+<ol start="3">
+<li>返回值：</li>
+</ol>
+</li>
+</ul>
+<blockquote>
+<p>有输入时，返回非<code>NULL</code>；<!-- raw HTML omitted -->
+无输入时，返回<code>NULL</code></p>
+</blockquote>
+<h3 id="22-puts">2.2 puts</h3>
+<ul>
+<li>
+<ol>
+<li><code>gets</code>函数的输出版本</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>把指定字符串写入标准输出并在末尾添上一个换行符</li>
+</ol>
+</li>
+</ul>
+<h2 id="3-fgets">3. fgets</h2>
+<ul>
+<li>在<code>gets</code>中，对于过长的行输入，可能会超出字符数组的大小，使其溢出，影响存储在溢出位置上的内容。用<code>fgets</code>，可以设置要读取的最大字符数</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">char</span> <span style="color:#000;font-weight:bold">*</span><span style="color:#900;font-weight:bold">fgets</span>(<span style="color:#458;font-weight:bold">char</span> <span style="color:#000;font-weight:bold">*</span>str, <span style="color:#458;font-weight:bold">int</span> n, FILE <span style="color:#000;font-weight:bold">*</span>stream)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<ol>
+<li>参数：</li>
+</ol>
+<ul>
+<li>str：字符数组的指针，存储了要读取的字符串。</li>
+<li>n：这是要读取的最大字符数（包括最后的空字符）。通常是使用以 str 传递的数组长度。</li>
+<li>stream：这是指向 FILE 对象的指针，该 FILE 对象标识了要从中读取字符的流。</li>
+</ul>
+<ol start="2">
+<li>返回值：</li>
+</ol>
+<ul>
+<li>成功：返回相同的 str 参数。如果到达文件末尾或者没有读取到任何字符，str 的内容保持不变，并返回一个空指针。</li>
+<li>失败：返回一个空指针</li>
+</ul>
+</blockquote>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#include</span> <span style="color:#999;font-weight:bold;font-style:italic">&lt;stdio.h&gt;</span><span style="color:#999;font-weight:bold;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> <span style="color:#900;font-weight:bold">main</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>   FILE <span style="color:#000;font-weight:bold">*</span>fp;
+</span></span><span style="display:flex;"><span>   <span style="color:#458;font-weight:bold">char</span> str[<span style="color:#099">60</span>];
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   <span style="color:#998;font-style:italic">/* 打开用于读取的文件 */</span>
+</span></span><span style="display:flex;"><span>   fp <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">fopen</span>(<span style="color:#d14">&#34;file.txt&#34;</span> , <span style="color:#d14">&#34;r&#34;</span>);
+</span></span><span style="display:flex;"><span>   <span style="color:#000;font-weight:bold">if</span>(fp <span style="color:#000;font-weight:bold">==</span> <span style="color:#0086b3">NULL</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">perror</span>(<span style="color:#d14">&#34;打开文件时发生错误&#34;</span>);
+</span></span><span style="display:flex;"><span>      <span style="color:#000;font-weight:bold">return</span>(<span style="color:#000;font-weight:bold">-</span><span style="color:#099">1</span>);
+</span></span><span style="display:flex;"><span>   }
+</span></span><span style="display:flex;"><span>   <span style="color:#000;font-weight:bold">if</span>( <span style="color:#900;font-weight:bold">fgets</span> (str, <span style="color:#099">60</span>, fp)<span style="color:#000;font-weight:bold">!=</span><span style="color:#0086b3">NULL</span> ) {
+</span></span><span style="display:flex;"><span>      <span style="color:#998;font-style:italic">/* 向标准输出 stdout 写入内容 */</span>
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">puts</span>(str);
+</span></span><span style="display:flex;"><span>   }
+</span></span><span style="display:flex;"><span>   <span style="color:#900;font-weight:bold">fclose</span>(fp);
+</span></span><span style="display:flex;"><span>   
+</span></span><span style="display:flex;"><span>   <span style="color:#000;font-weight:bold">return</span>(<span style="color:#099">0</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="4-getchar和putchar">4. getchar和putchar</h2>
+<h3 id="41-getchar">4.1 getchar</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> ch;
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">while</span>((ch <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">getchar</span>()) <span style="color:#000;font-weight:bold">!=</span> EOF <span style="color:#000;font-weight:bold">&amp;&amp;</span> ch <span style="color:#000;font-weight:bold">!=</span> <span style="color:#d14">&#39;\n&#39;</span>)
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>
+<ol>
+<li>从标准输入读取一个字符并返回它的值</li>
+</ol>
+</li>
+<li>
+<ol start="2">
+<li>结束：</li>
+</ol>
+</li>
+</ul>
+<blockquote>
+<p>文件结束，函数返回常量<code>EOF</code><!-- raw HTML omitted -->
+行结束，返回换行符<code>\n</code></p>
+</blockquote>
+<ul>
+<li>
+<ol start="3">
+<li><code>EOF</code>为整型值，所以类型为<code>int</code></li>
+</ol>
+</li>
+</ul>
+<h3 id="42-putchar">4.2 putchar</h3>
+<ul>
+<li>接收一个整型<code>int</code>参数，在输出中打印该字符</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#include</span> <span style="color:#999;font-weight:bold;font-style:italic">&lt;stdio.h&gt;</span><span style="color:#999;font-weight:bold;font-style:italic">
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> <span style="color:#900;font-weight:bold">main</span> ()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>   <span style="color:#458;font-weight:bold">char</span> ch;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>   <span style="color:#000;font-weight:bold">for</span>(ch <span style="color:#000;font-weight:bold">=</span> <span style="color:#d14">&#39;A&#39;</span> ; ch <span style="color:#000;font-weight:bold">&lt;=</span> <span style="color:#d14">&#39;Z&#39;</span> ; ch<span style="color:#000;font-weight:bold">++</span>) {
+</span></span><span style="display:flex;"><span>      <span style="color:#900;font-weight:bold">putchar</span>(ch);
+</span></span><span style="display:flex;"><span>   }
+</span></span><span style="display:flex;"><span>   
+</span></span><span style="display:flex;"><span>   <span style="color:#000;font-weight:bold">return</span>(<span style="color:#099">0</span>);
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 输出
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>ABCDEFGHIJKLMNOPQRSTUVWXYZ
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="注意">注意</h2>
+<ul>
+<li>可以将读取的赋值操作放入<code>while</code>语句中，这样可以避免同样语句的多次重复，修改和维护方便</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/c%E5%92%8C%E6%8C%87%E9%92%88/">C和指针</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/00_%E6%96%87%E4%BB%B6%E6%89%A7%E8%A1%8C/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">00_文件执行</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

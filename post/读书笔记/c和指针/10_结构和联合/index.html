@@ -1,0 +1,966 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='结构和联合 1. 结构 在C的基本数据类型中，聚合类型能够同时存储超过一个的单独数据，包括数组和结构两种。 🍒1.1 结构声明 1.1.1 最简单的声明 关键字struct 1 2 3 4 5 6 7 8 9 10 11 12 13 struct { // (1) int a; char b; float c; } x; struct { // (2) int a; char b; float c; } y[20], *z; z = &amp;amp;x; // 编译不通过 (3) 上面struct{};是一个自定义的聚合类型，类似int类型 struct{} x;相当于声明了一个x变量；struct{} y[20], *z;相当于声明了一个数组和一个指针变量 struct{};的成员列表中内容虽然一样，但是x和数组y中元素、z指向的变量，编译器不认为是同一个类型，所以(3)的赋值不成立 1.1.2 加入结构标签 “标签”允许为成员列表提供一个名字，便于声明相同类型的变量 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 // 加入结构标签 struct SIMPLE { int a; char b; float c; }; struct SIMPLE x; struct SIMPLE y[20], *z; z = &amp;amp;x; // 成立 // 加入结构标签的同时声明变量 struct SIMPLE_tag { int a; char b; float c; } s1, s2; // 不建议使用 建议使用结构标签声明变量而不是在创建结构的同时声明变量'>
+<title>10_结构和联合</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/10_%E7%BB%93%E6%9E%84%E5%92%8C%E8%81%94%E5%90%88/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='10_结构和联合'>
+<meta property='og:description' content='结构和联合 1. 结构 在C的基本数据类型中，聚合类型能够同时存储超过一个的单独数据，包括数组和结构两种。 🍒1.1 结构声明 1.1.1 最简单的声明 关键字struct 1 2 3 4 5 6 7 8 9 10 11 12 13 struct { // (1) int a; char b; float c; } x; struct { // (2) int a; char b; float c; } y[20], *z; z = &amp;amp;x; // 编译不通过 (3) 上面struct{};是一个自定义的聚合类型，类似int类型 struct{} x;相当于声明了一个x变量；struct{} y[20], *z;相当于声明了一个数组和一个指针变量 struct{};的成员列表中内容虽然一样，但是x和数组y中元素、z指向的变量，编译器不认为是同一个类型，所以(3)的赋值不成立 1.1.2 加入结构标签 “标签”允许为成员列表提供一个名字，便于声明相同类型的变量 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 // 加入结构标签 struct SIMPLE { int a; char b; float c; }; struct SIMPLE x; struct SIMPLE y[20], *z; z = &amp;amp;x; // 成立 // 加入结构标签的同时声明变量 struct SIMPLE_tag { int a; char b; float c; } s1, s2; // 不建议使用 建议使用结构标签声明变量而不是在创建结构的同时声明变量'>
+<meta property='og:url' content='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/10_%E7%BB%93%E6%9E%84%E5%92%8C%E8%81%94%E5%90%88/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='C和指针' /><meta property='article:published_time' content='2023-03-05T21:22:10&#43;08:00'/><meta property='article:modified_time' content='2023-03-05T21:22:10&#43;08:00'/>
+<meta name="twitter:title" content="10_结构和联合">
+<meta name="twitter:description" content="结构和联合 1. 结构 在C的基本数据类型中，聚合类型能够同时存储超过一个的单独数据，包括数组和结构两种。 🍒1.1 结构声明 1.1.1 最简单的声明 关键字struct 1 2 3 4 5 6 7 8 9 10 11 12 13 struct { // (1) int a; char b; float c; } x; struct { // (2) int a; char b; float c; } y[20], *z; z = &amp;amp;x; // 编译不通过 (3) 上面struct{};是一个自定义的聚合类型，类似int类型 struct{} x;相当于声明了一个x变量；struct{} y[20], *z;相当于声明了一个数组和一个指针变量 struct{};的成员列表中内容虽然一样，但是x和数组y中元素、z指向的变量，编译器不认为是同一个类型，所以(3)的赋值不成立 1.1.2 加入结构标签 “标签”允许为成员列表提供一个名字，便于声明相同类型的变量 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 // 加入结构标签 struct SIMPLE { int a; char b; float c; }; struct SIMPLE x; struct SIMPLE y[20], *z; z = &amp;amp;x; // 成立 // 加入结构标签的同时声明变量 struct SIMPLE_tag { int a; char b; float c; } s1, s2; // 不建议使用 建议使用结构标签声明变量而不是在创建结构的同时声明变量">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-结构">1. 结构</a>
+      <ul>
+        <li><a href="#11-结构声明">🍒1.1 结构声明</a></li>
+        <li><a href="#12-结构的初始化">🍒1.2 结构的初始化</a></li>
+        <li><a href="#13-结构指针">🍒1.3 结构指针</a></li>
+        <li><a href="#14-结构成员的访问">🍒1.4 结构成员的访问</a></li>
+        <li><a href="#15-结构的存储分配">🍒1.5 结构的存储分配</a></li>
+        <li><a href="#16-作为函数参数">🍒1.6 作为函数参数</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-位段">2. 位段</a></li>
+    <li><a href="#3-联合">3. 联合</a>
+      <ul>
+        <li><a href="#31-联合声明与内存分配">🍒3.1 联合声明与内存分配</a></li>
+        <li><a href="#32-初始化">🍒3.2 初始化</a></li>
+        <li><a href="#33-使用场合">🍒3.3 使用场合</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="background-color: #c1c1f6; color: #fff;">
+                读书笔记
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/10_%E7%BB%93%E6%9E%84%E5%92%8C%E8%81%94%E5%90%88/">10_结构和联合</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 05, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    3 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="结构和联合">结构和联合</h1>
+<h2 id="1-结构">1. 结构</h2>
+<ul>
+<li>在<code>C</code>的基本数据类型中，聚合类型能够同时存储超过一个的单独数据，包括数组和结构两种。</li>
+</ul>
+<h3 id="11-结构声明">🍒1.1 结构声明</h3>
+<h4 id="111-最简单的声明">1.1.1 最简单的声明</h4>
+<ul>
+<li>关键字<code>struct</code></li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">struct</span> {  <span style="color:#998;font-style:italic">// (1)
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#458;font-weight:bold">int</span> a;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">char</span> b;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">float</span> c;
+</span></span><span style="display:flex;"><span>} x;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">struct</span> {  <span style="color:#998;font-style:italic">// (2)
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#458;font-weight:bold">int</span> a;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">char</span> b;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">float</span> c;
+</span></span><span style="display:flex;"><span>} y[<span style="color:#099">20</span>], <span style="color:#000;font-weight:bold">*</span>z;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>z <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">&amp;</span>x;  <span style="color:#998;font-style:italic">// 编译不通过 (3)
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>上面<code>struct{};</code>是一个自定义的聚合类型，类似<code>int</code>类型</li>
+<li><code>struct{} x;</code>相当于声明了一个<code>x</code>变量；<code>struct{} y[20], *z;</code>相当于声明了一个数组和一个指针变量</li>
+<li><code>struct{};</code>的成员列表中内容虽然一样，但是<code>x</code>和数组<code>y</code>中元素、<code>z</code>指向的变量，编译器不认为是同一个类型，所以<code>(3)</code>的赋值不成立</li>
+</ul>
+<h4 id="112-加入结构标签">1.1.2 加入结构标签</h4>
+<ul>
+<li>“标签”允许为成员列表提供一个名字，便于声明相同类型的变量</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 加入结构标签
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">struct</span> SIMPLE { 
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">int</span> a;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">char</span> b;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">float</span> c;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">struct</span> SIMPLE x;
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">struct</span> SIMPLE y[<span style="color:#099">20</span>], <span style="color:#000;font-weight:bold">*</span>z;
+</span></span><span style="display:flex;"><span>z <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">&amp;</span>x; <span style="color:#998;font-style:italic">// 成立
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 加入结构标签的同时声明变量
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">struct</span> SIMPLE_tag { 
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">int</span> a;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">char</span> b;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">float</span> c;
+</span></span><span style="display:flex;"><span>} s1, s2; <span style="color:#998;font-style:italic">// 不建议使用
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><blockquote>
+<p>建议使用结构标签声明变量而不是在创建结构的同时声明变量</p>
+</blockquote>
+<h4 id="113-typedef的加入">1.1.3 typedef的加入</h4>
+<ul>
+<li><code>typedef</code>为结构创建新的别名</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">typedef</span> <span style="color:#000;font-weight:bold">struct</span> { 
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">int</span> a;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">char</span> b;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">float</span> c;
+</span></span><span style="display:flex;"><span>} Simple;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>Simple x;
+</span></span><span style="display:flex;"><span>Simple y[<span style="color:#099">20</span>], <span style="color:#000;font-weight:bold">*</span>z;
+</span></span><span style="display:flex;"><span>z <span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">&amp;</span>x; <span style="color:#998;font-style:italic">// 成立
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>上述效果几乎相同，但是区别在于：<code>Simple</code>现在是类型名而不是结构标签</li>
+<li>不要为了方便对结构使用<code>typedef</code>，推荐使用结构标签，并且可以取名为<code>_tag</code>结尾的名字，用以强调说明是一个结构</li>
+</ul>
+<blockquote>
+<p>对结构使用<code>typedef</code>顶多可以少些一个<code>struct</code>关键字，但是<code>struct</code>关键字可以起提示作用，使代码更为清晰</p>
+</blockquote>
+<h3 id="12-结构的初始化">🍒1.2 结构的初始化</h3>
+<ul>
+<li>使用<code>{}</code></li>
+<li>如果初始列表的值不够，则使用缺省值初始化</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">struct</span> INIT_EX {
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">int</span> a;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">short</span> b[<span style="color:#099">10</span>];
+</span></span><span style="display:flex;"><span>    Simple c;
+</span></span><span style="display:flex;"><span>} x <span style="color:#000;font-weight:bold">=</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#099">10</span>, 
+</span></span><span style="display:flex;"><span>    {<span style="color:#099">1</span>, <span style="color:#099">2</span>, <span style="color:#099">3</span>, <span style="color:#099">4</span>},
+</span></span><span style="display:flex;"><span>    {<span style="color:#099">25</span>, <span style="color:#d14">&#39;x&#39;</span>, <span style="color:#099">1.9</span>}
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="13-结构指针">🍒1.3 结构指针</h3>
+<h4 id="131-结构自引用">1.3.1 结构自引用</h4>
+<ul>
+<li>变量在声明的时候会根据类型分配内存，所以如果结构中有自己类型的变量，得用指针引用，因为指针的大小是固定的</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">struct</span> SIMPLE { 
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">int</span> a;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">char</span> b;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">float</span> c;
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">struct</span> SIMPLE d; <span style="color:#998;font-style:italic">// 错误
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">struct</span> SIMPLE { 
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">int</span> a;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">char</span> b;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">float</span> c;
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">struct</span> SIMPLE <span style="color:#000;font-weight:bold">*</span>d; <span style="color:#998;font-style:italic">// 正确
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>};
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="132-不完整的声明">1.3.2 不完整的声明</h4>
+<ul>
+<li>两个结构中包含了各自的结构作为成员</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 因为B还没有声明，但是A中需要使用，所以就进行了不完整的声明
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">struct</span> B; 
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">struct</span> A { 
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">struct</span> <span style="color:#000;font-weight:bold">*</span>B;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">struct</span> B { 
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">struct</span> <span style="color:#000;font-weight:bold">*</span>A;
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="14-结构成员的访问">🍒1.4 结构成员的访问</h3>
+<h4 id="141-结构成员访问运算符">1.4.1 结构成员访问运算符</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>Simple x, <span style="color:#000;font-weight:bold">*</span>z;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>(<span style="color:#000;font-weight:bold">*</span>z).c; <span style="color:#998;font-style:italic">// 等价于
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>z<span style="color:#000;font-weight:bold">-&gt;</span>c;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>标量使用<code>*</code></li>
+<li>指针使用<code>-&gt;</code></li>
+</ul>
+<h4 id="142-结构内成员的类型">1.4.2 结构内成员的类型</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">typedef</span> <span style="color:#000;font-weight:bold">struct</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">int</span> a;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">short</span> b[<span style="color:#099">2</span>];
+</span></span><span style="display:flex;"><span>}EX2;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">typedef</span> <span style="color:#000;font-weight:bold">struct</span> EX {
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">int</span> a;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">char</span> b[<span style="color:#099">3</span>];
+</span></span><span style="display:flex;"><span>    EX2 c;
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">struct</span> EX <span style="color:#000;font-weight:bold">*</span>d;
+</span></span><span style="display:flex;"><span>} Ex;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/00_picture/%e7%bb%93%e6%9e%84.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="结构"
+	
+	
+></p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>成员</th>
+<th>类型</th>
+<th>指针赋值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>a</code></td>
+<td><code>int</code></td>
+<td><code>int *pa = &amp;x-&gt;a;</code></td>
+</tr>
+<tr>
+<td><code>b</code></td>
+<td><code>char *</code></td>
+<td><code>char *pb = x-&gt;b;</code></td>
+</tr>
+<tr>
+<td><code>c</code></td>
+<td><code>EX2</code></td>
+<td><code>EX2 *pex2 = &amp;x-&gt;c;</code></td>
+</tr>
+<tr>
+<td><code>d</code></td>
+<td><code>EX *</code></td>
+<td><code>EX *pex = x-&gt;d;</code></td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>运算符优先级：<code>-&gt;</code> 高于 <code>&amp;</code></li>
+<li>运算符优先级：<code>-&gt;</code> 高于 <code>.</code> 高于 <code>*</code></li>
+</ul>
+<h3 id="15-结构的存储分配">🍒1.5 结构的存储分配</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">struct</span> A {
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">char</span> a;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">int</span> b;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">char</span> c;
+</span></span><span style="display:flex;"><span>};
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">struct</span> B {
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">int</span> b;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">char</span> a;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">char</span> c;
+</span></span><span style="display:flex;"><span>};
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>编译器按照成员列表声明的顺序给每个成员分配内存</li>
+<li>边界对齐的问题，让对边界要求最严格的成员首次出现，最弱的成员最后出现，可以最大限度的减少因边界对齐带来的空间损失</li>
+</ul>
+<p><img src="/00_picture/%e7%bb%93%e6%9e%84%e7%9a%84%e5%ad%98%e5%82%a8%e5%88%86%e9%85%8d.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="结构的存储分配"
+	
+	
+></p>
+<h3 id="16-作为函数参数">🍒1.6 作为函数参数</h3>
+<ul>
+<li>通常来说，传结构的指针比结构本身更效率</li>
+</ul>
+<h2 id="2-位段">2. 位段</h2>
+<ul>
+<li>声明类似结构</li>
+<li>不同之处：</li>
+</ul>
+<blockquote>
+<ol>
+<li>成员是一个或多个位的字段，这些不同长度的字段实际上存储于一个或多个整型变量中</li>
+<li>位段成员必须声明为int、signed int或unsigned int类型</li>
+<li>成员名后面是一个冒号和一个整数，整数指定该位段所占的位的数目</li>
+</ol>
+</blockquote>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">struct</span> CHAR {
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">unsigned</span> <span style="color:#900;font-weight:bold">ch</span> : <span style="color:#099">7</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">unsigned</span> <span style="color:#900;font-weight:bold">font</span> : <span style="color:#099">6</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">unsigned</span> <span style="color:#900;font-weight:bold">size</span> : <span style="color:#099">19</span>
+</span></span><span style="display:flex;"><span>}; <span style="color:#998;font-style:italic">// 32位
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>使用位段方便通过移位和屏蔽实现任务，唯一优点就是简化源代码</li>
+</ul>
+<h2 id="3-联合">3. 联合</h2>
+<h3 id="31-联合声明与内存分配">🍒3.1 联合声明与内存分配</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">union</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">int</span> i;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">float</span> f;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">char</span> <span style="color:#000;font-weight:bold">*</span>s;
+</span></span><span style="display:flex;"><span>} value;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>某一时刻，只有一个成员真正存放于该地址</li>
+<li>所有成员引用的是内存中相同的位置</li>
+<li>联合的长度是它最长成员的长度</li>
+<li>仅由的区别：在于每个成员的类型决定如何解释存放在相同位置处的数据</li>
+</ul>
+<h3 id="32-初始化">🍒3.2 初始化</h3>
+<ul>
+<li>初始化必须是联合第1个成员的类型</li>
+<li>通过{}初始化</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">union</span> {
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">int</span> i;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">float</span> f;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">char</span> <span style="color:#000;font-weight:bold">*</span>s;
+</span></span><span style="display:flex;"><span>} x <span style="color:#000;font-weight:bold">=</span> { <span style="color:#099">5</span> };
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="33-使用场合">🍒3.3 使用场合</h3>
+<ul>
+<li>通常作为大型结构的一部分</li>
+<li>因为数据项不能同时出现，所有联合一般被用来节省空间</li>
+<li>通常将相互排斥的字段存储与一个联合中，由程序员记住存放的是什么类型</li>
+<li>联合也可以把同一个数据解释成不同的东西</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/c%E5%92%8C%E6%8C%87%E9%92%88/">C和指针</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/08_%E6%95%B0%E7%BB%84/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">08_数组</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/07_%E5%87%BD%E6%95%B0/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">07_函数</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/06_%E6%8C%87%E9%92%88/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">06_指针</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/05_%E6%93%8D%E4%BD%9C%E7%AC%A6%E5%92%8C%E8%A1%A8%E8%BE%BE%E5%BC%8F/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">05_操作符和表达式</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/04_%E8%AF%AD%E5%8F%A5/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">04_语句</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
