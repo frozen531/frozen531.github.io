@@ -3,9 +3,9 @@
     <head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='1. 工具简介 在工程文件中，按照类型、功能、模块等将源文件分布于不同的目录下，makefile的好处是描述Linux下一个工程的编译和链接规则，使工程编译自动化执行。
 2. 编写格式和规范 2.1 文件命名规则 makefile文件的命名通常为makefile和Makefile，但也可以是其他任意名字，但要通过-f执行。
-2.2 基本格式 1 2 3 4 5 6 7 目标:依赖 命令 // 如： A: B C... (tab)&amp;lt;command&amp;gt; (tab)&amp;lt;command&amp;gt; 注意：
+1 2 [root@bogon 05_static]# make -f makefile_path [root@bogon 05_static]# make clean -f makefile_path 2.2 基本格式 1 2 3 4 5 6 7 目标:依赖 命令 // 如： A: B C... (tab)&amp;lt;command&amp;gt; (tab)&amp;lt;command&amp;gt; 注意：
 每个命令行前都必须键入tab； 依赖可以有多个，空格隔开； 3. 执行过程 3.1 make执行顺序 make时，默认查找顺序：当前目录下依次寻找&amp;quot;GNUmakefile&amp;quot;、&amp;ldquo;makefile&amp;quot;和&amp;quot;Makefile&amp;rdquo;，并默认生成第一个目标。
-make命令生成makefile文件中的终极目标（第一个规则） 在最上一个规则写我们最终要生成的目标文件（终极目标），对于其中的依赖项，如果没有相应文件，则向下查找生成该依赖文件的规则（子目标，为终极目标提供依赖） 1 2 3 4 5 6 7 8 9 10 11 // 可以生成hello5.o和hello5 main: hello5.o gcc hello5.o -o hello5 hello5.o :hello.c gcc -c hello.c -o hello5.o // 只能执行第一个目标格式中命令，只生成hello6.o hello6.o :hello.c gcc -c hello.c -o hello6.'>
+make命令生成makefile文件中的终极目标（第一个规则） 在最上一个规则写我们最终要生成的目标文件（终极目标），对于其中的依赖项，如果没有相应文件，则向下查找生成该依赖文件的规则（子目标，为终极目标提供依赖） 1 2 3 4 5 6 7 8 9 10 11 // 可以生成hello5.o和hello5 main: hello5.o gcc hello5.o -o hello5 hello5.o :hello.c gcc -c hello.'>
 <title>Makefile基本介绍</title>
 
 <link rel='canonical' href='https://frozen531.github.io/post/linux/makefile/makefile%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/'>
@@ -13,18 +13,18 @@ make命令生成makefile文件中的终极目标（第一个规则） 在最上�
 <link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='Makefile基本介绍'>
 <meta property='og:description' content='1. 工具简介 在工程文件中，按照类型、功能、模块等将源文件分布于不同的目录下，makefile的好处是描述Linux下一个工程的编译和链接规则，使工程编译自动化执行。
 2. 编写格式和规范 2.1 文件命名规则 makefile文件的命名通常为makefile和Makefile，但也可以是其他任意名字，但要通过-f执行。
-2.2 基本格式 1 2 3 4 5 6 7 目标:依赖 命令 // 如： A: B C... (tab)&amp;lt;command&amp;gt; (tab)&amp;lt;command&amp;gt; 注意：
+1 2 [root@bogon 05_static]# make -f makefile_path [root@bogon 05_static]# make clean -f makefile_path 2.2 基本格式 1 2 3 4 5 6 7 目标:依赖 命令 // 如： A: B C... (tab)&amp;lt;command&amp;gt; (tab)&amp;lt;command&amp;gt; 注意：
 每个命令行前都必须键入tab； 依赖可以有多个，空格隔开； 3. 执行过程 3.1 make执行顺序 make时，默认查找顺序：当前目录下依次寻找&amp;quot;GNUmakefile&amp;quot;、&amp;ldquo;makefile&amp;quot;和&amp;quot;Makefile&amp;rdquo;，并默认生成第一个目标。
-make命令生成makefile文件中的终极目标（第一个规则） 在最上一个规则写我们最终要生成的目标文件（终极目标），对于其中的依赖项，如果没有相应文件，则向下查找生成该依赖文件的规则（子目标，为终极目标提供依赖） 1 2 3 4 5 6 7 8 9 10 11 // 可以生成hello5.o和hello5 main: hello5.o gcc hello5.o -o hello5 hello5.o :hello.c gcc -c hello.c -o hello5.o // 只能执行第一个目标格式中命令，只生成hello6.o hello6.o :hello.c gcc -c hello.c -o hello6.'>
+make命令生成makefile文件中的终极目标（第一个规则） 在最上一个规则写我们最终要生成的目标文件（终极目标），对于其中的依赖项，如果没有相应文件，则向下查找生成该依赖文件的规则（子目标，为终极目标提供依赖） 1 2 3 4 5 6 7 8 9 10 11 // 可以生成hello5.o和hello5 main: hello5.o gcc hello5.o -o hello5 hello5.o :hello.c gcc -c hello.'>
 <meta property='og:url' content='https://frozen531.github.io/post/linux/makefile/makefile%E5%9F%BA%E6%9C%AC%E4%BB%8B%E7%BB%8D/'>
 <meta property='og:site_name' content='浅浅的行迹'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='makefile' /><meta property='article:published_time' content='2023-02-12T21:26:08&#43;08:00'/><meta property='article:modified_time' content='2023-02-12T21:26:08&#43;08:00'/>
 <meta name="twitter:title" content="Makefile基本介绍">
 <meta name="twitter:description" content="1. 工具简介 在工程文件中，按照类型、功能、模块等将源文件分布于不同的目录下，makefile的好处是描述Linux下一个工程的编译和链接规则，使工程编译自动化执行。
 2. 编写格式和规范 2.1 文件命名规则 makefile文件的命名通常为makefile和Makefile，但也可以是其他任意名字，但要通过-f执行。
-2.2 基本格式 1 2 3 4 5 6 7 目标:依赖 命令 // 如： A: B C... (tab)&amp;lt;command&amp;gt; (tab)&amp;lt;command&amp;gt; 注意：
+1 2 [root@bogon 05_static]# make -f makefile_path [root@bogon 05_static]# make clean -f makefile_path 2.2 基本格式 1 2 3 4 5 6 7 目标:依赖 命令 // 如： A: B C... (tab)&amp;lt;command&amp;gt; (tab)&amp;lt;command&amp;gt; 注意：
 每个命令行前都必须键入tab； 依赖可以有多个，空格隔开； 3. 执行过程 3.1 make执行顺序 make时，默认查找顺序：当前目录下依次寻找&amp;quot;GNUmakefile&amp;quot;、&amp;ldquo;makefile&amp;quot;和&amp;quot;Makefile&amp;rdquo;，并默认生成第一个目标。
-make命令生成makefile文件中的终极目标（第一个规则） 在最上一个规则写我们最终要生成的目标文件（终极目标），对于其中的依赖项，如果没有相应文件，则向下查找生成该依赖文件的规则（子目标，为终极目标提供依赖） 1 2 3 4 5 6 7 8 9 10 11 // 可以生成hello5.o和hello5 main: hello5.o gcc hello5.o -o hello5 hello5.o :hello.c gcc -c hello.c -o hello5.o // 只能执行第一个目标格式中命令，只生成hello6.o hello6.o :hello.c gcc -c hello.c -o hello6.">
+make命令生成makefile文件中的终极目标（第一个规则） 在最上一个规则写我们最终要生成的目标文件（终极目标），对于其中的依赖项，如果没有相应文件，则向下查找生成该依赖文件的规则（子目标，为终极目标提供依赖） 1 2 3 4 5 6 7 8 9 10 11 // 可以生成hello5.o和hello5 main: hello5.o gcc hello5.o -o hello5 hello5.o :hello.c gcc -c hello.">
     </head>
     <body class="
     article-page
@@ -315,7 +315,17 @@ make命令生成makefile文件中的终极目标（第一个规则） 在最上�
 <h2 id="2-编写格式和规范">2. 编写格式和规范</h2>
 <h3 id="21-文件命名规则">2.1 文件命名规则</h3>
 <p>makefile文件的命名通常为<code>makefile</code>和<code>Makefile</code>，但也可以是其他任意名字，但要通过<code>-f</code>执行。</p>
-<h3 id="22-基本格式">2.2 基本格式</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon 05_static<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># make -f makefile_path</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon 05_static<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># make clean -f makefile_path</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="22-基本格式">2.2 基本格式</h3>
 <div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
 <table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
 <pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1

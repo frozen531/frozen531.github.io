@@ -1,27 +1,27 @@
 <!DOCTYPE html>
 <html lang="en-us" dir="ltr">
     <head><meta charset='utf-8'>
-<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='静态库实际上是一组目标文件的集合，即很多目标文件经过压缩打包后形成的一个文件。&amp;mdash; 《程序员的自我修养》
-1. 示例代码 2. 生成静态库 库的链接有两种方式：
--L路径 -l库名：-L./human/ -lhuman 直接路径链接加库名：./human/libhuman.a main.c 1 2 3 4 5 6 7 8 9 #include &amp;lt;stdio.h&amp;gt; extern int process(int a); int main() { process(3); return 0; } 3. 链接静态库 1 2 3 TARGET:main.c gcc -c main.c gcc -o app_static main.o ./human/libhuman.a 注意：
-编译讲究先后顺序，需要main.o在./human/libhuman.a前，否则会出现未定义的引用，报错如下：需确认书上的解释 对于库链接的两种方式， app_static均可正常运行 1 2 3 4 5 6 7 gcc -c main.c gcc -o app_static ./human/libhuman.a main.o main.o: In function `main&amp;#39;: main.'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='静态库实际上是一组目标文件的集合，即很多目标文件.o经过压缩打包后形成的一个文件。&amp;mdash;&amp;mdash;&amp;mdash; 《程序员的自我修养 4.5静态库链接》
+1. 示例代码 构建如下代码结构。
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 [root@bogon 05_static]# tree . ├── add │ ├── add.c │ ├── libadd.a │ └── makefile ├── main.c ├── makefile ├── mul │ ├── div.c │ ├── libmul_div.a │ ├── makefile │ └── mul.c └── sub ├── libsub.a ├── makefile └── sub.c 2. 生成静态库 add 这里makefile用了add文件名，在迁移上局限性很高。
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 // add.'>
 <title>Gcc静态库编译链接</title>
 
 <link rel='canonical' href='https://frozen531.github.io/post/linux/gcc/gcc%E9%9D%99%E6%80%81%E5%BA%93%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/'>
 
 <link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='Gcc静态库编译链接'>
-<meta property='og:description' content='静态库实际上是一组目标文件的集合，即很多目标文件经过压缩打包后形成的一个文件。&amp;mdash; 《程序员的自我修养》
-1. 示例代码 2. 生成静态库 库的链接有两种方式：
--L路径 -l库名：-L./human/ -lhuman 直接路径链接加库名：./human/libhuman.a main.c 1 2 3 4 5 6 7 8 9 #include &amp;lt;stdio.h&amp;gt; extern int process(int a); int main() { process(3); return 0; } 3. 链接静态库 1 2 3 TARGET:main.c gcc -c main.c gcc -o app_static main.o ./human/libhuman.a 注意：
-编译讲究先后顺序，需要main.o在./human/libhuman.a前，否则会出现未定义的引用，报错如下：需确认书上的解释 对于库链接的两种方式， app_static均可正常运行 1 2 3 4 5 6 7 gcc -c main.c gcc -o app_static ./human/libhuman.a main.o main.o: In function `main&amp;#39;: main.'>
+<meta property='og:description' content='静态库实际上是一组目标文件的集合，即很多目标文件.o经过压缩打包后形成的一个文件。&amp;mdash;&amp;mdash;&amp;mdash; 《程序员的自我修养 4.5静态库链接》
+1. 示例代码 构建如下代码结构。
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 [root@bogon 05_static]# tree . ├── add │ ├── add.c │ ├── libadd.a │ └── makefile ├── main.c ├── makefile ├── mul │ ├── div.c │ ├── libmul_div.a │ ├── makefile │ └── mul.c └── sub ├── libsub.a ├── makefile └── sub.c 2. 生成静态库 add 这里makefile用了add文件名，在迁移上局限性很高。
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 // add.'>
 <meta property='og:url' content='https://frozen531.github.io/post/linux/gcc/gcc%E9%9D%99%E6%80%81%E5%BA%93%E7%BC%96%E8%AF%91%E9%93%BE%E6%8E%A5/'>
 <meta property='og:site_name' content='浅浅的行迹'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='gcc' /><meta property='article:published_time' content='2023-03-01T22:40:32&#43;08:00'/><meta property='article:modified_time' content='2023-03-01T22:40:32&#43;08:00'/>
 <meta name="twitter:title" content="Gcc静态库编译链接">
-<meta name="twitter:description" content="静态库实际上是一组目标文件的集合，即很多目标文件经过压缩打包后形成的一个文件。&amp;mdash; 《程序员的自我修养》
-1. 示例代码 2. 生成静态库 库的链接有两种方式：
--L路径 -l库名：-L./human/ -lhuman 直接路径链接加库名：./human/libhuman.a main.c 1 2 3 4 5 6 7 8 9 #include &amp;lt;stdio.h&amp;gt; extern int process(int a); int main() { process(3); return 0; } 3. 链接静态库 1 2 3 TARGET:main.c gcc -c main.c gcc -o app_static main.o ./human/libhuman.a 注意：
-编译讲究先后顺序，需要main.o在./human/libhuman.a前，否则会出现未定义的引用，报错如下：需确认书上的解释 对于库链接的两种方式， app_static均可正常运行 1 2 3 4 5 6 7 gcc -c main.c gcc -o app_static ./human/libhuman.a main.o main.o: In function `main&amp;#39;: main.">
+<meta name="twitter:description" content="静态库实际上是一组目标文件的集合，即很多目标文件.o经过压缩打包后形成的一个文件。&amp;mdash;&amp;mdash;&amp;mdash; 《程序员的自我修养 4.5静态库链接》
+1. 示例代码 构建如下代码结构。
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 [root@bogon 05_static]# tree . ├── add │ ├── add.c │ ├── libadd.a │ └── makefile ├── main.c ├── makefile ├── mul │ ├── div.c │ ├── libmul_div.a │ ├── makefile │ └── mul.c └── sub ├── libsub.a ├── makefile └── sub.c 2. 生成静态库 add 这里makefile用了add文件名，在迁移上局限性很高。
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 // add.">
     </head>
     <body class="
     article-page
@@ -213,9 +213,25 @@
             <nav id="TableOfContents">
   <ul>
     <li><a href="#1-示例代码">1. 示例代码</a></li>
-    <li><a href="#2-生成静态库">2. 生成静态库</a></li>
-    <li><a href="#3-链接静态库">3. 链接静态库</a></li>
+    <li><a href="#2-生成静态库">2. 生成静态库</a>
+      <ul>
+        <li><a href="#add"><code>add</code></a></li>
+        <li><a href="#sub"><code>sub</code></a></li>
+        <li><a href="#mul"><code>mul</code></a></li>
+      </ul>
+    </li>
+    <li><a href="#3-链接静态库">3. 链接静态库</a>
+      <ul>
+        <li><a href="#main"><code>main</code></a></li>
+      </ul>
+    </li>
     <li><a href="#4-运行">4. 运行</a></li>
+    <li><a href="#5-合并静态库">5. 合并静态库</a>
+      <ul>
+        <li><a href="#解压成o后合并">解压成.o后合并</a></li>
+        <li><a href="#直接合并多个a">直接合并多个.a</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
         </div>
@@ -280,7 +296,7 @@
 
 
                 <time class="article-time--reading">
-                    1 minute read
+                    3 minute read
                 </time>
             </div>
         
@@ -295,17 +311,218 @@
     <section class="article-content">
     
     
-    <p>静态库实际上是一组目标文件的集合，即很多目标文件经过压缩打包后形成的一个文件。&mdash; 《程序员的自我修养》</p>
+    <p>静态库实际上是一组目标文件的集合，即很多目标文件<code>.o</code>经过压缩打包后形成的一个文件。&mdash;&mdash;&mdash; 《程序员的自我修养 4.5静态库链接》</p>
 <h2 id="1-示例代码">1. 示例代码</h2>
-<h2 id="2-生成静态库">2. 生成静态库</h2>
-<p>库的链接有两种方式：</p>
-<ol>
-<li>-L路径 -l库名：<code>-L./human/ -lhuman </code></li>
-<li>直接路径链接加库名：<code>./human/libhuman.a</code></li>
-</ol>
-<ul>
-<li>main.c</li>
-</ul>
+<p>构建如下代码结构。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon 05_static<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># tree</span>
+</span></span><span style="display:flex;"><span>.
+</span></span><span style="display:flex;"><span>├── add
+</span></span><span style="display:flex;"><span>│   ├── add.c
+</span></span><span style="display:flex;"><span>│   ├── libadd.a
+</span></span><span style="display:flex;"><span>│   └── makefile
+</span></span><span style="display:flex;"><span>├── main.c
+</span></span><span style="display:flex;"><span>├── makefile
+</span></span><span style="display:flex;"><span>├── mul
+</span></span><span style="display:flex;"><span>│   ├── div.c
+</span></span><span style="display:flex;"><span>│   ├── libmul_div.a
+</span></span><span style="display:flex;"><span>│   ├── makefile
+</span></span><span style="display:flex;"><span>│   └── mul.c
+</span></span><span style="display:flex;"><span>└── sub
+</span></span><span style="display:flex;"><span>    ├── libsub.a
+</span></span><span style="display:flex;"><span>    ├── makefile
+</span></span><span style="display:flex;"><span>    └── sub.c
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="2-生成静态库">2. 生成静态库</h2>
+<h3 id="add"><code>add</code></h3>
+<p>这里makefile用了add文件名，在迁移上局限性很高。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>// add.c
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#include &lt;stdio.h&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>void add<span style="color:#000;font-weight:bold">(</span>int a, int b<span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        printf<span style="color:#000;font-weight:bold">(</span><span style="color:#d14">&#34;%d + %d = %d \n&#34;</span>, a, b, a + b<span style="color:#000;font-weight:bold">)</span>;
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>// makefile
+</span></span><span style="display:flex;"><span>TARGET :<span style="color:#000;font-weight:bold">=</span> libadd.a
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>TARGET : 
+</span></span><span style="display:flex;"><span>        gcc -c add.c -o add.o
+</span></span><span style="display:flex;"><span>        ar rc <span style="color:#000;font-weight:bold">$(</span>TARGET<span style="color:#000;font-weight:bold">)</span> add.o
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>clean:
+</span></span><span style="display:flex;"><span>        rm -f add.o
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="sub"><code>sub</code></h3>
+<p>使用函数<code>wildcard</code>取消了对文件名的依赖，只有target需要指定，并使用了通配符，简化操作。这里需要注意：<code>$@</code>是目标，从下面<code>makefile</code>可以看出目标即<code>main</code>这个变量名。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>// sub.c
+</span></span><span style="display:flex;"><span>void sub<span style="color:#000;font-weight:bold">(</span>int a, int b<span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        printf<span style="color:#000;font-weight:bold">(</span><span style="color:#d14">&#34;%d - %d = %d \n&#34;</span>, a, b, a - b<span style="color:#000;font-weight:bold">)</span>;
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>// makefile
+</span></span><span style="display:flex;"><span>SOURCE :<span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">$(</span>wildcard ./*.c<span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>OBJECT :<span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">$(</span>patsubst %.c, %.o, <span style="color:#000;font-weight:bold">$(</span>SOURCE<span style="color:#000;font-weight:bold">))</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>TARGET :<span style="color:#000;font-weight:bold">=</span> libsub.a
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>main : <span style="color:#000;font-weight:bold">$(</span>OBJECT<span style="color:#000;font-weight:bold">)</span> 
+</span></span><span style="display:flex;"><span>        <span style="color:#0086b3">echo</span> target:<span style="color:#008080">$@</span>
+</span></span><span style="display:flex;"><span>        ar rc <span style="color:#000;font-weight:bold">$(</span>TARGET<span style="color:#000;font-weight:bold">)</span> $^
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>%.o : %.c
+</span></span><span style="display:flex;"><span>        gcc -c $^ -o <span style="color:#008080">$@</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>clean:
+</span></span><span style="display:flex;"><span>        rm -f <span style="color:#000;font-weight:bold">$(</span>TARGET<span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">$(</span>OBJECT<span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="mul"><code>mul</code></h3>
+<p>该目录下包含两个.c，makefile同上。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">23
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">24
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">25
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">26
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">27
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">28
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">29
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">30
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">31
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">32
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>// mul.c
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#include &lt;stdio.h&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>void mul<span style="color:#000;font-weight:bold">(</span>int a, int b<span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        printf<span style="color:#000;font-weight:bold">(</span><span style="color:#d14">&#34;%d * %d = %d \n&#34;</span>, a, b, a*b<span style="color:#000;font-weight:bold">)</span>;
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>// div.c
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#include &lt;stdio.h&gt;</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>void div<span style="color:#000;font-weight:bold">(</span>int a, int b<span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        printf<span style="color:#000;font-weight:bold">(</span><span style="color:#d14">&#34;%d / %d = %d \n&#34;</span>, a, b, a/b<span style="color:#000;font-weight:bold">)</span>;
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>// makefile
+</span></span><span style="display:flex;"><span>SOURCE :<span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">$(</span>wildcard ./*.c<span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>OBJECT :<span style="color:#000;font-weight:bold">=</span> <span style="color:#000;font-weight:bold">$(</span>patsubst %.c, %.o, <span style="color:#000;font-weight:bold">$(</span>SOURCE<span style="color:#000;font-weight:bold">))</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>TARGET :<span style="color:#000;font-weight:bold">=</span> libmul_div.a
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">$(</span>TARGET<span style="color:#000;font-weight:bold">)</span> : <span style="color:#000;font-weight:bold">$(</span>OBJECT<span style="color:#000;font-weight:bold">)</span> 
+</span></span><span style="display:flex;"><span>        <span style="color:#0086b3">echo</span> target:<span style="color:#000;font-weight:bold">$(</span>TARGET<span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>        ar rc <span style="color:#008080">$@</span> $^
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>%.o : %.c
+</span></span><span style="display:flex;"><span>        gcc -c $^ -o <span style="color:#008080">$@</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>CLEAN:
+</span></span><span style="display:flex;"><span>        rm -f <span style="color:#000;font-weight:bold">$(</span>TARGET<span style="color:#000;font-weight:bold">)</span> <span style="color:#000;font-weight:bold">$(</span>OBJECT<span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="3-链接静态库">3. 链接静态库</h2>
+<h3 id="main"><code>main</code></h3>
 <div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
 <table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
 <pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
@@ -319,35 +536,92 @@
 </span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9
 </span></code></pre></td>
 <td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#include</span> <span style="color:#999;font-weight:bold;font-style:italic">&lt;stdio.h&gt;</span><span style="color:#999;font-weight:bold;font-style:italic">
-</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic"></span>
-</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">extern</span> <span style="color:#458;font-weight:bold">int</span> <span style="color:#900;font-weight:bold">process</span>(<span style="color:#458;font-weight:bold">int</span> a);
-</span></span><span style="display:flex;"><span>
-</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> <span style="color:#900;font-weight:bold">main</span>()
-</span></span><span style="display:flex;"><span>{
-</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">process</span>(<span style="color:#099">3</span>);
-</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#099">0</span>;
-</span></span><span style="display:flex;"><span>}
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>// main.c
+</span></span><span style="display:flex;"><span>int main<span style="color:#000;font-weight:bold">()</span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">{</span>
+</span></span><span style="display:flex;"><span>        add<span style="color:#000;font-weight:bold">(</span>3, 4<span style="color:#000;font-weight:bold">)</span>;
+</span></span><span style="display:flex;"><span>        sub<span style="color:#000;font-weight:bold">(</span>5, 6<span style="color:#000;font-weight:bold">)</span>;
+</span></span><span style="display:flex;"><span>        mul<span style="color:#000;font-weight:bold">(</span>7, 8<span style="color:#000;font-weight:bold">)</span>;
+</span></span><span style="display:flex;"><span>        div<span style="color:#000;font-weight:bold">(</span>6, 4<span style="color:#000;font-weight:bold">)</span>;
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">return</span> 0;
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">}</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="3-链接静态库">3. 链接静态库</h2>
+</div><p>库的链接有两种方式：</p>
+<ol>
+<li>-L路径 -l库名：<code>-L./human/ -lhuman </code></li>
+</ol>
 <div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
 <table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
-<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
-</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
-</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
 </span></code></pre></td>
 <td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>TARGET:main.c
-</span></span><span style="display:flex;"><span>	gcc -c main.c
-</span></span><span style="display:flex;"><span>	gcc -o app_static main.o ./human/libhuman.a 
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>// makefile
+</span></span><span style="display:flex;"><span>libs :<span style="color:#000;font-weight:bold">=</span> -L./add/ -ladd
+</span></span><span style="display:flex;"><span><span style="color:#008080">libs</span> <span style="color:#000;font-weight:bold">+=</span> -L./sub/ -lsub
+</span></span><span style="display:flex;"><span><span style="color:#008080">libs</span> <span style="color:#000;font-weight:bold">+=</span> -L./mul/ -lmul_div
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>target :<span style="color:#000;font-weight:bold">=</span> app
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">$(</span>target<span style="color:#000;font-weight:bold">)</span> : 
+</span></span><span style="display:flex;"><span>        gcc -c main.c -o main.o
+</span></span><span style="display:flex;"><span>        gcc -o <span style="color:#008080">$@</span> main.o <span style="color:#000;font-weight:bold">$(</span>libs<span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>clean:
+</span></span><span style="display:flex;"><span>        rm -f *.o <span style="color:#000;font-weight:bold">$(</span>target<span style="color:#000;font-weight:bold">)</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ol start="2">
+<li>直接路径链接加库名：<code>./human/libhuman.a</code></li>
+</ol>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>// makefile
+</span></span><span style="display:flex;"><span>libs :<span style="color:#000;font-weight:bold">=</span> ./add/libadd.a
+</span></span><span style="display:flex;"><span><span style="color:#008080">libs</span> <span style="color:#000;font-weight:bold">+=</span> ./sub/libsub.a
+</span></span><span style="display:flex;"><span><span style="color:#008080">libs</span> <span style="color:#000;font-weight:bold">+=</span> ./mul/libmul_div.a
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>target :<span style="color:#000;font-weight:bold">=</span> app
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">$(</span>target<span style="color:#000;font-weight:bold">)</span> : 
+</span></span><span style="display:flex;"><span>        gcc -c main.c -o main.o
+</span></span><span style="display:flex;"><span>        gcc -o <span style="color:#008080">$@</span> main.o <span style="color:#000;font-weight:bold">$(</span>libs<span style="color:#000;font-weight:bold">)</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>clean:
+</span></span><span style="display:flex;"><span>        rm -f *.o <span style="color:#000;font-weight:bold">$(</span>target<span style="color:#000;font-weight:bold">)</span>
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p>注意：</p>
 <blockquote>
 <ol>
-<li>编译讲究先后顺序，需要<code>main.o</code>在<code>./human/libhuman.a</code>前，否则会出现未定义的引用，报错如下：<em><strong>需确认书上的解释</strong></em></li>
-<li>对于库链接的两种方式， <code>app_static</code>均可正常运行</li>
+<li>编译讲究先后顺序，<code>gcc -o $@ main.o $(libs)</code>，需要<code>main.o</code>在<code>./human/libhuman.a</code>前，否则会出现未定义的引用，报错如下：<em><strong>需确认书上的解释</strong></em></li>
 </ol>
 </blockquote>
 <div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
@@ -359,39 +633,51 @@
 </span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
 </span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
 </span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9
 </span></code></pre></td>
 <td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>gcc -c main.c
-</span></span><span style="display:flex;"><span>gcc -o app_static ./human/libhuman.a main.o
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon 05_static<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># make -f makefile_L</span>
+</span></span><span style="display:flex;"><span>gcc -c main.c -o main.o
+</span></span><span style="display:flex;"><span>gcc -o app -L./add/ -ladd -L ./sub/ -lsub -L ./mul/ -lmul_div main.o
 </span></span><span style="display:flex;"><span>main.o: In <span style="color:#000;font-weight:bold">function</span> <span style="color:#d14">`</span>main<span style="color:#d14">&#39;:
-</span></span></span><span style="display:flex;"><span><span style="color:#d14">main.c:(.text+0xa): undefined reference to `process&#39;</span>
-</span></span><span style="display:flex;"><span>collect2: error: ld returned <span style="color:#099">1</span> <span style="color:#0086b3">exit</span> status
-</span></span><span style="display:flex;"><span>makefile:2: recipe <span style="color:#000;font-weight:bold">for</span> target <span style="color:#d14">&#39;TARGET&#39;</span> failed
-</span></span><span style="display:flex;"><span>make: *** <span style="color:#000;font-weight:bold">[</span>TARGET<span style="color:#000;font-weight:bold">]</span> Error <span style="color:#099">1</span>
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">main.c:(.text+0x14): undefined reference to `add&#39;</span>
+</span></span><span style="display:flex;"><span>main.c:<span style="color:#000;font-weight:bold">(</span>.text+0x28<span style="color:#000;font-weight:bold">)</span>: undefined reference to <span style="color:#d14">`</span>sub<span style="color:#d14">&#39;
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">main.c:(.text+0x3c): undefined reference to `mul&#39;</span>
+</span></span><span style="display:flex;"><span>collect2: ld 返回 <span style="color:#099">1</span>
+</span></span><span style="display:flex;"><span>make: *** <span style="color:#000;font-weight:bold">[</span>app<span style="color:#000;font-weight:bold">]</span> 错误 <span style="color:#099">1</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="4-运行">4. 运行</h2>
+</div><blockquote>
+<ol start="2">
+<li>对于库链接的两种方式， <code>app</code>均可正常运行</li>
+</ol>
+</blockquote>
+<h2 id="4-运行">4. 运行</h2>
 <div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
 <table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
 <pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
 </span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
 </span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
 </span></code></pre></td>
 <td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
-<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost 01_newlib<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># ./app_static</span>
-</span></span><span style="display:flex;"><span>human:process <span style="color:#099">3</span>
-</span></span><span style="display:flex;"><span>play:human
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@localhost 01_newlib<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># ./app</span>
+</span></span><span style="display:flex;"><span><span style="color:#099">3</span> + <span style="color:#008080">4</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">7</span> 
+</span></span><span style="display:flex;"><span><span style="color:#099">5</span> - <span style="color:#008080">6</span> <span style="color:#000;font-weight:bold">=</span> -1 
+</span></span><span style="display:flex;"><span><span style="color:#099">7</span> * <span style="color:#008080">8</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">56</span> 
+</span></span><span style="display:flex;"><span><span style="color:#099">6</span> / <span style="color:#008080">4</span> <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1</span>
 </span></span></code></pre></td></tr></table>
 </div>
-</div><p>合并静态库有两种方法：</p>
+</div><h2 id="5-合并静态库">5. 合并静态库</h2>
+<p>合并静态库有两种方法：</p>
 <ol>
-<li>
-<p>将所有.a解压为众多的.o，然后合为一个.a</p>
-</li>
-<li>
-<p>直接将多个.a合为一个</p>
-</li>
+<li>将所有.a解压为众多的.o，然后合为一个.a</li>
+<li>直接将多个.a合为一个</li>
 </ol>
+<h3 id="解压成o后合并">解压成.o后合并</h3>
+<h3 id="直接合并多个a">直接合并多个.a</h3>
 <div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
 <table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
 <pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1

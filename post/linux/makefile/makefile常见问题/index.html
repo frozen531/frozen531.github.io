@@ -3,7 +3,9 @@
     <head><meta charset='utf-8'>
 <meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='1. *** 遗漏分隔符 。 停止 1 2 [root@bogon 01_hello_world]# make makefile:2: *** 遗漏分隔符 。 停止。 command前一定要是tab不能是空格
 2. 增加宏但编译未体现 gcc编译不会全部编译，当.o存在时，会比较对应.c和.o的修改时间，如果.c时间早于.o，认为文件没有变化，那么.o也就无需重新编译。
-这有时候会导致，当你新增了一个编译宏作用在.c，但是.c之前已按照没有编译宏做了编译，且未做任何修改，那么会发现编译一直报错，这时需要删掉原来的.o重新编译。'>
+这有时候会导致，当你新增了一个编译宏作用在.c，但是.c之前已按照没有编译宏做了编译，且未做任何修改，那么会发现编译一直报错，这时需要删掉原来的.o重新编译。
+3. undefined reference to `main&#39; 报错如下：
+1 2 3 4 5 6 [root@bogon add]# make gcc add.c -o add.o /usr/lib/gcc/x86_64-redhat-linux/4.4.6/../../../../lib64/crt1.o: In function `_start&amp;#39;: (.text&#43;0x20): undefined reference to `main&amp;#39; collect2: ld 返回 1 make: *** [TARGET] 错误 1 提示找不到main，这是因为gcc add.c -o add.o是要生成一个可执行文件，可执行意味着里面会包含函数入口main（目前并不知道为什么链接不到main?）；我的意图是生成add.o，应该改为gcc -c add.c -o add.o。'>
 <title>Makefile常见问题</title>
 
 <link rel='canonical' href='https://frozen531.github.io/post/linux/makefile/makefile%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/'>
@@ -11,14 +13,18 @@
 <link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='Makefile常见问题'>
 <meta property='og:description' content='1. *** 遗漏分隔符 。 停止 1 2 [root@bogon 01_hello_world]# make makefile:2: *** 遗漏分隔符 。 停止。 command前一定要是tab不能是空格
 2. 增加宏但编译未体现 gcc编译不会全部编译，当.o存在时，会比较对应.c和.o的修改时间，如果.c时间早于.o，认为文件没有变化，那么.o也就无需重新编译。
-这有时候会导致，当你新增了一个编译宏作用在.c，但是.c之前已按照没有编译宏做了编译，且未做任何修改，那么会发现编译一直报错，这时需要删掉原来的.o重新编译。'>
+这有时候会导致，当你新增了一个编译宏作用在.c，但是.c之前已按照没有编译宏做了编译，且未做任何修改，那么会发现编译一直报错，这时需要删掉原来的.o重新编译。
+3. undefined reference to `main&#39; 报错如下：
+1 2 3 4 5 6 [root@bogon add]# make gcc add.c -o add.o /usr/lib/gcc/x86_64-redhat-linux/4.4.6/../../../../lib64/crt1.o: In function `_start&amp;#39;: (.text&#43;0x20): undefined reference to `main&amp;#39; collect2: ld 返回 1 make: *** [TARGET] 错误 1 提示找不到main，这是因为gcc add.c -o add.o是要生成一个可执行文件，可执行意味着里面会包含函数入口main（目前并不知道为什么链接不到main?）；我的意图是生成add.o，应该改为gcc -c add.c -o add.o。'>
 <meta property='og:url' content='https://frozen531.github.io/post/linux/makefile/makefile%E5%B8%B8%E8%A7%81%E9%97%AE%E9%A2%98/'>
 <meta property='og:site_name' content='浅浅的行迹'>
 <meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='makefile' /><meta property='article:published_time' content='2023-02-12T21:28:47&#43;08:00'/><meta property='article:modified_time' content='2023-02-12T21:28:47&#43;08:00'/>
 <meta name="twitter:title" content="Makefile常见问题">
 <meta name="twitter:description" content="1. *** 遗漏分隔符 。 停止 1 2 [root@bogon 01_hello_world]# make makefile:2: *** 遗漏分隔符 。 停止。 command前一定要是tab不能是空格
 2. 增加宏但编译未体现 gcc编译不会全部编译，当.o存在时，会比较对应.c和.o的修改时间，如果.c时间早于.o，认为文件没有变化，那么.o也就无需重新编译。
-这有时候会导致，当你新增了一个编译宏作用在.c，但是.c之前已按照没有编译宏做了编译，且未做任何修改，那么会发现编译一直报错，这时需要删掉原来的.o重新编译。">
+这有时候会导致，当你新增了一个编译宏作用在.c，但是.c之前已按照没有编译宏做了编译，且未做任何修改，那么会发现编译一直报错，这时需要删掉原来的.o重新编译。
+3. undefined reference to `main&#39; 报错如下：
+1 2 3 4 5 6 [root@bogon add]# make gcc add.c -o add.o /usr/lib/gcc/x86_64-redhat-linux/4.4.6/../../../../lib64/crt1.o: In function `_start&amp;#39;: (.text&#43;0x20): undefined reference to `main&amp;#39; collect2: ld 返回 1 make: *** [TARGET] 错误 1 提示找不到main，这是因为gcc add.c -o add.o是要生成一个可执行文件，可执行意味着里面会包含函数入口main（目前并不知道为什么链接不到main?）；我的意图是生成add.o，应该改为gcc -c add.c -o add.o。">
     </head>
     <body class="
     article-page
@@ -211,6 +217,7 @@
   <ul>
     <li><a href="#1--遗漏分隔符--停止">1. *** 遗漏分隔符 。 停止</a></li>
     <li><a href="#2-增加宏但编译未体现">2. 增加宏但编译未体现</a></li>
+    <li><a href="#3-undefined-reference-to-main">3. undefined reference to `main'</a></li>
   </ul>
 </nav>
         </div>
@@ -305,6 +312,27 @@
 <h2 id="2-增加宏但编译未体现">2. 增加宏但编译未体现</h2>
 <p>gcc编译不会全部编译，当.o存在时，会比较对应.c和.o的修改时间，如果.c时间早于.o，认为文件没有变化，那么.o也就无需重新编译。</p>
 <p>这有时候会导致，当你新增了一个编译宏作用在.c，但是.c之前已按照没有编译宏做了编译，且未做任何修改，那么会发现编译一直报错，这时需要删掉原来的.o重新编译。</p>
+<h2 id="3-undefined-reference-to-main">3. undefined reference to `main'</h2>
+<p>报错如下：</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">[</span>root@bogon add<span style="color:#000;font-weight:bold">]</span><span style="color:#998;font-style:italic"># make</span>
+</span></span><span style="display:flex;"><span>gcc add.c -o add.o
+</span></span><span style="display:flex;"><span>/usr/lib/gcc/x86_64-redhat-linux/4.4.6/../../../../lib64/crt1.o: In <span style="color:#000;font-weight:bold">function</span> <span style="color:#d14">`</span>_start<span style="color:#d14">&#39;:
+</span></span></span><span style="display:flex;"><span><span style="color:#d14">(.text+0x20): undefined reference to `main&#39;</span>
+</span></span><span style="display:flex;"><span>collect2: ld 返回 <span style="color:#099">1</span>
+</span></span><span style="display:flex;"><span>make: *** <span style="color:#000;font-weight:bold">[</span>TARGET<span style="color:#000;font-weight:bold">]</span> 错误 <span style="color:#099">1</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>提示找不到<code>main</code>，这是因为<code>gcc add.c -o add.o</code>是要生成一个可执行文件，可执行意味着里面会包含函数入口<code>main</code>（目前并不知道为什么链接不到<code>main</code>?）；我的意图是生成<code>add.o</code>，应该改为<code>gcc -c add.c -o add.o</code>。</p>
 
 </section>
 
