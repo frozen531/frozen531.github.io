@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='RAW数据 RAW数据是指sensor采集到的原始数据。
+每个感光点只能对一种颜色的光进行采样和量化（每个pixel上加一个香像素级的滤光片），RAW8、RAW10、RAW12表示每个像素点有8bit，10bit和12bit。
+RAW数据格式一般采用的是Bayer排列方式，鉴于人眼对绿色波段颜色敏感，所有绿色分量比重最大，按照1:2:1。以2*2像素矩阵，一般Bayer格式有GBRG、GRBG、BGGR、RGGB四种模式，下图为GRBG格式。
+在实际处理中，每个像素的RGB信号由像素本身输出的某一种颜色信号和其相邻像素输出的其他颜色信号构成，这种采样方式在基本不降低图像质量的同时，可以降低采样率。
+由于Bayer模式看起来像一个个马赛克，所以通过ISP-Demosaic（插值运算）为每个pixel恢复完整的RGB数据，成为去马赛克。
+ISP常用算法：
+亮度调节 对比度调节 饱和度调节 gamma校正 去噪 锐化 自动白平衡（AWB） RGB RGB使用红、绿、蓝三原色表示颜色。
+RGB格式是RAW数据通过ISP模块插值计算得来，每个像素均包含RGB三种颜色信息。常见的有RGB565、RGB555、RGB888，如RGB888表示一个像素包含R(8bit)、G(8bit)、B(8bit)信息，共3Byte。
+YUV YUV使用亮度Y、色度UV来表示颜色。
+将亮度与色彩信息分离，可以很好的解决彩色电视与黑白电视的兼容问题。 通常视频采集芯片输出的都是YUV格式的数据，在此基础上进行编码。
+Y：亮度分量，黑白图片 U：色度分量（蓝色投影），照片蓝色部分去掉亮度Y V：色度分量（红色投影），照片红色部分去掉亮度Y YUV采样方式 相比RGB24格式，利用人眼对Y分量敏感，UV分量不敏感，视频可降低UV分量的采样数据，达到降低数据量、降低带宽压力的目的。
+YUV444：对每个像素点的的YUV分量都进行采样，这样的三个分量信息量完整。 YUV422：按一行4个像素点，Y全部采样，UV水平间隔采样，所以Y:U:V=4:2:2，相当于每个像素点的采样值由3变为2，可节省1/3存储空间和1/3的数据传输量。 YUV420（最常用）：并不是指只采样U分量而不采样V分量。而是指，在每一行扫描时，只扫描一种色度分量（U或者V），和Y分量按照2 : 1的方式采样。比如，第一行扫描时，YU 按照 2 : 1的方式采样，那么第二行扫描时，YV分量按照 2:1的方式采样，所以单行来看，Y为4，U/V其中一个为2，另一个为0。对于每个色度分量来说，它的水平方向和竖直方向的采样和Y分量相比都是2:1 。可节省1/2存储空间和1/2的数据传输量。 采样及内存占用：
+采样格式 采样方式 单像素内存占用(byte) YUV444 YUV三个分量全采样 3 YUV422 Y全采样，U/V水平间隔采样 2 YUV420 Y全采样，U/V水平/垂直间隔采样 1.5 YUV存储格式 YUV存储信息有两种格式：
+packed（打包格式）：YUV分量被连续交替存储在同一个数组中 planar（平面格式，后缀P）：用三个数据分开存储三个分量 Semi-planar（半平面格式，后缀SP）：介于上面中间的一种格式，Y单独存储，UV交叉存储 常见的YUV422和YUV420采样的格式有：
+/ YUV422 YUV420 packed YUYV、UYUV / P类型 YUV422P YU12(I420)、YV12 SP类型 / NV12、NV21 YUV422：YUYV/UYVY/YUV422P 1 2 3 4 5 6 7 8 9 10 11 12 // YUYV格式：Y0和Y1公用U0 V0分量，Y2和Y3公用U2 V2分量 // (Y0,U0,V0), (Y1,U0,V0), (Y2,U2,V2), (Y3,U2,V2) Y0 UO Y1 V0 Y2 U2 Y3 V2 // UYVY格式：先采用U分量再采样Y分量 U0 Y0 V0 Y1 U2 Y2 V2 Y3 // YUV422P：3个平面 Y0 Y1 Y2 Y3 Y4 Y5 Y6 Y7 --&amp;gt; Y Y8 Y9 Y10 Y11 Y12 Y13 Y14 Y15 U0 U2 U4 U6 U8 U10 U12 U14 --&amp;gt; U V0 V2 V4 V6 V8 V10 V12 V14 --&amp;gt; V YUV420：YUV420P/YUV420SP 以8*2像素图像为例： YU12：先U后V YV12：先V后U NV12：UV交错 NV21：VU交错 RGB与YUV转换 这个公式里面所使用的转换矩阵，不同的ColorSpace是不相同的，目前比较常见的colorSpace有BT601、BT709和BT2020。'>
+<title>YUV基础知识</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E9%9F%B3%E8%A7%86%E9%A2%91/yuv%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='YUV基础知识'>
+<meta property='og:description' content='RAW数据 RAW数据是指sensor采集到的原始数据。
+每个感光点只能对一种颜色的光进行采样和量化（每个pixel上加一个香像素级的滤光片），RAW8、RAW10、RAW12表示每个像素点有8bit，10bit和12bit。
+RAW数据格式一般采用的是Bayer排列方式，鉴于人眼对绿色波段颜色敏感，所有绿色分量比重最大，按照1:2:1。以2*2像素矩阵，一般Bayer格式有GBRG、GRBG、BGGR、RGGB四种模式，下图为GRBG格式。
+在实际处理中，每个像素的RGB信号由像素本身输出的某一种颜色信号和其相邻像素输出的其他颜色信号构成，这种采样方式在基本不降低图像质量的同时，可以降低采样率。
+由于Bayer模式看起来像一个个马赛克，所以通过ISP-Demosaic（插值运算）为每个pixel恢复完整的RGB数据，成为去马赛克。
+ISP常用算法：
+亮度调节 对比度调节 饱和度调节 gamma校正 去噪 锐化 自动白平衡（AWB） RGB RGB使用红、绿、蓝三原色表示颜色。
+RGB格式是RAW数据通过ISP模块插值计算得来，每个像素均包含RGB三种颜色信息。常见的有RGB565、RGB555、RGB888，如RGB888表示一个像素包含R(8bit)、G(8bit)、B(8bit)信息，共3Byte。
+YUV YUV使用亮度Y、色度UV来表示颜色。
+将亮度与色彩信息分离，可以很好的解决彩色电视与黑白电视的兼容问题。 通常视频采集芯片输出的都是YUV格式的数据，在此基础上进行编码。
+Y：亮度分量，黑白图片 U：色度分量（蓝色投影），照片蓝色部分去掉亮度Y V：色度分量（红色投影），照片红色部分去掉亮度Y YUV采样方式 相比RGB24格式，利用人眼对Y分量敏感，UV分量不敏感，视频可降低UV分量的采样数据，达到降低数据量、降低带宽压力的目的。
+YUV444：对每个像素点的的YUV分量都进行采样，这样的三个分量信息量完整。 YUV422：按一行4个像素点，Y全部采样，UV水平间隔采样，所以Y:U:V=4:2:2，相当于每个像素点的采样值由3变为2，可节省1/3存储空间和1/3的数据传输量。 YUV420（最常用）：并不是指只采样U分量而不采样V分量。而是指，在每一行扫描时，只扫描一种色度分量（U或者V），和Y分量按照2 : 1的方式采样。比如，第一行扫描时，YU 按照 2 : 1的方式采样，那么第二行扫描时，YV分量按照 2:1的方式采样，所以单行来看，Y为4，U/V其中一个为2，另一个为0。对于每个色度分量来说，它的水平方向和竖直方向的采样和Y分量相比都是2:1 。可节省1/2存储空间和1/2的数据传输量。 采样及内存占用：
+采样格式 采样方式 单像素内存占用(byte) YUV444 YUV三个分量全采样 3 YUV422 Y全采样，U/V水平间隔采样 2 YUV420 Y全采样，U/V水平/垂直间隔采样 1.5 YUV存储格式 YUV存储信息有两种格式：
+packed（打包格式）：YUV分量被连续交替存储在同一个数组中 planar（平面格式，后缀P）：用三个数据分开存储三个分量 Semi-planar（半平面格式，后缀SP）：介于上面中间的一种格式，Y单独存储，UV交叉存储 常见的YUV422和YUV420采样的格式有：
+/ YUV422 YUV420 packed YUYV、UYUV / P类型 YUV422P YU12(I420)、YV12 SP类型 / NV12、NV21 YUV422：YUYV/UYVY/YUV422P 1 2 3 4 5 6 7 8 9 10 11 12 // YUYV格式：Y0和Y1公用U0 V0分量，Y2和Y3公用U2 V2分量 // (Y0,U0,V0), (Y1,U0,V0), (Y2,U2,V2), (Y3,U2,V2) Y0 UO Y1 V0 Y2 U2 Y3 V2 // UYVY格式：先采用U分量再采样Y分量 U0 Y0 V0 Y1 U2 Y2 V2 Y3 // YUV422P：3个平面 Y0 Y1 Y2 Y3 Y4 Y5 Y6 Y7 --&amp;gt; Y Y8 Y9 Y10 Y11 Y12 Y13 Y14 Y15 U0 U2 U4 U6 U8 U10 U12 U14 --&amp;gt; U V0 V2 V4 V6 V8 V10 V12 V14 --&amp;gt; V YUV420：YUV420P/YUV420SP 以8*2像素图像为例： YU12：先U后V YV12：先V后U NV12：UV交错 NV21：VU交错 RGB与YUV转换 这个公式里面所使用的转换矩阵，不同的ColorSpace是不相同的，目前比较常见的colorSpace有BT601、BT709和BT2020。'>
+<meta property='og:url' content='https://frozen531.github.io/post/%E9%9F%B3%E8%A7%86%E9%A2%91/yuv%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='流媒体' /><meta property='article:published_time' content='2023-03-31T20:58:56&#43;08:00'/><meta property='article:modified_time' content='2023-03-31T20:58:56&#43;08:00'/>
+<meta name="twitter:title" content="YUV基础知识">
+<meta name="twitter:description" content="RAW数据 RAW数据是指sensor采集到的原始数据。
+每个感光点只能对一种颜色的光进行采样和量化（每个pixel上加一个香像素级的滤光片），RAW8、RAW10、RAW12表示每个像素点有8bit，10bit和12bit。
+RAW数据格式一般采用的是Bayer排列方式，鉴于人眼对绿色波段颜色敏感，所有绿色分量比重最大，按照1:2:1。以2*2像素矩阵，一般Bayer格式有GBRG、GRBG、BGGR、RGGB四种模式，下图为GRBG格式。
+在实际处理中，每个像素的RGB信号由像素本身输出的某一种颜色信号和其相邻像素输出的其他颜色信号构成，这种采样方式在基本不降低图像质量的同时，可以降低采样率。
+由于Bayer模式看起来像一个个马赛克，所以通过ISP-Demosaic（插值运算）为每个pixel恢复完整的RGB数据，成为去马赛克。
+ISP常用算法：
+亮度调节 对比度调节 饱和度调节 gamma校正 去噪 锐化 自动白平衡（AWB） RGB RGB使用红、绿、蓝三原色表示颜色。
+RGB格式是RAW数据通过ISP模块插值计算得来，每个像素均包含RGB三种颜色信息。常见的有RGB565、RGB555、RGB888，如RGB888表示一个像素包含R(8bit)、G(8bit)、B(8bit)信息，共3Byte。
+YUV YUV使用亮度Y、色度UV来表示颜色。
+将亮度与色彩信息分离，可以很好的解决彩色电视与黑白电视的兼容问题。 通常视频采集芯片输出的都是YUV格式的数据，在此基础上进行编码。
+Y：亮度分量，黑白图片 U：色度分量（蓝色投影），照片蓝色部分去掉亮度Y V：色度分量（红色投影），照片红色部分去掉亮度Y YUV采样方式 相比RGB24格式，利用人眼对Y分量敏感，UV分量不敏感，视频可降低UV分量的采样数据，达到降低数据量、降低带宽压力的目的。
+YUV444：对每个像素点的的YUV分量都进行采样，这样的三个分量信息量完整。 YUV422：按一行4个像素点，Y全部采样，UV水平间隔采样，所以Y:U:V=4:2:2，相当于每个像素点的采样值由3变为2，可节省1/3存储空间和1/3的数据传输量。 YUV420（最常用）：并不是指只采样U分量而不采样V分量。而是指，在每一行扫描时，只扫描一种色度分量（U或者V），和Y分量按照2 : 1的方式采样。比如，第一行扫描时，YU 按照 2 : 1的方式采样，那么第二行扫描时，YV分量按照 2:1的方式采样，所以单行来看，Y为4，U/V其中一个为2，另一个为0。对于每个色度分量来说，它的水平方向和竖直方向的采样和Y分量相比都是2:1 。可节省1/2存储空间和1/2的数据传输量。 采样及内存占用：
+采样格式 采样方式 单像素内存占用(byte) YUV444 YUV三个分量全采样 3 YUV422 Y全采样，U/V水平间隔采样 2 YUV420 Y全采样，U/V水平/垂直间隔采样 1.5 YUV存储格式 YUV存储信息有两种格式：
+packed（打包格式）：YUV分量被连续交替存储在同一个数组中 planar（平面格式，后缀P）：用三个数据分开存储三个分量 Semi-planar（半平面格式，后缀SP）：介于上面中间的一种格式，Y单独存储，UV交叉存储 常见的YUV422和YUV420采样的格式有：
+/ YUV422 YUV420 packed YUYV、UYUV / P类型 YUV422P YU12(I420)、YV12 SP类型 / NV12、NV21 YUV422：YUYV/UYVY/YUV422P 1 2 3 4 5 6 7 8 9 10 11 12 // YUYV格式：Y0和Y1公用U0 V0分量，Y2和Y3公用U2 V2分量 // (Y0,U0,V0), (Y1,U0,V0), (Y2,U2,V2), (Y3,U2,V2) Y0 UO Y1 V0 Y2 U2 Y3 V2 // UYVY格式：先采用U分量再采样Y分量 U0 Y0 V0 Y1 U2 Y2 V2 Y3 // YUV422P：3个平面 Y0 Y1 Y2 Y3 Y4 Y5 Y6 Y7 --&amp;gt; Y Y8 Y9 Y10 Y11 Y12 Y13 Y14 Y15 U0 U2 U4 U6 U8 U10 U12 U14 --&amp;gt; U V0 V2 V4 V6 V8 V10 V12 V14 --&amp;gt; V YUV420：YUV420P/YUV420SP 以8*2像素图像为例： YU12：先U后V YV12：先V后U NV12：UV交错 NV21：VU交错 RGB与YUV转换 这个公式里面所使用的转换矩阵，不同的ColorSpace是不相同的，目前比较常见的colorSpace有BT601、BT709和BT2020。">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#raw数据">RAW数据</a></li>
+    <li><a href="#rgb">RGB</a></li>
+    <li><a href="#yuv">YUV</a>
+      <ul>
+        <li><a href="#yuv采样方式">YUV采样方式</a></li>
+        <li><a href="#yuv存储格式">YUV存储格式</a></li>
+        <li><a href="#yuv422yuyvuyvyyuv422p">YUV422：YUYV/UYVY/YUV422P</a></li>
+        <li><a href="#yuv420yuv420pyuv420sp">YUV420：YUV420P/YUV420SP</a></li>
+      </ul>
+    </li>
+    <li><a href="#rgb与yuv转换">RGB与YUV转换</a></li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E9%9F%B3%E8%A7%86%E9%A2%91/" style="background-color: #8B658B; color: #fff;">
+                音视频
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E9%9F%B3%E8%A7%86%E9%A2%91/yuv%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">YUV基础知识</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 31, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    2 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="raw数据">RAW数据</h2>
+<p>RAW数据是指sensor采集到的原始数据。<br>
+每个感光点只能对一种颜色的光进行采样和量化（每个pixel上加一个香像素级的滤光片），RAW8、RAW10、RAW12表示每个像素点有8bit，10bit和12bit。<br>
+RAW数据格式一般采用的是Bayer排列方式，鉴于人眼对绿色波段颜色敏感，所有绿色分量比重最大，按照1:2:1。以2*2像素矩阵，一般Bayer格式有GBRG、GRBG、BGGR、RGGB四种模式，下图为GRBG格式。</p>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_RAW%e6%95%b0%e6%8d%ae.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_RAW数据"
+	
+	
+></p>
+<p>在实际处理中，每个像素的RGB信号由像素本身输出的某一种颜色信号和其相邻像素输出的其他颜色信号构成，这种采样方式在基本不降低图像质量的同时，可以降低采样率。</p>
+<p>由于Bayer模式看起来像一个个马赛克，所以通过ISP-Demosaic（插值运算）为每个pixel恢复完整的RGB数据，成为去马赛克。</p>
+<p>ISP常用算法：</p>
+<ol>
+<li>亮度调节</li>
+<li>对比度调节</li>
+<li>饱和度调节</li>
+<li>gamma校正</li>
+<li>去噪</li>
+<li>锐化</li>
+<li>自动白平衡（AWB）</li>
+</ol>
+<h2 id="rgb">RGB</h2>
+<p>RGB使用红、绿、蓝三原色表示颜色。<br>
+RGB格式是RAW数据通过ISP模块插值计算得来，每个像素均包含RGB三种颜色信息。常见的有RGB565、RGB555、RGB888，如RGB888表示一个像素包含R(8bit)、G(8bit)、B(8bit)信息，共3Byte。</p>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_RGB%e6%a0%bc%e5%bc%8f.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_RGB格式"
+	
+	
+></p>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_RGB%e5%bd%a2%e6%88%90%e5%9b%be%e5%83%8f.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_RGB形成图像"
+	
+	
+></p>
+<h2 id="yuv">YUV</h2>
+<p>YUV使用亮度Y、色度UV来表示颜色。<br>
+将亮度与色彩信息分离，可以很好的解决彩色电视与黑白电视的兼容问题。 <br>
+通常视频采集芯片输出的都是YUV格式的数据，在此基础上进行编码。</p>
+<ul>
+<li>Y：亮度分量，黑白图片</li>
+<li>U：色度分量（蓝色投影），照片蓝色部分去掉亮度Y</li>
+<li>V：色度分量（红色投影），照片红色部分去掉亮度Y</li>
+</ul>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_YUV%e5%bd%a2%e6%88%90%e5%9b%be%e5%83%8f.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_YUV形成图像"
+	
+	
+></p>
+<h3 id="yuv采样方式">YUV采样方式</h3>
+<p>相比RGB24格式，利用人眼对Y分量敏感，UV分量不敏感，视频可降低UV分量的采样数据，达到降低数据量、降低带宽压力的目的。</p>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_YUV%e9%87%87%e6%a0%b7.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_YUV采样"
+	
+	
+></p>
+<ul>
+<li>YUV444：对每个像素点的的YUV分量都进行采样，这样的三个分量信息量完整。</li>
+<li>YUV422：按一行4个像素点，Y全部采样，UV水平间隔采样，所以Y:U:V=4:2:2，相当于每个像素点的采样值由3变为2，可节省1/3存储空间和1/3的数据传输量。</li>
+<li>YUV420（最常用）：并不是指只采样U分量而不采样V分量。而是指，在每一行扫描时，只扫描一种色度分量（U或者V），和Y分量按照2 : 1的方式采样。比如，第一行扫描时，YU 按照 2 : 1的方式采样，那么第二行扫描时，YV分量按照 2:1的方式采样，所以单行来看，Y为4，U/V其中一个为2，另一个为0。对于每个色度分量来说，它的水平方向和竖直方向的采样和Y分量相比都是2:1 。可节省1/2存储空间和1/2的数据传输量。</li>
+</ul>
+<p>采样及内存占用：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>采样格式</th>
+<th>采样方式</th>
+<th>单像素内存占用(byte)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>YUV444</td>
+<td>YUV三个分量全采样</td>
+<td>3</td>
+</tr>
+<tr>
+<td>YUV422</td>
+<td>Y全采样，U/V水平间隔采样</td>
+<td>2</td>
+</tr>
+<tr>
+<td>YUV420</td>
+<td>Y全采样，U/V水平/垂直间隔采样</td>
+<td>1.5</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="yuv存储格式">YUV存储格式</h3>
+<p>YUV存储信息有两种格式：</p>
+<ul>
+<li>packed（打包格式）：YUV分量被连续交替存储在同一个数组中</li>
+<li>planar（平面格式，后缀P）：用三个数据分开存储三个分量</li>
+<li>Semi-planar（半平面格式，后缀SP）：介于上面中间的一种格式，Y单独存储，UV交叉存储</li>
+</ul>
+<p>常见的YUV422和YUV420采样的格式有：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>/</th>
+<th>YUV422</th>
+<th>YUV420</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>packed</td>
+<td>YUYV、UYUV</td>
+<td>/</td>
+</tr>
+<tr>
+<td>P类型</td>
+<td>YUV422P</td>
+<td>YU12(I420)、YV12</td>
+</tr>
+<tr>
+<td>SP类型</td>
+<td>/</td>
+<td>NV12、NV21</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="yuv422yuyvuyvyyuv422p">YUV422：YUYV/UYVY/YUV422P</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>// YUYV格式：Y0和Y1公用U0 V0分量，Y2和Y3公用U2 V2分量
+</span></span><span style="display:flex;"><span>// (Y0,U0,V0), (Y1,U0,V0), (Y2,U2,V2), (Y3,U2,V2)
+</span></span><span style="display:flex;"><span>Y0 UO Y1 V0  Y2 U2 Y3 V2
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>// UYVY格式：先采用U分量再采样Y分量
+</span></span><span style="display:flex;"><span>U0 Y0 V0 Y1  U2 Y2 V2 Y3
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span>// YUV422P：3个平面
+</span></span><span style="display:flex;"><span>Y0  Y1  Y2  Y3  Y4  Y5  Y6  Y7 --&gt; Y
+</span></span><span style="display:flex;"><span>Y8  Y9 Y10 Y11 Y12 Y13 Y14 Y15
+</span></span><span style="display:flex;"><span>U0  U2  U4  U6  U8 U10 U12 U14 --&gt; U
+</span></span><span style="display:flex;"><span>V0  V2  V4  V6  V8 V10 V12 V14 --&gt; V
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="yuv420yuv420pyuv420sp">YUV420：YUV420P/YUV420SP</h3>
+<p>以8*2像素图像为例：
+<img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_YUV420P.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_YUV420P"
+	
+	
+></p>
+<ul>
+<li>YU12：先U后V</li>
+<li>YV12：先V后U</li>
+</ul>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_YUV420SP.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_YUV420SP"
+	
+	
+></p>
+<ul>
+<li>NV12：UV交错</li>
+<li>NV21：VU交错</li>
+</ul>
+<h2 id="rgb与yuv转换">RGB与YUV转换</h2>
+<p>这个公式里面所使用的转换矩阵，不同的ColorSpace是不相同的，目前比较常见的colorSpace有BT601、BT709和BT2020。</p>
+<ul>
+<li>RGB转YUV</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>Y = 0.299R + 0.587G + 0.114B
+</span></span><span style="display:flex;"><span>U= -0.147R - 0.289G + 0.436B
+</span></span><span style="display:flex;"><span>V = 0.615R - 0.515G - 0.100B
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>YUV转RGB</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>R = Y + 1.14V
+</span></span><span style="display:flex;"><span>G = Y - 0.39U - 0.58V
+</span></span><span style="display:flex;"><span>B = Y + 2.03U
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="参考">参考</h2>
+<ol>
+<li><a class="link" href="https://blog.csdn.net/u010783226/article/details/120516602"  target="_blank" rel="noopener"
+    >拜尔模板 bayer pattern</a></li>
+<li><a class="link" href="https://blog.csdn.net/qq_39791130/article/details/109093393"  target="_blank" rel="noopener"
+    >RAW, YUV, RGB, JPEG之间关系</a></li>
+<li><a class="link" href="https://www.pianshen.com/article/42761065662/"  target="_blank" rel="noopener"
+    >传感器原始图像格式:Bayer RGB 和RGB RAW</a></li>
+<li><a class="link" href="%e4%b8%80%e6%96%87%e8%af%bb%e6%87%82rawRGB%e3%80%81RGB%e5%92%8cYUV%e6%95%b0%e6%8d%ae%e6%a0%bc%e5%bc%8f%e4%b8%8e%e8%bd%ac%e6%8d%a2" >一文读懂rawRGB、RGB和YUV数据格式与转换</a></li>
+<li><a class="link" href="https://blog.csdn.net/weixin_42463482/article/details/127702176"  target="_blank" rel="noopener"
+    >RAW、RGB和YUV格式</a></li>
+<li><a class="link" href="https://blog.csdn.net/skynullcode/article/details/122190729"  target="_blank" rel="noopener"
+    >YUV 420、YCbCr 422、RGB 444以及色度二次采样</a></li>
+<li><a class="link" href="https://blog.csdn.net/m0_60259116/article/details/124458889?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522168026760216800182189601%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fblog.%2522%257D&amp;request_id=168026760216800182189601&amp;biz_id=0&amp;utm_medium=distribute.pc_search_result.none-task-blog-2~blog~first_rank_ecpm_v1~rank_v31_ecpm-1-124458889-null-null.blog_rank_default&amp;utm_term=YUV&amp;spm=1018.2226.3001.4450"  target="_blank" rel="noopener"
+    >图文理解YUV</a></li>
+<li><a class="link" href="https://blog.csdn.net/m0_60259116/article/details/125434762?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522168026760216800182189601%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fblog.%2522%257D&amp;request_id=168026760216800182189601&amp;biz_id=0&amp;utm_medium=distribute.pc_search_result.none-task-blog-2~blog~first_rank_ecpm_v1~rank_v31_ecpm-4-125434762-null-null.blog_rank_default&amp;utm_term=YUV&amp;spm=1018.2226.3001.4450"  target="_blank" rel="noopener"
+    >YUV内存里的存放顺序</a></li>
+<li><a class="link" href="https://blog.csdn.net/m0_60259116/article/details/126728385?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522168026760216800182189601%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fblog.%2522%257D&amp;request_id=168026760216800182189601&amp;biz_id=0&amp;utm_medium=distribute.pc_search_result.none-task-blog-2~blog~first_rank_ecpm_v1~rank_v31_ecpm-3-126728385-null-null.blog_rank_default&amp;utm_term=YUV&amp;spm=1018.2226.3001.4450"  target="_blank" rel="noopener"
+    >YUV采样方式与存储格式</a></li>
+<li><a class="link" href="https://blog.csdn.net/llljjlj/article/details/115052159?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522167619676016782427473261%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&amp;request_id=167619676016782427473261&amp;biz_id=0&amp;utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~rank_v31_ecpm-7-115052159-null-null.142%5Ev73%5Einsert_down3,201%5Ev4%5Eadd_ask,239%5Ev1%5Econtrol&amp;utm_term=colorspaceconversion&amp;spm=1018.2226.3001.4187"  target="_blank" rel="noopener"
+    >MATLAB：RGB转BT601、BT709协议中各种YUV格式的转换函数</a></li>
+<li><a class="link" href="https://mp.weixin.qq.com/s?__biz=MjM5MTkxOTQyMQ==&amp;mid=2257484448&amp;idx=1&amp;sn=a245b5a178f173489e730a0bac4c7b9c&amp;chksm=a5d4e6f292a36fe4b79063ad93b4df175e2f0f460e03162370934683bc69519fed5cf998f864&amp;scene=178&amp;cur_album_id=2140155659944787969#rd"  target="_blank" rel="noopener"
+    >图像的表示（2）：YCbCr 怎么来的？必看这篇颜色空间发展简史丨音视频基础</a></li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E6%B5%81%E5%AA%92%E4%BD%93/">流媒体</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/%E9%9F%B3%E8%A7%86%E9%A2%91/%E9%9F%B3%E9%A2%91%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">音频基础知识</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E9%9F%B3%E8%A7%86%E9%A2%91/h264%E5%B8%A7%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">H264帧基础知识</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E9%9F%B3%E8%A7%86%E9%A2%91/ps/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">数据流:PS和TS</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E9%9F%B3%E8%A7%86%E9%A2%91/rtp/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">流媒体传输协议:RTP</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

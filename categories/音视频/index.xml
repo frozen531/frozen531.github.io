@@ -1,0 +1,1188 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>音视频 on 浅浅的行迹</title>
+        <link>https://frozen531.github.io/categories/%E9%9F%B3%E8%A7%86%E9%A2%91/</link>
+        <description>Recent content in 音视频 on 浅浅的行迹</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Fri, 31 Mar 2023 20:58:56 +0800</lastBuildDate><atom:link href="https://frozen531.github.io/categories/%E9%9F%B3%E8%A7%86%E9%A2%91/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>YUV基础知识</title>
+        <link>https://frozen531.github.io/post/%E9%9F%B3%E8%A7%86%E9%A2%91/yuv%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/</link>
+        <pubDate>Fri, 31 Mar 2023 20:58:56 +0800</pubDate>
+        
+        <guid>https://frozen531.github.io/post/%E9%9F%B3%E8%A7%86%E9%A2%91/yuv%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/</guid>
+        <description>&lt;h2 id=&#34;raw数据&#34;&gt;RAW数据&lt;/h2&gt;
+&lt;p&gt;RAW数据是指sensor采集到的原始数据。&lt;br&gt;
+每个感光点只能对一种颜色的光进行采样和量化（每个pixel上加一个香像素级的滤光片），RAW8、RAW10、RAW12表示每个像素点有8bit，10bit和12bit。&lt;br&gt;
+RAW数据格式一般采用的是Bayer排列方式，鉴于人眼对绿色波段颜色敏感，所有绿色分量比重最大，按照1:2:1。以2*2像素矩阵，一般Bayer格式有GBRG、GRBG、BGGR、RGGB四种模式，下图为GRBG格式。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_RAW%e6%95%b0%e6%8d%ae.bmp&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_RAW数据&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;在实际处理中，每个像素的RGB信号由像素本身输出的某一种颜色信号和其相邻像素输出的其他颜色信号构成，这种采样方式在基本不降低图像质量的同时，可以降低采样率。&lt;/p&gt;
+&lt;p&gt;由于Bayer模式看起来像一个个马赛克，所以通过ISP-Demosaic（插值运算）为每个pixel恢复完整的RGB数据，成为去马赛克。&lt;/p&gt;
+&lt;p&gt;ISP常用算法：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;亮度调节&lt;/li&gt;
+&lt;li&gt;对比度调节&lt;/li&gt;
+&lt;li&gt;饱和度调节&lt;/li&gt;
+&lt;li&gt;gamma校正&lt;/li&gt;
+&lt;li&gt;去噪&lt;/li&gt;
+&lt;li&gt;锐化&lt;/li&gt;
+&lt;li&gt;自动白平衡（AWB）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;rgb&#34;&gt;RGB&lt;/h2&gt;
+&lt;p&gt;RGB使用红、绿、蓝三原色表示颜色。&lt;br&gt;
+RGB格式是RAW数据通过ISP模块插值计算得来，每个像素均包含RGB三种颜色信息。常见的有RGB565、RGB555、RGB888，如RGB888表示一个像素包含R(8bit)、G(8bit)、B(8bit)信息，共3Byte。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_RGB%e6%a0%bc%e5%bc%8f.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_RGB格式&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_RGB%e5%bd%a2%e6%88%90%e5%9b%be%e5%83%8f.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_RGB形成图像&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;yuv&#34;&gt;YUV&lt;/h2&gt;
+&lt;p&gt;YUV使用亮度Y、色度UV来表示颜色。&lt;br&gt;
+将亮度与色彩信息分离，可以很好的解决彩色电视与黑白电视的兼容问题。 &lt;br&gt;
+通常视频采集芯片输出的都是YUV格式的数据，在此基础上进行编码。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Y：亮度分量，黑白图片&lt;/li&gt;
+&lt;li&gt;U：色度分量（蓝色投影），照片蓝色部分去掉亮度Y&lt;/li&gt;
+&lt;li&gt;V：色度分量（红色投影），照片红色部分去掉亮度Y&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_YUV%e5%bd%a2%e6%88%90%e5%9b%be%e5%83%8f.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_YUV形成图像&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;yuv采样方式&#34;&gt;YUV采样方式&lt;/h3&gt;
+&lt;p&gt;相比RGB24格式，利用人眼对Y分量敏感，UV分量不敏感，视频可降低UV分量的采样数据，达到降低数据量、降低带宽压力的目的。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_YUV%e9%87%87%e6%a0%b7.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_YUV采样&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;YUV444：对每个像素点的的YUV分量都进行采样，这样的三个分量信息量完整。&lt;/li&gt;
+&lt;li&gt;YUV422：按一行4个像素点，Y全部采样，UV水平间隔采样，所以Y:U:V=4:2:2，相当于每个像素点的采样值由3变为2，可节省1/3存储空间和1/3的数据传输量。&lt;/li&gt;
+&lt;li&gt;YUV420（最常用）：并不是指只采样U分量而不采样V分量。而是指，在每一行扫描时，只扫描一种色度分量（U或者V），和Y分量按照2 : 1的方式采样。比如，第一行扫描时，YU 按照 2 : 1的方式采样，那么第二行扫描时，YV分量按照 2:1的方式采样，所以单行来看，Y为4，U/V其中一个为2，另一个为0。对于每个色度分量来说，它的水平方向和竖直方向的采样和Y分量相比都是2:1 。可节省1/2存储空间和1/2的数据传输量。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;采样及内存占用：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;采样格式&lt;/th&gt;
+&lt;th&gt;采样方式&lt;/th&gt;
+&lt;th&gt;单像素内存占用(byte)&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;YUV444&lt;/td&gt;
+&lt;td&gt;YUV三个分量全采样&lt;/td&gt;
+&lt;td&gt;3&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;YUV422&lt;/td&gt;
+&lt;td&gt;Y全采样，U/V水平间隔采样&lt;/td&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;YUV420&lt;/td&gt;
+&lt;td&gt;Y全采样，U/V水平/垂直间隔采样&lt;/td&gt;
+&lt;td&gt;1.5&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;yuv存储格式&#34;&gt;YUV存储格式&lt;/h3&gt;
+&lt;p&gt;YUV存储信息有两种格式：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;packed（打包格式）：YUV分量被连续交替存储在同一个数组中&lt;/li&gt;
+&lt;li&gt;planar（平面格式，后缀P）：用三个数据分开存储三个分量&lt;/li&gt;
+&lt;li&gt;Semi-planar（半平面格式，后缀SP）：介于上面中间的一种格式，Y单独存储，UV交叉存储&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;常见的YUV422和YUV420采样的格式有：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;/&lt;/th&gt;
+&lt;th&gt;YUV422&lt;/th&gt;
+&lt;th&gt;YUV420&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;packed&lt;/td&gt;
+&lt;td&gt;YUYV、UYUV&lt;/td&gt;
+&lt;td&gt;/&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;P类型&lt;/td&gt;
+&lt;td&gt;YUV422P&lt;/td&gt;
+&lt;td&gt;YU12(I420)、YV12&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;SP类型&lt;/td&gt;
+&lt;td&gt;/&lt;/td&gt;
+&lt;td&gt;NV12、NV21&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;yuv422yuyvuyvyyuv422p&#34;&gt;YUV422：YUYV/UYVY/YUV422P&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;11
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;12
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;// YUYV格式：Y0和Y1公用U0 V0分量，Y2和Y3公用U2 V2分量
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;// (Y0,U0,V0), (Y1,U0,V0), (Y2,U2,V2), (Y3,U2,V2)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Y0 UO Y1 V0  Y2 U2 Y3 V2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;// UYVY格式：先采用U分量再采样Y分量
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;U0 Y0 V0 Y1  U2 Y2 V2 Y3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;// YUV422P：3个平面
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Y0  Y1  Y2  Y3  Y4  Y5  Y6  Y7 --&amp;gt; Y
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Y8  Y9 Y10 Y11 Y12 Y13 Y14 Y15
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;U0  U2  U4  U6  U8 U10 U12 U14 --&amp;gt; U
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;V0  V2  V4  V6  V8 V10 V12 V14 --&amp;gt; V
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;yuv420yuv420pyuv420sp&#34;&gt;YUV420：YUV420P/YUV420SP&lt;/h3&gt;
+&lt;p&gt;以8*2像素图像为例：
+&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_YUV420P.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_YUV420P&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;YU12：先U后V&lt;/li&gt;
+&lt;li&gt;YV12：先V后U&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_YUV420SP.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_YUV420SP&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;NV12：UV交错&lt;/li&gt;
+&lt;li&gt;NV21：VU交错&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;rgb与yuv转换&#34;&gt;RGB与YUV转换&lt;/h2&gt;
+&lt;p&gt;这个公式里面所使用的转换矩阵，不同的ColorSpace是不相同的，目前比较常见的colorSpace有BT601、BT709和BT2020。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;RGB转YUV&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Y = 0.299R + 0.587G + 0.114B
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;U= -0.147R - 0.289G + 0.436B
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;V = 0.615R - 0.515G - 0.100B
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;YUV转RGB&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;R = Y + 1.14V
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;G = Y - 0.39U - 0.58V
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;B = Y + 2.03U
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/u010783226/article/details/120516602&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;拜尔模板 bayer pattern&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/qq_39791130/article/details/109093393&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;RAW, YUV, RGB, JPEG之间关系&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://www.pianshen.com/article/42761065662/&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;传感器原始图像格式:Bayer RGB 和RGB RAW&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;%e4%b8%80%e6%96%87%e8%af%bb%e6%87%82rawRGB%e3%80%81RGB%e5%92%8cYUV%e6%95%b0%e6%8d%ae%e6%a0%bc%e5%bc%8f%e4%b8%8e%e8%bd%ac%e6%8d%a2&#34; &gt;一文读懂rawRGB、RGB和YUV数据格式与转换&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/weixin_42463482/article/details/127702176&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;RAW、RGB和YUV格式&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/skynullcode/article/details/122190729&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;YUV 420、YCbCr 422、RGB 444以及色度二次采样&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/m0_60259116/article/details/124458889?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522168026760216800182189601%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fblog.%2522%257D&amp;amp;request_id=168026760216800182189601&amp;amp;biz_id=0&amp;amp;utm_medium=distribute.pc_search_result.none-task-blog-2~blog~first_rank_ecpm_v1~rank_v31_ecpm-1-124458889-null-null.blog_rank_default&amp;amp;utm_term=YUV&amp;amp;spm=1018.2226.3001.4450&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;图文理解YUV&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/m0_60259116/article/details/125434762?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522168026760216800182189601%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fblog.%2522%257D&amp;amp;request_id=168026760216800182189601&amp;amp;biz_id=0&amp;amp;utm_medium=distribute.pc_search_result.none-task-blog-2~blog~first_rank_ecpm_v1~rank_v31_ecpm-4-125434762-null-null.blog_rank_default&amp;amp;utm_term=YUV&amp;amp;spm=1018.2226.3001.4450&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;YUV内存里的存放顺序&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/m0_60259116/article/details/126728385?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522168026760216800182189601%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fblog.%2522%257D&amp;amp;request_id=168026760216800182189601&amp;amp;biz_id=0&amp;amp;utm_medium=distribute.pc_search_result.none-task-blog-2~blog~first_rank_ecpm_v1~rank_v31_ecpm-3-126728385-null-null.blog_rank_default&amp;amp;utm_term=YUV&amp;amp;spm=1018.2226.3001.4450&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;YUV采样方式与存储格式&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/llljjlj/article/details/115052159?ops_request_misc=%257B%2522request%255Fid%2522%253A%2522167619676016782427473261%2522%252C%2522scm%2522%253A%252220140713.130102334.pc%255Fall.%2522%257D&amp;amp;request_id=167619676016782427473261&amp;amp;biz_id=0&amp;amp;utm_medium=distribute.pc_search_result.none-task-blog-2~all~first_rank_ecpm_v1~rank_v31_ecpm-7-115052159-null-null.142%5Ev73%5Einsert_down3,201%5Ev4%5Eadd_ask,239%5Ev1%5Econtrol&amp;amp;utm_term=colorspaceconversion&amp;amp;spm=1018.2226.3001.4187&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;MATLAB：RGB转BT601、BT709协议中各种YUV格式的转换函数&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://mp.weixin.qq.com/s?__biz=MjM5MTkxOTQyMQ==&amp;amp;mid=2257484448&amp;amp;idx=1&amp;amp;sn=a245b5a178f173489e730a0bac4c7b9c&amp;amp;chksm=a5d4e6f292a36fe4b79063ad93b4df175e2f0f460e03162370934683bc69519fed5cf998f864&amp;amp;scene=178&amp;amp;cur_album_id=2140155659944787969#rd&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;图像的表示（2）：YCbCr 怎么来的？必看这篇颜色空间发展简史丨音视频基础&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>音频基础知识</title>
+        <link>https://frozen531.github.io/post/%E9%9F%B3%E8%A7%86%E9%A2%91/%E9%9F%B3%E9%A2%91%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/</link>
+        <pubDate>Wed, 29 Mar 2023 08:18:39 +0800</pubDate>
+        
+        <guid>https://frozen531.github.io/post/%E9%9F%B3%E8%A7%86%E9%A2%91/%E9%9F%B3%E9%A2%91%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/</guid>
+        <description>&lt;p&gt;AAC一帧1024个点
+MP3一帧1152个点&lt;/p&gt;
+</description>
+        </item>
+        <item>
+        <title>H264帧基础知识</title>
+        <link>https://frozen531.github.io/post/%E9%9F%B3%E8%A7%86%E9%A2%91/h264%E5%B8%A7%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/</link>
+        <pubDate>Tue, 28 Mar 2023 21:52:39 +0800</pubDate>
+        
+        <guid>https://frozen531.github.io/post/%E9%9F%B3%E8%A7%86%E9%A2%91/h264%E5%B8%A7%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/</guid>
+        <description>&lt;h2 id=&#34;1-基础概念&#34;&gt;1. 基础概念&lt;/h2&gt;
+&lt;h3 id=&#34;11-帧类型&#34;&gt;1.1 帧类型&lt;/h3&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;类型&lt;/th&gt;
+&lt;th&gt;说明&lt;/th&gt;
+&lt;th&gt;预测方式&lt;/th&gt;
+&lt;th&gt;信息&lt;/th&gt;
+&lt;th&gt;参考&lt;/th&gt;
+&lt;th&gt;被参考&lt;/th&gt;
+&lt;th&gt;大概压缩比&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;I帧&lt;/td&gt;
+&lt;td&gt;关键帧&lt;/td&gt;
+&lt;td&gt;帧内&lt;/td&gt;
+&lt;td&gt;包含完整的图像内容&lt;/td&gt;
+&lt;td&gt;无&lt;/td&gt;
+&lt;td&gt;用于为其他帧图像编码、解码做参考，其质量直接影响参考它的P帧、B帧&lt;/td&gt;
+&lt;td&gt;7&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;P帧&lt;/td&gt;
+&lt;td&gt;前向预测编码帧&lt;/td&gt;
+&lt;td&gt;帧间&lt;/td&gt;
+&lt;td&gt;与前面I或P帧的差别&lt;/td&gt;
+&lt;td&gt;参考前面的I帧或P帧，解码时需要用之前缓存的画面叠加上本帧的差别生成最终画面&lt;/td&gt;
+&lt;td&gt;可被前后的B帧参考，可能造成解码错误的扩散&lt;/td&gt;
+&lt;td&gt;20&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;B帧&lt;/td&gt;
+&lt;td&gt;双向预测编码帧&lt;/td&gt;
+&lt;td&gt;帧间&lt;/td&gt;
+&lt;td&gt;本帧与前后帧的差别&lt;/td&gt;
+&lt;td&gt;参考前面的I或P帧，和后面的P帧&lt;/td&gt;
+&lt;td&gt;不是参考帧，不会造成解码错误的扩散&lt;/td&gt;
+&lt;td&gt;50&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_%e7%bc%96%e7%a0%81%e5%8f%82%e8%80%83.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_编码参考&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;12-gop&#34;&gt;1.2 GOP&lt;/h3&gt;
+&lt;p&gt;视频序列被分为若干GOP(group of picture)，两个IDR帧间是一个GOP。&lt;/p&gt;
+&lt;p&gt;GOP的长度过大：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;图像质量问题：一个GOP中的P、B帧都是由I帧预测得到，当I帧的质量较差时，会影响整个GOP的图像质量，直到下一个GOP才能恢复；&lt;/li&gt;
+&lt;li&gt;丢帧解码失败问题：当传输中丢失了GOP中的I帧，该GOP解码失败，视频会丢失整个GOP的内容；&lt;/li&gt;
+&lt;li&gt;降低编码效率：P/B帧编码复杂度高于I帧，过多的P/B帧会降低编码效率；&lt;/li&gt;
+&lt;li&gt;影响seek响应速度；当seek操作定位一个P/B帧时，GOP越长，需要解码的帧就越多，seek响应时间就越长。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;13-idr和i帧的区别&#34;&gt;1.3 IDR和I帧的区别&lt;/h3&gt;
+&lt;p&gt;GOP的首帧为IDR帧（立即刷新帧），IDR帧是I帧，但I帧不一定是IDR帧。IDR帧承担随机访问功能，视频可以从任意一个IDR帧开始播放；&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;内容&lt;/th&gt;
+&lt;th&gt;IDR&lt;/th&gt;
+&lt;th&gt;I&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;区别&lt;/td&gt;
+&lt;td&gt;当出现IDR帧时，会清空DPB(decoded picture buffer：解码参考帧列表)，其后的帧不能再参考之前帧的信息，阻断误差的累积&lt;/td&gt;
+&lt;td&gt;普通I帧之后的的P/B帧仍可以参考I帧之前的其他帧&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;产生&lt;/td&gt;
+&lt;td&gt;每个GOP的首帧是IDR帧&lt;/td&gt;
+&lt;td&gt;在VBR码率控制下，当图像内容变化很大时，会动态调整I帧数量，即为普通I帧&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;14-pts和dts的区别&#34;&gt;1.4 PTS和DTS的区别&lt;/h3&gt;
+&lt;p&gt;PTS和DTS用于指导播放器的行为。对于如下一个的视频序列&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;IBBPBBP
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;1234567
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;内容&lt;/th&gt;
+&lt;th&gt;PTS&lt;/th&gt;
+&lt;th&gt;DTS&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;名称&lt;/td&gt;
+&lt;td&gt;presentation time stamp:显示时间戳&lt;/td&gt;
+&lt;td&gt;decoding time stamp:解码时间戳&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;说明&lt;/td&gt;
+&lt;td&gt;告知播放器什么时候显示该帧数据&lt;/td&gt;
+&lt;td&gt;告知播放器什么时候解码该帧数据&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;视频顺序&lt;/td&gt;
+&lt;td&gt;显示：1234567&lt;/td&gt;
+&lt;td&gt;编解码/传输：1423756&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;音频顺序&lt;/td&gt;
+&lt;td&gt;一致&lt;/td&gt;
+&lt;td&gt;一致&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;音视频同步&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;编码音视频流时，会依靠参考时钟给每帧数据打上时间戳(PTS)；&lt;br&gt;
+在播放时，读取数据帧上时间戳，同时参考当前参考时钟上时间进行播放，可以选择：同步视频到音频、同步音频到视频、同步音频和视频到外部时钟。&lt;/p&gt;
+&lt;h2 id=&#34;2-h264-profile和level&#34;&gt;2. H264 profile和level&lt;/h2&gt;
+&lt;h3 id=&#34;21-profile&#34;&gt;2.1 profile&lt;/h3&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;profile&lt;/th&gt;
+&lt;th&gt;名称&lt;/th&gt;
+&lt;th&gt;说明&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;BP(baseline profile)&lt;/td&gt;
+&lt;td&gt;基本画质&lt;/td&gt;
+&lt;td&gt;支持I/P帧，只支持无交错和CAVLC&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;MP(main profile)&lt;/td&gt;
+&lt;td&gt;主流画质&lt;/td&gt;
+&lt;td&gt;支持I/P/B帧，支持无交错和交错，也支持CAVLC和CABAC&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;HP(high profile)&lt;/td&gt;
+&lt;td&gt;高级画质&lt;/td&gt;
+&lt;td&gt;在main profile的基础上增加了8X8内部预测、自定义量化、无损视频编码和更多的YUV格式&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;ul&gt;
+&lt;li&gt;不同的profile，使用的算法不同；profile越高，编码效率和压缩率越高&lt;/li&gt;
+&lt;li&gt;CAVLC是H264中使用的熵编码方式，无损压缩，CABAC的简化版，压缩效率不如CAVLC，实现简单。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;22-level&#34;&gt;2.2 level&lt;/h3&gt;
+&lt;p&gt;level越高，视频的码率、分辨率、fps越高。&lt;/p&gt;
+&lt;h2 id=&#34;3-码率控制&#34;&gt;3. 码率控制&lt;/h2&gt;
+&lt;p&gt;？？？&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;内容&lt;/th&gt;
+&lt;th&gt;CBR&lt;/th&gt;
+&lt;th&gt;VBR&lt;/th&gt;
+&lt;th&gt;AVBR&lt;/th&gt;
+&lt;th&gt;CVBR&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;名称&lt;/td&gt;
+&lt;td&gt;（Constant Bit Rate）固定比特率&lt;/td&gt;
+&lt;td&gt;（Variable Bit Rate）可变比特率&lt;/td&gt;
+&lt;td&gt;（Adaptive Variable Bit Rate）可变比特率&lt;/td&gt;
+&lt;td&gt;(Constrained Variable Bit Rate)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;说明&lt;/td&gt;
+&lt;td&gt;在码率统计时间内维持编码码率的平稳&lt;/td&gt;
+&lt;td&gt;在码率统计时间内编码码率波动，保证图像质量平稳&lt;/td&gt;
+&lt;td&gt;在码率统计时间内编码码率波动，从而保证编码图像质量平稳。码率控制内部会检测当前场景的运动静止状态，在运动时用较高码率编码，在静止时主动降低目标码率&lt;/td&gt;
+&lt;td&gt;在图像内容静止时，节省带宽，有Motion发生时，利用前期节省的带宽来尽可能的提高图像质量，达到同时兼顾带宽和图像质量的目的&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;QP调整&lt;/td&gt;
+&lt;td&gt;当图像中发生运动时，增大QP；反之减小QP&lt;/td&gt;
+&lt;td&gt;根据场景复杂度分配不同的码率，这样既保证了质量，有兼顾带宽限制&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;优点&lt;/td&gt;
+&lt;td&gt;压缩速度快&lt;/td&gt;
+&lt;td&gt;优先考虑图像质量&lt;/td&gt;
+&lt;td&gt;VBR和CBR的一种折衷选择&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;缺点&lt;/td&gt;
+&lt;td&gt;每秒流量都相同容易导致空间浪费&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;td&gt;&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h2 id=&#34;4-h264的格式&#34;&gt;4. H264的格式&lt;/h2&gt;
+&lt;p&gt;由于视频数据在信息上存在空间、时间、结构、视觉等大量冗余信息，所以可以在保证视频质量的前提下，对数据进行压缩，降低存储和传输的数据量。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;空间冗余：单帧图像中，相邻像素的值常有相同或变化不大，有很强的关联性；&lt;/li&gt;
+&lt;li&gt;结构冗余：图像中存在相同或类似的结构，如矩形图案；&lt;/li&gt;
+&lt;li&gt;视觉冗余：对图像中亮度变化敏感而对颜色变化不敏感；对剧烈变化的边缘区域敏感而对缓慢变化的非边缘区域不敏感。&lt;/li&gt;
+&lt;li&gt;时间冗余：在一段时间间隔里出现的场景相同或变化不大，帧与帧间有很强的关联性；&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;根据当前以编码的信息对当前信号做预测，可以是帧间、帧内。&lt;/li&gt;
+&lt;li&gt;预测值与当前值相减得到残差信号&lt;/li&gt;
+&lt;li&gt;残差信号经过变换（通常为离散余弦变换），然后量化，熵编码去除冗余信息&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;41-帧内预测&#34;&gt;4.1 帧内预测&lt;/h3&gt;
+&lt;p&gt;利用空间、结构等做预测&lt;/p&gt;
+&lt;h3 id=&#34;42-帧间预测&#34;&gt;4.2 帧间预测&lt;/h3&gt;
+&lt;p&gt;利用时间冗余性做预测&lt;/p&gt;
+&lt;h3 id=&#34;43-两种格式&#34;&gt;4.3 两种格式&lt;/h3&gt;
+&lt;p&gt;H264的两种打包/封装方法：字节流AnnexB格式 和 AVCC格式。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;AnnexB格式用于网络发送，实时播放，可封装成RTP格式&lt;/li&gt;
+&lt;li&gt;AVCC格式用于存储，如硬盘文件：MP4、MKV通常用该格式&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;两者在NALU上格式一致，防竞争字节仍然存在，所有两个格式转换时不需要考虑NALU内部差异性。&lt;/p&gt;
+&lt;h2 id=&#34;5-annexb格式&#34;&gt;5. AnnexB格式&lt;/h2&gt;
+&lt;h3 id=&#34;51-格式&#34;&gt;5.1 格式&lt;/h3&gt;
+&lt;p&gt;视频编码格式，主要包含NAL和VCL两个主要内容。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;VCL，(video coding layer:视频编码层)，负责高效显示视频内容。VCL层是对块、宏块及片语法级别的定义，最终输出压缩编码后的数据&lt;strong&gt;SODB&lt;/strong&gt;(string of data byte,数据比特流)，数据 bit 流，最原始的编码数据。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_H264_Annexb1.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_H264_Annexb1.png&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;ul&gt;
+&lt;li&gt;RBSP：Raw Byte Sequence Payload，原始字节序列载荷，在SODB的后面填加了结尾比特，RBSP trailing bits　一个bit“1”，若干比特“0”,以便字节对齐；&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;ul&gt;
+&lt;li&gt;EBSP：Encapsulated Byte Sequence Payload，扩展字节序列载荷，在RBSP基础上填加了仿竞争字节（0x03），为防止编码数据中出现后续要添加的起始码，当发现连续2个字节为0，就会添加0x03，解码时再去掉；&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;ul&gt;
+&lt;li&gt;EBSP前添加Nalu头构成NALU；&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;ul&gt;
+&lt;li&gt;NALU前添加起始码，由于nalu以起始码0x00000001寻找开始。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;NAL，(network abstraction layer：网络抽象层)，用于对数据进行打包和发送。在存储和传输前对SODB添加NAL头，组成NALU单元。NALU可以携带编码片，或者是序列参数集，或图像参数集等。&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;52-nalu-header&#34;&gt;5.2 NALU header&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;5
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+---------------+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|0|1|2|3|4|5|6|7|
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+-+-+-+-+-+-+-+-+
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;|F|NRI|   TYPE  |
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;+---------------+
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;bit位&lt;/th&gt;
+&lt;th&gt;描述&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;F&lt;/td&gt;
+&lt;td&gt;禁止位，0表示正常，1表示错误，一般为0&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;NRI&lt;/td&gt;
+&lt;td&gt;重要级别，11：非常重要，一般取值为01、10、11&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;TYPE:nalu_unit_type&lt;/td&gt;
+&lt;td&gt;NALU类型&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;nalu_unit_type&lt;/th&gt;
+&lt;th&gt;NAL类型&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;0&lt;/td&gt;
+&lt;td&gt;未使用&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;td&gt;非IDR的片&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;5&lt;/td&gt;
+&lt;td&gt;一个序列的第一个图像叫IDR帧（立即刷新帧），IDR帧都是I帧&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;6&lt;/td&gt;
+&lt;td&gt;补充增强信息单元SEI&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;7&lt;/td&gt;
+&lt;td&gt;序列参数集SPS&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;8&lt;/td&gt;
+&lt;td&gt;图像参数集PPS&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// 类型
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; type &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; code &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;amp;&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;0x1f&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;nalu header常见取值如下：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;NALU header&lt;/th&gt;
+&lt;th&gt;描述&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;0x67,0x47,0x27&lt;/td&gt;
+&lt;td&gt;SPS，重要级别分别为11,10,01&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;0x68,0x48,0x28&lt;/td&gt;
+&lt;td&gt;PPS，重要级别分别为11,10,01&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;0x65,0x45,0x25&lt;/td&gt;
+&lt;td&gt;IDR帧，重要级别分别为11,10,01&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;0x61,0x41,0x21&lt;/td&gt;
+&lt;td&gt;非IDR帧，重要级别分别为11,10,01&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_H264%e8%a3%b8%e6%95%b0%e6%8d%ae.bmp&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_H264裸数据&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;53-sps-pps-sei作用&#34;&gt;5.3 SPS PPS SEI作用&lt;/h3&gt;
+&lt;p&gt;SPS信息对解码至关重要，如果该数据丢失，解码过程可能失败。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;SPS：保存一组编码后图像序列依赖全局参数&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;包括：图像分辨率、profile、level&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;PPS：保存每一帧编码后的图像所依赖的参数，如slice信息&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;包括：熵编码模式选择标识(0:CAVLC 1:CABAC)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;SEI：向码流中加入额外信息&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;54-nalu-start-code&#34;&gt;5.4 NALU start-code&lt;/h3&gt;
+&lt;p&gt;NALU中数据不包含它的长度信息，所有添加起始码来标识包的起始和结束，所有Annex B格式使用起始码start-code：0x00 00 00 01或0x00 00 01解决这个问题。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;防竞争字节：为防止编码数据中存在start-code，当检测到连续两个或三个00时，插入新字节0x03。解码时逐字节读取NAL数据，统计NAL长度，然后再开始解码。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;6-avcc格式&#34;&gt;6. AVCC格式&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;Annex-B：没有NALU长度字节，使用start code分隔NALU，start code为三字节或四字节，0x000001或0x00000001，一般是四字节；SPS和PPS按流的方式写在一组GOP之前。&lt;/li&gt;
+&lt;li&gt;AVCC：使用NALU长度，固定字节，通常为4字节，分隔NALU；一般在每个NALU头部为4字节大端格式的长度字节，在一组GOP的头部包含extradata结构，用于存储sequence-header、SPS、PPS数据。&lt;/li&gt;
+&lt;li&gt;虽然AVCC格式不使用起始码，防竞争字节仍然存在&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;61-extradatasequence-header结构详解&#34;&gt;6.1 extradata/sequence header结构详解&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_H264_extradata.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_H264_extradata&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;name&lt;/th&gt;
+&lt;th&gt;length,unit:bit&lt;/th&gt;
+&lt;th&gt;value&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;version&lt;/td&gt;
+&lt;td&gt;8bit&lt;/td&gt;
+&lt;td&gt;0x01&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;avc profile&lt;/td&gt;
+&lt;td&gt;8bit&lt;/td&gt;
+&lt;td&gt;0x64&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;avc compatibility&lt;/td&gt;
+&lt;td&gt;8bit&lt;/td&gt;
+&lt;td&gt;0x00&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;avc level&lt;/td&gt;
+&lt;td&gt;8bit&lt;/td&gt;
+&lt;td&gt;0x0A&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;NALULengthSizeMinusOne&lt;/td&gt;
+&lt;td&gt;8bit&lt;/td&gt;
+&lt;td&gt;0xFF，高6位保留，默认为1，低2位为11，表示NALU长度用3+1=4字节表示(0xFC，低2位为00，表示NALU长度用1个字节表示)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;number of sps nalus&lt;/td&gt;
+&lt;td&gt;8bit&lt;/td&gt;
+&lt;td&gt;0xE1，高3为保留，低5为表示有几个SPS，通常只有一个SPS&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;SPS size&lt;/td&gt;
+&lt;td&gt;16bit&lt;/td&gt;
+&lt;td&gt;大端格式的SPS长度，0x0019，表示25字节SPS&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;SPS NALU data&lt;/td&gt;
+&lt;td&gt;SPS size x 8bit&lt;/td&gt;
+&lt;td&gt;0x67到0x80，表示SPS数据&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;number of pps nalus&lt;/td&gt;
+&lt;td&gt;8bit&lt;/td&gt;
+&lt;td&gt;0x01个PPS个数，通常只有一个PPS&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;PPS size&lt;/td&gt;
+&lt;td&gt;8bit&lt;/td&gt;
+&lt;td&gt;0x07，表示PPS的数据长度&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;PPS NALU data&lt;/td&gt;
+&lt;td&gt;PPS size x 8bit&lt;/td&gt;
+&lt;td&gt;0x68到0x30，表示PPS数据&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;NALULengthSizeMinusOne解释：这个变量告诉我们用几个字节来存储NALU的长度。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;如果NALULengthSizeMinusOne是0，那么每个NALU使用一个字节的前缀来指定长度，那么每个NALU包的最大长度是255字节，这个明显太小了&lt;/li&gt;
+&lt;li&gt;使用2个字节的前缀来指定长度，那么每个NALU包的最大长度是64K字节，也不一定够，一般分辨率达到1280*720 的图像编码出的I帧，可能大于64K。3字节是比较完美的，但是因为一些原因（例如对齐）没有被广泛支持&lt;/li&gt;
+&lt;li&gt;因此4字节长度的前缀是目前使用最多的方式。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;7-h264-annexb与avcc格式转换&#34;&gt;7. H264 AnnexB与AVCC格式转换&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_H264_%e6%a0%bc%e5%bc%8f.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_H264_格式&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;71-h264-annexb转为avcc&#34;&gt;7.1 H264 Annexb转为AVCC&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;对于一个GOP的开始，根据start-code，分离出SPS、PPS帧，并分别计算出长度&lt;/li&gt;
+&lt;li&gt;根据SPS, PPS创建出extradata，附加到GOP的头部&lt;/li&gt;
+&lt;li&gt;从IDR帧开始，搜索start-code，分离出每一个NALU，计算长度，然后将start-code转为4字节的NALU长度&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;72-avcc-转为-h264-annexb&#34;&gt;7.2 AVCC 转为 H264 Annexb&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;对于一个GOP的开始，首先检索出extradata部分的数据&lt;/li&gt;
+&lt;li&gt;根据extradata数据创建出SPS帧，并用4字节的start-code：0x00000001附加在SPS数据的头部&lt;/li&gt;
+&lt;li&gt;根据extradata数据创建出PPS帧，并用4字节的start-code：0x00000001附加在PPS数据的头部，并将PPS数据连接到SPS后面&lt;/li&gt;
+&lt;li&gt;根据NALU的长度字段，分离出每一个NALU，然后用用4字节的start-code：0x00000001替换长度字段&lt;/li&gt;
+&lt;li&gt;在以上过程中需要计算每一个NALU的长度，尤其是GOP的IDR帧，一般在IDR帧前还有SPS与PPS帧，其长度需要一起计算。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/qq_21743659/article/details/124007428&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;音视频学习-H264帧基础知识&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/heli200482128/article/details/126058291&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;H264 Profile对比分析&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/m0_60259116/article/details/124870967?spm=1001.2101.3001.6661.1&amp;amp;utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1-124870967-blog-124007428.235%5Ev27%5Epc_relevant_3mothn_strategy_and_data_recovery&amp;amp;depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1-124870967-blog-124007428.235%5Ev27%5Epc_relevant_3mothn_strategy_and_data_recovery&amp;amp;utm_relevant_index=1&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;H264编码基础概念+格式分析&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>数据流:PS和TS</title>
+        <link>https://frozen531.github.io/post/%E9%9F%B3%E8%A7%86%E9%A2%91/ps/</link>
+        <pubDate>Sat, 25 Mar 2023 18:51:47 +0800</pubDate>
+        
+        <guid>https://frozen531.github.io/post/%E9%9F%B3%E8%A7%86%E9%A2%91/ps/</guid>
+        <description>&lt;p&gt;MPEG(moving picture expert group)动态图像专家组开发的标准成为MPEG标准，主要用来阐明视像、音频的编码和解码过程，规定编码后组成位流的语法等。&lt;/p&gt;
+&lt;p&gt;MPEG-1的编码系统由两部分组成：视像编码和声音编码、系统层上的多路复合；其中MPEG-1 system部分定义了如何将压缩后的音、视频及其他数据进行组合和实现同步，其目的在于生成单一数据位流，便于存储和传输。&lt;/p&gt;
+&lt;p&gt;MPEG-2对MPEG-1进行扩展，其编码系统由两部分组成：视像编码和声音编码、数据打包和多路数据复合。&lt;/p&gt;
+&lt;p&gt;MPEG-2将视像、声音和其他数据组合在一起，生成适合存储或传输的基本数据流。数据流由两种类型：PS和TS。这两类都由一个或多个打包的基本数据流PES组合生成。&lt;/p&gt;
+&lt;p&gt;MPEG-2为了避免不同系统的复杂性和带宽浪费，引入profile(配置)和level(等级)。不同profile使用的编码算法不同，且不同profile按照分辨率和帧率、码率等定义有不同的level。&lt;/p&gt;
+&lt;p&gt;MPEG定义数据位流结构，按照统一的规范组织视像数据流，保证解码器设计的通用性。MPEG-1将视像序列分成若干个GOP(group of picture：图像组)，把GOP中每帧图像分成许多slice，每个slice分成若干宏块，每个宏块又分为若干图块，如下图所示。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_mpeg_1_%e8%a7%86%e5%83%8f%e6%95%b0%e6%8d%ae%e6%b5%81%e7%bb%93%e6%9e%84.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_mpeg_1_视像数据流结构&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;术语&#34;&gt;术语&lt;/h2&gt;
+&lt;ul&gt;
+&lt;li&gt;ES流（elementary stream）：基本码流，指编码后的音、视频数据，每个ES只包含一种数据类型。&lt;/li&gt;
+&lt;li&gt;PES （packet elementary stream）：将ES根据需要分割为不同长度的数据包，加上包头得到PES。通过将连续的长流分割为短流，便于在网络中分组发送。&lt;/li&gt;
+&lt;li&gt;TS（transport stream）：传输流。将视频、音频的ES流和辅助信息&lt;strong&gt;复合&lt;/strong&gt;在一起用于实际传输的标准信息流。不同的PES根据共同或独立的时间基准组合成一个TS流。&lt;/li&gt;
+&lt;li&gt;PS （program stream）：节目流。总以0x000001BA开始，如果为PS文件，则有且只有一个结束码0x000001B9；网传PS通常没有结束码。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;PS与TS的区别：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;TS是固定包长度为188字节，PS包长可变；&lt;/li&gt;
+&lt;li&gt;TS用于出现错误相对较多的环境下；PS用在出现错误相对比较少的环境。信道环境差的情况下，当同步信息被破坏，对于TS流，接收端可检测后面包的同步信息，从而恢复同步，避免信息丢失；PS包变长，接收端无法在特定位置检查同步信息，丢失同步信息，无法正常播放。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;从使用范围上看：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;TS、RTP适用于数据流传输，不具有存储属性；&lt;/li&gt;
+&lt;li&gt;PS既有存储属性又可以做实时流传输。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;pes&#34;&gt;PES&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_PES.bmp&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_PES&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;PES 包中的部分字段解释：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;packet_start_code_prefix，PES包头起始串，0x00000001&lt;/li&gt;
+&lt;li&gt;stream_id，表示基本流的类型和编号。&lt;/li&gt;
+&lt;li&gt;PES_packet_length，表示 PES 包中在该字段后的数据字节数，该字段 16 比特。&lt;/li&gt;
+&lt;li&gt;PTS，表示显示时间戳。分为 3 段，共 33 比特。&lt;/li&gt;
+&lt;li&gt;DTS，表示解码时间戳。分为 3 段，共 33 比特。&lt;/li&gt;
+&lt;li&gt;ES_rate，基本流速率，在 PES 流情况中，指定解码器接收 PES 包字节的速率。&lt;/li&gt;
+&lt;li&gt;trick_mode_control，表示相关视频的特技方式，3 比特字段。这些特技方式包括：快进、慢动作、冻结帧、快速反向、慢反向等。&lt;/li&gt;
+&lt;li&gt;PES_packet_data_byte，表示来自包 stream_id 或 PID 所指示的基本流的连贯数据字节。该字段 8 比特一个单位。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;ps基本封装格式&#34;&gt;PS基本封装格式&lt;/h2&gt;
+&lt;p&gt;PS流是对PES的进一步封装，是将具有共同时间基准的一个或多个PES包组合而成的单一的数据流。&lt;br&gt;
+PS流由PS包组成，PS包主要由固定包头、系统头和PES包组成。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_PS%e5%88%86%e8%a3%85.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_PS分装&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_PS.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_PS&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;PSH：(Program stream pack header:ps包包头)，0x000001BA。存放系统时间、码率、帧号等信息；&lt;/li&gt;
+&lt;li&gt;PS system header：(Partial system header，系统头)，0x000001BB，码率、类型说明等；&lt;/li&gt;
+&lt;li&gt;PSM：(Program Stream Map:节目映射流)，0x000001BC，提供节目流中基本流的描述及其相互关系。存放版本号、描述子（basic、encrypt、video、clip、audio）、校验码等。&lt;/li&gt;
+&lt;li&gt;PES：负载类型：e0为视频、c0为音频、包长度等。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_PS%e5%b0%81%e8%a3%85%e6%95%b0%e6%8d%ae%e8%a7%a3%e6%9e%90.bmp&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_PS封装数据解析&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;ps打包解包过程&#34;&gt;PS打包/解包过程&lt;/h3&gt;
+&lt;ol&gt;
+&lt;li&gt;找到起始码0x000001BA，解析头部字段；&lt;/li&gt;
+&lt;li&gt;判断是否有PSM，根据PSM确定负载的ES流类型；&lt;/li&gt;
+&lt;li&gt;根据ES流类型解析出具体的ES流数据。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;ts基本封装格式&#34;&gt;TS基本封装格式&lt;/h2&gt;
+&lt;p&gt;TS数据包大小必须为188字节，，包括头部(TS Header)和荷载(Payload Data)2部分。TS Header主要包含传输流的头信息，用于传输和包分组，包括固定部分（4字节）和可选部分（adaptation field适配域）。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_TS.bmp&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_TS&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;TS包中PID用来识别TS包所承载的数据类型。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;PID&lt;/th&gt;
+&lt;th&gt;类型&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;0x0000&lt;/td&gt;
+&lt;td&gt;PAT(Program Association Table:节目关联表)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;0x0001&lt;/td&gt;
+&lt;td&gt;CAT(Conditional Access Table:条件访问表)&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;TS流中是多路节目复用的，即多个节目的多个基本流复用后在同一个TS流上传输，那么怎么知道各个节目在传输流中的位置，并区分哪个流属于哪个节目呢？所以就还需要一些附加信息，这就是PSI（Program Specific Information，节目专用信息）。&lt;br&gt;
+标准中规定了4个PSI，分别是节目关联表PAT、节目映射表PMT、条件访问表CAT、网络信息表NIT。&lt;br&gt;
+这些表都由一个或多个子表组成，而子表又进一步由一个或多个section组成，在从PSI表到TS包的转换过程中，section起到了中介的作用。不同的表之间可以通过表标识（table_id）进行区分，属于同一个table_id的不同子表一般通过表的扩展标识（table_id_extension）、版本号（version_number）进行区分，对于子表还要加上其它的字段信息条件。其在这些表中的结构如下图：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_TS_PSI%e7%bb%93%e6%9e%84.bmp&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_TS_PSI结构&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;patprogram-association-table节目关联表&#34;&gt;PAT(Program Association Table，节目关联表)&lt;/h3&gt;
+&lt;p&gt;PAT（Program Association Table，节目关联表）的PID值固定为&#39;0x0000&amp;rsquo;， 是PSI的根节点。每个TS流中可能包含一个或多个PAT，所有的这些PAT共同组成了这个TS流中包含的节目列表。PAT列出了TS流中存在哪些节目流，指定了TS流中每个节目对应PMT所在TS包的PID。&lt;br&gt;
+当播放器对视频开始检索分析的时候，针对每个TS 包的header中pid成员进行判定，直到找到PAT表开始的地方进行有效数据起始分析。&lt;br&gt;
+PAT的第一条数据指定了NIT所在TS包的PID，其他数据指定了PMT所在TS包的PID，一个TS流含多少个节目就含有多少PMT。节目关联表PAT的结构图、结构代码、字段信息按顺序展示如下：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_TS_PAT.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_TS_PAT&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;pmtprogram-map-table节目映射表&#34;&gt;PMT(Program Map Table，节目映射表)&lt;/h3&gt;
+&lt;p&gt;解析TS流的时候首先要从PID为0的包里找到节目关联表PAT，因为在PAT中指定了PMT（Program Map Table，节目映射表）所在包的PID。由于PMT中指定了一路节目中各个基本流（视频、音频等）的映射关系，即该节目视频或音频所在TS包的PID，根据指定的PID就可以找到对应的音视频流。总结来说，PMT是用来区分单个节目中的各个基本流，PAT则是区分多路复用中的各个节目。节目映射表的结构图、代码结构、字段解释按顺序解释如下：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_TS_PMT.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_TS_PMT&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;cat条件访问表cat&#34;&gt;CAT(条件访问表CAT)&lt;/h3&gt;
+&lt;p&gt;CAT（Conditional Access Table，条件访问表）所在TS包的PID值为&#39;0x0001&amp;rsquo;，CAT中列出了条件控制信息（ECM）和条件管理信息（EMM）所在分组的PID，用于节目的加密与解密。CAT的结构图、代码结构按顺序展示如下（相关字段在上面的PAT和PMT中已经出现过了，不需要再解释，参考上面即可）：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e9%9f%b3%e8%a7%86%e9%a2%91_TS_PMT.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;音视频_TS_CAT&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;nitnetwork-information-table网络信息表nit&#34;&gt;NIT(Network Information Table,网络信息表NIT)&lt;/h3&gt;
+&lt;p&gt;NIT（Network Information Table，网络信息表）的PID由PAT中的network_PID字段指定，但NIT的内容是私有的、由用户指定的。它提供TS流的传输信息以及网络自身特性信息，比如网络名称、频道频率、调制特征等信息。&lt;/p&gt;
+&lt;h2 id=&#34;ps与ts转换&#34;&gt;PS与TS转换&lt;/h2&gt;
+&lt;h2 id=&#34;ts流生成和解析&#34;&gt;TS流生成和解析&lt;/h2&gt;
+&lt;p&gt;1）TS 流的生成流程大致如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;将原始的音视频数据编码后，组成基本码流（ES）；&lt;/li&gt;
+&lt;li&gt;将基本码流（ES）打包成 PES；&lt;/li&gt;
+&lt;li&gt;在 PES 中加入需要的信息，比如 PTS、DTS 等；&lt;/li&gt;
+&lt;li&gt;将 PES 包的数据装载到一系列固定长度为 188 字节的传输包（TS Packet）中；&lt;/li&gt;
+&lt;li&gt;在 TS 包中加入需要的信息，比如 PSI、PCR 等；&lt;/li&gt;
+&lt;li&gt;连输输出 TS 包形成具有恒定码率的 TS 流。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;2）TS 流的解析流程大致如下：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;从 TS 流中解析出 TS 包；&lt;/li&gt;
+&lt;li&gt;从 TS 包中获取流信息，比如 PSI、PCR 等；&lt;/li&gt;
+&lt;li&gt;获取特定节目的音视频 PID；&lt;/li&gt;
+&lt;li&gt;通过 PID 获取特定音视频相关的 TS 包，从中解析出 PES 包；&lt;/li&gt;
+&lt;li&gt;从 PES 包中获取 PTS、DTS 等时间戳信息，并从 PES 中解析出基本码流（ES）；&lt;/li&gt;
+&lt;li&gt;将基本码流数据交给解码器，解码出原始音视频数据。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;参考&#34;&gt;参考&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/jisuanji111111/article/details/120326420&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;网络流媒体&amp;ndash;PS封装格式&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/qq_37837061/article/details/116293819&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;PS和TS&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/woshizhanhun/article/details/3589730?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-8-3589730-blog-116293819.pc_relevant_aa&amp;amp;spm=1001.2101.3001.4242.5&amp;amp;utm_relevant_index=11&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;有关视频传输中TS、PS的释疑（转）&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://cloud.tencent.com/developer/article/2021489&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;TS 格式：为什么直播回放的切片一般都用它？丨音视频基础&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://cloud.tencent.com/developer/article/1985862?from=article.detail.2216858&amp;amp;areaSource=106000.14&amp;amp;traceId=CfFGLGQIXIT7zpFPawge3&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;学习音视频技术要看什么书？世界读书日图书推荐&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/m0_60259116/article/details/127211160&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;MPEG2 -TS流结构详细浅析&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/m0_60259116/article/details/127414345&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;H264解码之PS流解析&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
+        <title>流媒体传输协议:RTP</title>
+        <link>https://frozen531.github.io/post/%E9%9F%B3%E8%A7%86%E9%A2%91/rtp/</link>
+        <pubDate>Tue, 21 Mar 2023 20:22:59 +0800</pubDate>
+        
+        <guid>https://frozen531.github.io/post/%E9%9F%B3%E8%A7%86%E9%A2%91/rtp/</guid>
+        <description>&lt;h2 id=&#34;概念&#34;&gt;概念&lt;/h2&gt;
+&lt;p&gt;多媒体网络：指支持实时语音和视像的高速互联网络。将因特网和三大网络（公共交换电话网络PSTN、有线电视网络CATV和移动电话网络mobile network）组成的网络称为多媒体网络。&lt;/p&gt;
+&lt;p&gt;QoS（Quality of Service，服务质量）：指一个网络能够利用各种基础技术，为指定的网络通信提供更好的服务能力，是网络的一种安全机制， 是用来解决网络延迟和阻塞等问题的一种技术。衡量参数如下：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;时延，数据包从数据发送端到目的端所需时间&lt;/li&gt;
+&lt;li&gt;抖动：时延不一致带来的连续数据包间断断续续到达目的地&lt;/li&gt;
+&lt;li&gt;丢包率：衡量网络可靠性指标。丢失占发送的百分比&lt;/li&gt;
+&lt;li&gt;吞吐量：衡量系统实际的传输能力，以每秒传输的数据量&lt;/li&gt;
+&lt;li&gt;带宽：通信通道传送信号的频率范围&lt;/li&gt;
+&lt;li&gt;服务可用性：用户链接互联网络获取网络资源的难易程度，在给定时间范围内，网络可提供的服务时间占给定时间的百分比。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;简介&#34;&gt;简介&lt;/h2&gt;
+&lt;p&gt;RTP(real-time transport protocol实时传输协议)，传输具有实时特性的数据，为实时数据（音频、视频）提供端到端的传输服务。如果底层网络可支持多路分发，RTP可以将数据传输给多个目标。&lt;/p&gt;
+&lt;p&gt;RTCP(RTP控制协议)，监控QoS和传递会话中参与者的信息，它没有明确的成员控制功能和session建立过程。当进行RTP传输时，会周期性反馈接收者的名字和数据接收情况等信息，当有接收者数据接收不正常时，可能会相应的改变编码、控制带宽限制等。&lt;/p&gt;
+&lt;p&gt;在不同的组播地址和端口对中，音频和视频可以不在同一个RTP session发送，分别传输各自的RTP报文和RTCP报文，接收者可以建立同名的session，通过参考RTCP协议中时间信息来同步播放。&lt;/p&gt;
+&lt;h3 id=&#34;可靠性&#34;&gt;可靠性&lt;/h3&gt;
+&lt;p&gt;一般应用都是基于UDP协议。RTP不提供任何机制保证数据的实时性和QoS，而是依赖底层网络服务提供这些功能。&lt;/p&gt;
+&lt;p&gt;RTP既不保证传输的可靠性和有序性，也不假定底层网络是否可信和有序。接收端可以利用RTP中的序列号排序收到的报文。&lt;/p&gt;
+&lt;h3 id=&#34;携带信息&#34;&gt;携带信息&lt;/h3&gt;
+&lt;p&gt;RTP包包含了时间信息、序列号、荷载类型、时间戳等。接收者可以通过相关信息重新排列数据包，同时可以知道丢失了多少报文。&lt;/p&gt;
+&lt;h3 id=&#34;rtp级别的中继节点mixer&#34;&gt;RTP级别的中继节点Mixer&lt;/h3&gt;
+&lt;p&gt;不同的接收者网络情况不同，不能强迫所有接收者都使用低带宽并降低音频编码的质量。&lt;/p&gt;
+&lt;p&gt;多媒体应用可以根据接收者的能力或网络拥堵情况调整传输速率，降低分辨率，降低码率，减小网络压力。但这个操作放在发送端和组播模式（多人会议）不太兼容，因为这样会产生木桶效应，带宽最差的接收者会拖垮这个会议的通讯质量。&lt;!-- raw HTML omitted --&gt;不清楚Mixer是否是将高码率的流重新压缩，产生多种不同码率的流，这个有点难度吧，费时？&lt;!-- raw HTML omitted --&gt;&lt;/p&gt;
+&lt;p&gt;带宽自适应的工作应该放在接收者这里，发送者需要拆分出面对不同带宽接收者的媒体流（不同的码率，500k，2M，5M，&lt;!-- raw HTML omitted --&gt;主码流和子码流是否就是对这种的适应？&lt;!-- raw HTML omitted --&gt;），分别对应不同的组播地址，接收者根据自身带宽情况，选中加入适合的组播。&lt;/p&gt;
+&lt;h2 id=&#34;rtp-数据传输协议&#34;&gt;RTP 数据传输协议&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/RTP%e7%9a%84%e5%ae%9a%e9%95%bf%e5%a4%b4%e5%ad%97%e6%ae%b5.bmp&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;RTP的定长头字段&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;96-bit（12Byte）为每个RTP包都有的部分。CSRC部分只有Mixer发送的报文才会有。RTP报文由两部分构成：RTP报头和RTP负载。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;位&lt;/th&gt;
+&lt;th&gt;说明&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;V&lt;/td&gt;
+&lt;td&gt;RTP协议的版本号，占2位，当前协议版本号为2。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;P&lt;/td&gt;
+&lt;td&gt;填充标志，占1位，如果P=1，则在该报文的尾部填充一个或多个额外的八位组，它们不是有效载荷的一部分。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;X&lt;/td&gt;
+&lt;td&gt;扩展标志，占1位，如果X=1，则在RTP报头后跟有一个扩展报头。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;CC&lt;/td&gt;
+&lt;td&gt;CSRC计数器，占4位，指示CSRC 标识符的个数。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;M&lt;/td&gt;
+&lt;td&gt;标记，占1位，不同的有效载荷有不同的含义，对于视频，标记一帧的结束；对于音频，标记会话的开始。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;PT&lt;/td&gt;
+&lt;td&gt;有效载荷类型，占7位，用于说明RTP报文中有效载荷的类型，如GSM音频、JPEM图像等,在流媒体中大部分是用来区分音频流和视频流的，这样便于客户端进行解析。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;序列号&lt;/td&gt;
+&lt;td&gt;占16位，用于标识发送者所发送的RTP报文的序列号，每发送一个报文，序列号增1。这个字段当下层的承载协议用UDP的时候，网络状况不好的时候可以用来检查丢包。同时出现网络抖动的情况可以用来对数据进行重新排序，在helix服务器中这个字段是从0开始的，同时音频包和视频包的sequence是分别记数的。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;时戳(Timestamp)&lt;/td&gt;
+&lt;td&gt;占32位，时戳反映了该RTP报文的第一个八位组的采样时刻。接收者使用时戳来计算延迟和延迟抖动，并进行同步控制。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;同步信源(SSRC)标识符&lt;/td&gt;
+&lt;td&gt;占32位，用于标识同步信源。该标识符是随机选择的，参加同一视频会议的两个同步信源不能有相同的SSRC。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;特约信源(CSRC)标识符&lt;/td&gt;
+&lt;td&gt;每个CSRC标识符占32位，可以有0～15个。每个CSRC标识了包含在该RTP报文有效载荷中的所有特约信源。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;rtp扩展头结构&#34;&gt;RTP扩展头结构&lt;/h3&gt;
+&lt;p&gt;在固定头中有扩展头标志位，标志位置1可以在固定头之后可以加一个扩展头。&lt;/p&gt;
+&lt;h3 id=&#34;rtcp的封装&#34;&gt;RTCP的封装&lt;/h3&gt;
+&lt;p&gt;主要是对服务质量的监视和反馈，媒体间的同步，以及多播组中成员的标识。&lt;/p&gt;
+&lt;p&gt;RTCP包含有已发送的数据包的数据、丢失数据包的数量统计。可以通过监视网络情况，将用户加入不同的组播中，满足用户的流畅度和实时性。&lt;/p&gt;
+&lt;h2 id=&#34;rtp会话过程&#34;&gt;RTP会话过程&lt;/h2&gt;
+&lt;p&gt;应用程序建立一个RTP会话，应用程序确定目的传输地址（网络地址IP和端口地址，两个端口：RTP包和RTCP包）。&lt;/p&gt;
+&lt;h2 id=&#34;rtp与rtsp的区别&#34;&gt;RTP与RTSP的区别&lt;/h2&gt;
+&lt;p&gt;RTP(Real-time Transport Protocol:实时传输协议)是一种针对多媒体数据流的传输协议。RTP通常作为应用程序代码的一部分，而非独立的网络层来实现。配合RTCP提供的统计数据，由服务器动态的改变传输速率，甚至改变荷载类型，来达到流量控制和拥塞控制。&lt;/p&gt;
+&lt;p&gt;RTSP(Real-time Streaming Protocol:实时流协议)，在体系结构上，RTSP与HTTP同级，位于RTP和RTCP之上，可以使用TCP或RTP完成数据传输。&lt;/p&gt;
+&lt;h2 id=&#34;链接&#34;&gt;链接&lt;/h2&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/irainsa/article/details/128000807&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;流媒体传输协议之 RTP （上篇）&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;&lt;a class=&#34;link&#34; href=&#34;https://cloud.tencent.com/developer/article/2020373&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;RTP/RTCP详解系列&amp;mdash;&amp;ndash;协议介绍&lt;/a&gt;&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='概念 多媒体网络：指支持实时语音和视像的高速互联网络。将因特网和三大网络（公共交换电话网络PSTN、有线电视网络CATV和移动电话网络mobile network）组成的网络称为多媒体网络。
+QoS（Quality of Service，服务质量）：指一个网络能够利用各种基础技术，为指定的网络通信提供更好的服务能力，是网络的一种安全机制， 是用来解决网络延迟和阻塞等问题的一种技术。衡量参数如下：
+时延，数据包从数据发送端到目的端所需时间 抖动：时延不一致带来的连续数据包间断断续续到达目的地 丢包率：衡量网络可靠性指标。丢失占发送的百分比 吞吐量：衡量系统实际的传输能力，以每秒传输的数据量 带宽：通信通道传送信号的频率范围 服务可用性：用户链接互联网络获取网络资源的难易程度，在给定时间范围内，网络可提供的服务时间占给定时间的百分比。 简介 RTP(real-time transport protocol实时传输协议)，传输具有实时特性的数据，为实时数据（音频、视频）提供端到端的传输服务。如果底层网络可支持多路分发，RTP可以将数据传输给多个目标。
+RTCP(RTP控制协议)，监控QoS和传递会话中参与者的信息，它没有明确的成员控制功能和session建立过程。当进行RTP传输时，会周期性反馈接收者的名字和数据接收情况等信息，当有接收者数据接收不正常时，可能会相应的改变编码、控制带宽限制等。
+在不同的组播地址和端口对中，音频和视频可以不在同一个RTP session发送，分别传输各自的RTP报文和RTCP报文，接收者可以建立同名的session，通过参考RTCP协议中时间信息来同步播放。
+可靠性 一般应用都是基于UDP协议。RTP不提供任何机制保证数据的实时性和QoS，而是依赖底层网络服务提供这些功能。
+RTP既不保证传输的可靠性和有序性，也不假定底层网络是否可信和有序。接收端可以利用RTP中的序列号排序收到的报文。
+携带信息 RTP包包含了时间信息、序列号、荷载类型、时间戳等。接收者可以通过相关信息重新排列数据包，同时可以知道丢失了多少报文。
+RTP级别的中继节点Mixer 不同的接收者网络情况不同，不能强迫所有接收者都使用低带宽并降低音频编码的质量。
+多媒体应用可以根据接收者的能力或网络拥堵情况调整传输速率，降低分辨率，降低码率，减小网络压力。但这个操作放在发送端和组播模式（多人会议）不太兼容，因为这样会产生木桶效应，带宽最差的接收者会拖垮这个会议的通讯质量。不清楚Mixer是否是将高码率的流重新压缩，产生多种不同码率的流，这个有点难度吧，费时？
+带宽自适应的工作应该放在接收者这里，发送者需要拆分出面对不同带宽接收者的媒体流（不同的码率，500k，2M，5M，主码流和子码流是否就是对这种的适应？），分别对应不同的组播地址，接收者根据自身带宽情况，选中加入适合的组播。
+RTP 数据传输协议 96-bit（12Byte）为每个RTP包都有的部分。CSRC部分只有Mixer发送的报文才会有。RTP报文由两部分构成：RTP报头和RTP负载。
+位 说明 V RTP协议的版本号，占2位，当前协议版本号为2。 P 填充标志，占1位，如果P=1，则在该报文的尾部填充一个或多个额外的八位组，它们不是有效载荷的一部分。 X 扩展标志，占1位，如果X=1，则在RTP报头后跟有一个扩展报头。 CC CSRC计数器，占4位，指示CSRC 标识符的个数。 M 标记，占1位，不同的有效载荷有不同的含义，对于视频，标记一帧的结束；对于音频，标记会话的开始。 PT 有效载荷类型，占7位，用于说明RTP报文中有效载荷的类型，如GSM音频、JPEM图像等,在流媒体中大部分是用来区分音频流和视频流的，这样便于客户端进行解析。 序列号 占16位，用于标识发送者所发送的RTP报文的序列号，每发送一个报文，序列号增1。这个字段当下层的承载协议用UDP的时候，网络状况不好的时候可以用来检查丢包。同时出现网络抖动的情况可以用来对数据进行重新排序，在helix服务器中这个字段是从0开始的，同时音频包和视频包的sequence是分别记数的。 时戳(Timestamp) 占32位，时戳反映了该RTP报文的第一个八位组的采样时刻。接收者使用时戳来计算延迟和延迟抖动，并进行同步控制。 同步信源(SSRC)标识符 占32位，用于标识同步信源。该标识符是随机选择的，参加同一视频会议的两个同步信源不能有相同的SSRC。 特约信源(CSRC)标识符 每个CSRC标识符占32位，可以有0～15个。每个CSRC标识了包含在该RTP报文有效载荷中的所有特约信源。 RTP扩展头结构 在固定头中有扩展头标志位，标志位置1可以在固定头之后可以加一个扩展头。
+RTCP的封装 主要是对服务质量的监视和反馈，媒体间的同步，以及多播组中成员的标识。
+RTCP包含有已发送的数据包的数据、丢失数据包的数量统计。可以通过监视网络情况，将用户加入不同的组播中，满足用户的流畅度和实时性。
+RTP会话过程 应用程序建立一个RTP会话，应用程序确定目的传输地址（网络地址IP和端口地址，两个端口：RTP包和RTCP包）。
+RTP与RTSP的区别 RTP(Real-time Transport Protocol:实时传输协议)是一种针对多媒体数据流的传输协议。RTP通常作为应用程序代码的一部分，而非独立的网络层来实现。配合RTCP提供的统计数据，由服务器动态的改变传输速率，甚至改变荷载类型，来达到流量控制和拥塞控制。
+RTSP(Real-time Streaming Protocol:实时流协议)，在体系结构上，RTSP与HTTP同级，位于RTP和RTCP之上，可以使用TCP或RTP完成数据传输。
+链接 流媒体传输协议之 RTP （上篇） RTP/RTCP详解系列&amp;mdash;&amp;ndash;协议介绍 '>
+<title>流媒体传输协议:RTP</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E9%9F%B3%E8%A7%86%E9%A2%91/rtp/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='流媒体传输协议:RTP'>
+<meta property='og:description' content='概念 多媒体网络：指支持实时语音和视像的高速互联网络。将因特网和三大网络（公共交换电话网络PSTN、有线电视网络CATV和移动电话网络mobile network）组成的网络称为多媒体网络。
+QoS（Quality of Service，服务质量）：指一个网络能够利用各种基础技术，为指定的网络通信提供更好的服务能力，是网络的一种安全机制， 是用来解决网络延迟和阻塞等问题的一种技术。衡量参数如下：
+时延，数据包从数据发送端到目的端所需时间 抖动：时延不一致带来的连续数据包间断断续续到达目的地 丢包率：衡量网络可靠性指标。丢失占发送的百分比 吞吐量：衡量系统实际的传输能力，以每秒传输的数据量 带宽：通信通道传送信号的频率范围 服务可用性：用户链接互联网络获取网络资源的难易程度，在给定时间范围内，网络可提供的服务时间占给定时间的百分比。 简介 RTP(real-time transport protocol实时传输协议)，传输具有实时特性的数据，为实时数据（音频、视频）提供端到端的传输服务。如果底层网络可支持多路分发，RTP可以将数据传输给多个目标。
+RTCP(RTP控制协议)，监控QoS和传递会话中参与者的信息，它没有明确的成员控制功能和session建立过程。当进行RTP传输时，会周期性反馈接收者的名字和数据接收情况等信息，当有接收者数据接收不正常时，可能会相应的改变编码、控制带宽限制等。
+在不同的组播地址和端口对中，音频和视频可以不在同一个RTP session发送，分别传输各自的RTP报文和RTCP报文，接收者可以建立同名的session，通过参考RTCP协议中时间信息来同步播放。
+可靠性 一般应用都是基于UDP协议。RTP不提供任何机制保证数据的实时性和QoS，而是依赖底层网络服务提供这些功能。
+RTP既不保证传输的可靠性和有序性，也不假定底层网络是否可信和有序。接收端可以利用RTP中的序列号排序收到的报文。
+携带信息 RTP包包含了时间信息、序列号、荷载类型、时间戳等。接收者可以通过相关信息重新排列数据包，同时可以知道丢失了多少报文。
+RTP级别的中继节点Mixer 不同的接收者网络情况不同，不能强迫所有接收者都使用低带宽并降低音频编码的质量。
+多媒体应用可以根据接收者的能力或网络拥堵情况调整传输速率，降低分辨率，降低码率，减小网络压力。但这个操作放在发送端和组播模式（多人会议）不太兼容，因为这样会产生木桶效应，带宽最差的接收者会拖垮这个会议的通讯质量。不清楚Mixer是否是将高码率的流重新压缩，产生多种不同码率的流，这个有点难度吧，费时？
+带宽自适应的工作应该放在接收者这里，发送者需要拆分出面对不同带宽接收者的媒体流（不同的码率，500k，2M，5M，主码流和子码流是否就是对这种的适应？），分别对应不同的组播地址，接收者根据自身带宽情况，选中加入适合的组播。
+RTP 数据传输协议 96-bit（12Byte）为每个RTP包都有的部分。CSRC部分只有Mixer发送的报文才会有。RTP报文由两部分构成：RTP报头和RTP负载。
+位 说明 V RTP协议的版本号，占2位，当前协议版本号为2。 P 填充标志，占1位，如果P=1，则在该报文的尾部填充一个或多个额外的八位组，它们不是有效载荷的一部分。 X 扩展标志，占1位，如果X=1，则在RTP报头后跟有一个扩展报头。 CC CSRC计数器，占4位，指示CSRC 标识符的个数。 M 标记，占1位，不同的有效载荷有不同的含义，对于视频，标记一帧的结束；对于音频，标记会话的开始。 PT 有效载荷类型，占7位，用于说明RTP报文中有效载荷的类型，如GSM音频、JPEM图像等,在流媒体中大部分是用来区分音频流和视频流的，这样便于客户端进行解析。 序列号 占16位，用于标识发送者所发送的RTP报文的序列号，每发送一个报文，序列号增1。这个字段当下层的承载协议用UDP的时候，网络状况不好的时候可以用来检查丢包。同时出现网络抖动的情况可以用来对数据进行重新排序，在helix服务器中这个字段是从0开始的，同时音频包和视频包的sequence是分别记数的。 时戳(Timestamp) 占32位，时戳反映了该RTP报文的第一个八位组的采样时刻。接收者使用时戳来计算延迟和延迟抖动，并进行同步控制。 同步信源(SSRC)标识符 占32位，用于标识同步信源。该标识符是随机选择的，参加同一视频会议的两个同步信源不能有相同的SSRC。 特约信源(CSRC)标识符 每个CSRC标识符占32位，可以有0～15个。每个CSRC标识了包含在该RTP报文有效载荷中的所有特约信源。 RTP扩展头结构 在固定头中有扩展头标志位，标志位置1可以在固定头之后可以加一个扩展头。
+RTCP的封装 主要是对服务质量的监视和反馈，媒体间的同步，以及多播组中成员的标识。
+RTCP包含有已发送的数据包的数据、丢失数据包的数量统计。可以通过监视网络情况，将用户加入不同的组播中，满足用户的流畅度和实时性。
+RTP会话过程 应用程序建立一个RTP会话，应用程序确定目的传输地址（网络地址IP和端口地址，两个端口：RTP包和RTCP包）。
+RTP与RTSP的区别 RTP(Real-time Transport Protocol:实时传输协议)是一种针对多媒体数据流的传输协议。RTP通常作为应用程序代码的一部分，而非独立的网络层来实现。配合RTCP提供的统计数据，由服务器动态的改变传输速率，甚至改变荷载类型，来达到流量控制和拥塞控制。
+RTSP(Real-time Streaming Protocol:实时流协议)，在体系结构上，RTSP与HTTP同级，位于RTP和RTCP之上，可以使用TCP或RTP完成数据传输。
+链接 流媒体传输协议之 RTP （上篇） RTP/RTCP详解系列&amp;mdash;&amp;ndash;协议介绍 '>
+<meta property='og:url' content='https://frozen531.github.io/post/%E9%9F%B3%E8%A7%86%E9%A2%91/rtp/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='流媒体' /><meta property='article:published_time' content='2023-03-21T20:22:59&#43;08:00'/><meta property='article:modified_time' content='2023-03-21T20:22:59&#43;08:00'/>
+<meta name="twitter:title" content="流媒体传输协议:RTP">
+<meta name="twitter:description" content="概念 多媒体网络：指支持实时语音和视像的高速互联网络。将因特网和三大网络（公共交换电话网络PSTN、有线电视网络CATV和移动电话网络mobile network）组成的网络称为多媒体网络。
+QoS（Quality of Service，服务质量）：指一个网络能够利用各种基础技术，为指定的网络通信提供更好的服务能力，是网络的一种安全机制， 是用来解决网络延迟和阻塞等问题的一种技术。衡量参数如下：
+时延，数据包从数据发送端到目的端所需时间 抖动：时延不一致带来的连续数据包间断断续续到达目的地 丢包率：衡量网络可靠性指标。丢失占发送的百分比 吞吐量：衡量系统实际的传输能力，以每秒传输的数据量 带宽：通信通道传送信号的频率范围 服务可用性：用户链接互联网络获取网络资源的难易程度，在给定时间范围内，网络可提供的服务时间占给定时间的百分比。 简介 RTP(real-time transport protocol实时传输协议)，传输具有实时特性的数据，为实时数据（音频、视频）提供端到端的传输服务。如果底层网络可支持多路分发，RTP可以将数据传输给多个目标。
+RTCP(RTP控制协议)，监控QoS和传递会话中参与者的信息，它没有明确的成员控制功能和session建立过程。当进行RTP传输时，会周期性反馈接收者的名字和数据接收情况等信息，当有接收者数据接收不正常时，可能会相应的改变编码、控制带宽限制等。
+在不同的组播地址和端口对中，音频和视频可以不在同一个RTP session发送，分别传输各自的RTP报文和RTCP报文，接收者可以建立同名的session，通过参考RTCP协议中时间信息来同步播放。
+可靠性 一般应用都是基于UDP协议。RTP不提供任何机制保证数据的实时性和QoS，而是依赖底层网络服务提供这些功能。
+RTP既不保证传输的可靠性和有序性，也不假定底层网络是否可信和有序。接收端可以利用RTP中的序列号排序收到的报文。
+携带信息 RTP包包含了时间信息、序列号、荷载类型、时间戳等。接收者可以通过相关信息重新排列数据包，同时可以知道丢失了多少报文。
+RTP级别的中继节点Mixer 不同的接收者网络情况不同，不能强迫所有接收者都使用低带宽并降低音频编码的质量。
+多媒体应用可以根据接收者的能力或网络拥堵情况调整传输速率，降低分辨率，降低码率，减小网络压力。但这个操作放在发送端和组播模式（多人会议）不太兼容，因为这样会产生木桶效应，带宽最差的接收者会拖垮这个会议的通讯质量。不清楚Mixer是否是将高码率的流重新压缩，产生多种不同码率的流，这个有点难度吧，费时？
+带宽自适应的工作应该放在接收者这里，发送者需要拆分出面对不同带宽接收者的媒体流（不同的码率，500k，2M，5M，主码流和子码流是否就是对这种的适应？），分别对应不同的组播地址，接收者根据自身带宽情况，选中加入适合的组播。
+RTP 数据传输协议 96-bit（12Byte）为每个RTP包都有的部分。CSRC部分只有Mixer发送的报文才会有。RTP报文由两部分构成：RTP报头和RTP负载。
+位 说明 V RTP协议的版本号，占2位，当前协议版本号为2。 P 填充标志，占1位，如果P=1，则在该报文的尾部填充一个或多个额外的八位组，它们不是有效载荷的一部分。 X 扩展标志，占1位，如果X=1，则在RTP报头后跟有一个扩展报头。 CC CSRC计数器，占4位，指示CSRC 标识符的个数。 M 标记，占1位，不同的有效载荷有不同的含义，对于视频，标记一帧的结束；对于音频，标记会话的开始。 PT 有效载荷类型，占7位，用于说明RTP报文中有效载荷的类型，如GSM音频、JPEM图像等,在流媒体中大部分是用来区分音频流和视频流的，这样便于客户端进行解析。 序列号 占16位，用于标识发送者所发送的RTP报文的序列号，每发送一个报文，序列号增1。这个字段当下层的承载协议用UDP的时候，网络状况不好的时候可以用来检查丢包。同时出现网络抖动的情况可以用来对数据进行重新排序，在helix服务器中这个字段是从0开始的，同时音频包和视频包的sequence是分别记数的。 时戳(Timestamp) 占32位，时戳反映了该RTP报文的第一个八位组的采样时刻。接收者使用时戳来计算延迟和延迟抖动，并进行同步控制。 同步信源(SSRC)标识符 占32位，用于标识同步信源。该标识符是随机选择的，参加同一视频会议的两个同步信源不能有相同的SSRC。 特约信源(CSRC)标识符 每个CSRC标识符占32位，可以有0～15个。每个CSRC标识了包含在该RTP报文有效载荷中的所有特约信源。 RTP扩展头结构 在固定头中有扩展头标志位，标志位置1可以在固定头之后可以加一个扩展头。
+RTCP的封装 主要是对服务质量的监视和反馈，媒体间的同步，以及多播组中成员的标识。
+RTCP包含有已发送的数据包的数据、丢失数据包的数量统计。可以通过监视网络情况，将用户加入不同的组播中，满足用户的流畅度和实时性。
+RTP会话过程 应用程序建立一个RTP会话，应用程序确定目的传输地址（网络地址IP和端口地址，两个端口：RTP包和RTCP包）。
+RTP与RTSP的区别 RTP(Real-time Transport Protocol:实时传输协议)是一种针对多媒体数据流的传输协议。RTP通常作为应用程序代码的一部分，而非独立的网络层来实现。配合RTCP提供的统计数据，由服务器动态的改变传输速率，甚至改变荷载类型，来达到流量控制和拥塞控制。
+RTSP(Real-time Streaming Protocol:实时流协议)，在体系结构上，RTSP与HTTP同级，位于RTP和RTCP之上，可以使用TCP或RTP完成数据传输。
+链接 流媒体传输协议之 RTP （上篇） RTP/RTCP详解系列&amp;mdash;&amp;ndash;协议介绍 ">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#概念">概念</a></li>
+    <li><a href="#简介">简介</a>
+      <ul>
+        <li><a href="#可靠性">可靠性</a></li>
+        <li><a href="#携带信息">携带信息</a></li>
+        <li><a href="#rtp级别的中继节点mixer">RTP级别的中继节点Mixer</a></li>
+      </ul>
+    </li>
+    <li><a href="#rtp-数据传输协议">RTP 数据传输协议</a>
+      <ul>
+        <li><a href="#rtp扩展头结构">RTP扩展头结构</a></li>
+        <li><a href="#rtcp的封装">RTCP的封装</a></li>
+      </ul>
+    </li>
+    <li><a href="#rtp会话过程">RTP会话过程</a></li>
+    <li><a href="#rtp与rtsp的区别">RTP与RTSP的区别</a></li>
+    <li><a href="#链接">链接</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E9%9F%B3%E8%A7%86%E9%A2%91/" style="background-color: #8B658B; color: #fff;">
+                音视频
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E9%9F%B3%E8%A7%86%E9%A2%91/rtp/">流媒体传输协议:RTP</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 21, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    1 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="概念">概念</h2>
+<p>多媒体网络：指支持实时语音和视像的高速互联网络。将因特网和三大网络（公共交换电话网络PSTN、有线电视网络CATV和移动电话网络mobile network）组成的网络称为多媒体网络。</p>
+<p>QoS（Quality of Service，服务质量）：指一个网络能够利用各种基础技术，为指定的网络通信提供更好的服务能力，是网络的一种安全机制， 是用来解决网络延迟和阻塞等问题的一种技术。衡量参数如下：</p>
+<ul>
+<li>时延，数据包从数据发送端到目的端所需时间</li>
+<li>抖动：时延不一致带来的连续数据包间断断续续到达目的地</li>
+<li>丢包率：衡量网络可靠性指标。丢失占发送的百分比</li>
+<li>吞吐量：衡量系统实际的传输能力，以每秒传输的数据量</li>
+<li>带宽：通信通道传送信号的频率范围</li>
+<li>服务可用性：用户链接互联网络获取网络资源的难易程度，在给定时间范围内，网络可提供的服务时间占给定时间的百分比。</li>
+</ul>
+<h2 id="简介">简介</h2>
+<p>RTP(real-time transport protocol实时传输协议)，传输具有实时特性的数据，为实时数据（音频、视频）提供端到端的传输服务。如果底层网络可支持多路分发，RTP可以将数据传输给多个目标。</p>
+<p>RTCP(RTP控制协议)，监控QoS和传递会话中参与者的信息，它没有明确的成员控制功能和session建立过程。当进行RTP传输时，会周期性反馈接收者的名字和数据接收情况等信息，当有接收者数据接收不正常时，可能会相应的改变编码、控制带宽限制等。</p>
+<p>在不同的组播地址和端口对中，音频和视频可以不在同一个RTP session发送，分别传输各自的RTP报文和RTCP报文，接收者可以建立同名的session，通过参考RTCP协议中时间信息来同步播放。</p>
+<h3 id="可靠性">可靠性</h3>
+<p>一般应用都是基于UDP协议。RTP不提供任何机制保证数据的实时性和QoS，而是依赖底层网络服务提供这些功能。</p>
+<p>RTP既不保证传输的可靠性和有序性，也不假定底层网络是否可信和有序。接收端可以利用RTP中的序列号排序收到的报文。</p>
+<h3 id="携带信息">携带信息</h3>
+<p>RTP包包含了时间信息、序列号、荷载类型、时间戳等。接收者可以通过相关信息重新排列数据包，同时可以知道丢失了多少报文。</p>
+<h3 id="rtp级别的中继节点mixer">RTP级别的中继节点Mixer</h3>
+<p>不同的接收者网络情况不同，不能强迫所有接收者都使用低带宽并降低音频编码的质量。</p>
+<p>多媒体应用可以根据接收者的能力或网络拥堵情况调整传输速率，降低分辨率，降低码率，减小网络压力。但这个操作放在发送端和组播模式（多人会议）不太兼容，因为这样会产生木桶效应，带宽最差的接收者会拖垮这个会议的通讯质量。<!-- raw HTML omitted -->不清楚Mixer是否是将高码率的流重新压缩，产生多种不同码率的流，这个有点难度吧，费时？<!-- raw HTML omitted --></p>
+<p>带宽自适应的工作应该放在接收者这里，发送者需要拆分出面对不同带宽接收者的媒体流（不同的码率，500k，2M，5M，<!-- raw HTML omitted -->主码流和子码流是否就是对这种的适应？<!-- raw HTML omitted -->），分别对应不同的组播地址，接收者根据自身带宽情况，选中加入适合的组播。</p>
+<h2 id="rtp-数据传输协议">RTP 数据传输协议</h2>
+<p><img src="/RTP%e7%9a%84%e5%ae%9a%e9%95%bf%e5%a4%b4%e5%ad%97%e6%ae%b5.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="RTP的定长头字段"
+	
+	
+></p>
+<p>96-bit（12Byte）为每个RTP包都有的部分。CSRC部分只有Mixer发送的报文才会有。RTP报文由两部分构成：RTP报头和RTP负载。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>位</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>V</td>
+<td>RTP协议的版本号，占2位，当前协议版本号为2。</td>
+</tr>
+<tr>
+<td>P</td>
+<td>填充标志，占1位，如果P=1，则在该报文的尾部填充一个或多个额外的八位组，它们不是有效载荷的一部分。</td>
+</tr>
+<tr>
+<td>X</td>
+<td>扩展标志，占1位，如果X=1，则在RTP报头后跟有一个扩展报头。</td>
+</tr>
+<tr>
+<td>CC</td>
+<td>CSRC计数器，占4位，指示CSRC 标识符的个数。</td>
+</tr>
+<tr>
+<td>M</td>
+<td>标记，占1位，不同的有效载荷有不同的含义，对于视频，标记一帧的结束；对于音频，标记会话的开始。</td>
+</tr>
+<tr>
+<td>PT</td>
+<td>有效载荷类型，占7位，用于说明RTP报文中有效载荷的类型，如GSM音频、JPEM图像等,在流媒体中大部分是用来区分音频流和视频流的，这样便于客户端进行解析。</td>
+</tr>
+<tr>
+<td>序列号</td>
+<td>占16位，用于标识发送者所发送的RTP报文的序列号，每发送一个报文，序列号增1。这个字段当下层的承载协议用UDP的时候，网络状况不好的时候可以用来检查丢包。同时出现网络抖动的情况可以用来对数据进行重新排序，在helix服务器中这个字段是从0开始的，同时音频包和视频包的sequence是分别记数的。</td>
+</tr>
+<tr>
+<td>时戳(Timestamp)</td>
+<td>占32位，时戳反映了该RTP报文的第一个八位组的采样时刻。接收者使用时戳来计算延迟和延迟抖动，并进行同步控制。</td>
+</tr>
+<tr>
+<td>同步信源(SSRC)标识符</td>
+<td>占32位，用于标识同步信源。该标识符是随机选择的，参加同一视频会议的两个同步信源不能有相同的SSRC。</td>
+</tr>
+<tr>
+<td>特约信源(CSRC)标识符</td>
+<td>每个CSRC标识符占32位，可以有0～15个。每个CSRC标识了包含在该RTP报文有效载荷中的所有特约信源。</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="rtp扩展头结构">RTP扩展头结构</h3>
+<p>在固定头中有扩展头标志位，标志位置1可以在固定头之后可以加一个扩展头。</p>
+<h3 id="rtcp的封装">RTCP的封装</h3>
+<p>主要是对服务质量的监视和反馈，媒体间的同步，以及多播组中成员的标识。</p>
+<p>RTCP包含有已发送的数据包的数据、丢失数据包的数量统计。可以通过监视网络情况，将用户加入不同的组播中，满足用户的流畅度和实时性。</p>
+<h2 id="rtp会话过程">RTP会话过程</h2>
+<p>应用程序建立一个RTP会话，应用程序确定目的传输地址（网络地址IP和端口地址，两个端口：RTP包和RTCP包）。</p>
+<h2 id="rtp与rtsp的区别">RTP与RTSP的区别</h2>
+<p>RTP(Real-time Transport Protocol:实时传输协议)是一种针对多媒体数据流的传输协议。RTP通常作为应用程序代码的一部分，而非独立的网络层来实现。配合RTCP提供的统计数据，由服务器动态的改变传输速率，甚至改变荷载类型，来达到流量控制和拥塞控制。</p>
+<p>RTSP(Real-time Streaming Protocol:实时流协议)，在体系结构上，RTSP与HTTP同级，位于RTP和RTCP之上，可以使用TCP或RTP完成数据传输。</p>
+<h2 id="链接">链接</h2>
+<ol>
+<li><a class="link" href="https://blog.csdn.net/irainsa/article/details/128000807"  target="_blank" rel="noopener"
+    >流媒体传输协议之 RTP （上篇）</a></li>
+<li><a class="link" href="https://cloud.tencent.com/developer/article/2020373"  target="_blank" rel="noopener"
+    >RTP/RTCP详解系列&mdash;&ndash;协议介绍</a></li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E6%B5%81%E5%AA%92%E4%BD%93/">流媒体</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

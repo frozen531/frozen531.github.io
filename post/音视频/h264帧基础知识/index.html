@@ -1,0 +1,1062 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='1. 基础概念 1.1 帧类型 类型 说明 预测方式 信息 参考 被参考 大概压缩比 I帧 关键帧 帧内 包含完整的图像内容 无 用于为其他帧图像编码、解码做参考，其质量直接影响参考它的P帧、B帧 7 P帧 前向预测编码帧 帧间 与前面I或P帧的差别 参考前面的I帧或P帧，解码时需要用之前缓存的画面叠加上本帧的差别生成最终画面 可被前后的B帧参考，可能造成解码错误的扩散 20 B帧 双向预测编码帧 帧间 本帧与前后帧的差别 参考前面的I或P帧，和后面的P帧 不是参考帧，不会造成解码错误的扩散 50 1.2 GOP 视频序列被分为若干GOP(group of picture)，两个IDR帧间是一个GOP。
+GOP的长度过大：
+图像质量问题：一个GOP中的P、B帧都是由I帧预测得到，当I帧的质量较差时，会影响整个GOP的图像质量，直到下一个GOP才能恢复； 丢帧解码失败问题：当传输中丢失了GOP中的I帧，该GOP解码失败，视频会丢失整个GOP的内容； 降低编码效率：P/B帧编码复杂度高于I帧，过多的P/B帧会降低编码效率； 影响seek响应速度；当seek操作定位一个P/B帧时，GOP越长，需要解码的帧就越多，seek响应时间就越长。 1.3 IDR和I帧的区别 GOP的首帧为IDR帧（立即刷新帧），IDR帧是I帧，但I帧不一定是IDR帧。IDR帧承担随机访问功能，视频可以从任意一个IDR帧开始播放；
+内容 IDR I 区别 当出现IDR帧时，会清空DPB(decoded picture buffer：解码参考帧列表)，其后的帧不能再参考之前帧的信息，阻断误差的累积 普通I帧之后的的P/B帧仍可以参考I帧之前的其他帧 产生 每个GOP的首帧是IDR帧 在VBR码率控制下，当图像内容变化很大时，会动态调整I帧数量，即为普通I帧 1.4 PTS和DTS的区别 PTS和DTS用于指导播放器的行为。对于如下一个的视频序列
+1 2 IBBPBBP 1234567 内容 PTS DTS 名称 presentation time stamp:显示时间戳 decoding time stamp:解码时间戳 说明 告知播放器什么时候显示该帧数据 告知播放器什么时候解码该帧数据 视频顺序 显示：1234567 编解码/传输：1423756 音频顺序 一致 一致 音视频同步 编码音视频流时，会依靠参考时钟给每帧数据打上时间戳(PTS)；'>
+<title>H264帧基础知识</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E9%9F%B3%E8%A7%86%E9%A2%91/h264%E5%B8%A7%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='H264帧基础知识'>
+<meta property='og:description' content='1. 基础概念 1.1 帧类型 类型 说明 预测方式 信息 参考 被参考 大概压缩比 I帧 关键帧 帧内 包含完整的图像内容 无 用于为其他帧图像编码、解码做参考，其质量直接影响参考它的P帧、B帧 7 P帧 前向预测编码帧 帧间 与前面I或P帧的差别 参考前面的I帧或P帧，解码时需要用之前缓存的画面叠加上本帧的差别生成最终画面 可被前后的B帧参考，可能造成解码错误的扩散 20 B帧 双向预测编码帧 帧间 本帧与前后帧的差别 参考前面的I或P帧，和后面的P帧 不是参考帧，不会造成解码错误的扩散 50 1.2 GOP 视频序列被分为若干GOP(group of picture)，两个IDR帧间是一个GOP。
+GOP的长度过大：
+图像质量问题：一个GOP中的P、B帧都是由I帧预测得到，当I帧的质量较差时，会影响整个GOP的图像质量，直到下一个GOP才能恢复； 丢帧解码失败问题：当传输中丢失了GOP中的I帧，该GOP解码失败，视频会丢失整个GOP的内容； 降低编码效率：P/B帧编码复杂度高于I帧，过多的P/B帧会降低编码效率； 影响seek响应速度；当seek操作定位一个P/B帧时，GOP越长，需要解码的帧就越多，seek响应时间就越长。 1.3 IDR和I帧的区别 GOP的首帧为IDR帧（立即刷新帧），IDR帧是I帧，但I帧不一定是IDR帧。IDR帧承担随机访问功能，视频可以从任意一个IDR帧开始播放；
+内容 IDR I 区别 当出现IDR帧时，会清空DPB(decoded picture buffer：解码参考帧列表)，其后的帧不能再参考之前帧的信息，阻断误差的累积 普通I帧之后的的P/B帧仍可以参考I帧之前的其他帧 产生 每个GOP的首帧是IDR帧 在VBR码率控制下，当图像内容变化很大时，会动态调整I帧数量，即为普通I帧 1.4 PTS和DTS的区别 PTS和DTS用于指导播放器的行为。对于如下一个的视频序列
+1 2 IBBPBBP 1234567 内容 PTS DTS 名称 presentation time stamp:显示时间戳 decoding time stamp:解码时间戳 说明 告知播放器什么时候显示该帧数据 告知播放器什么时候解码该帧数据 视频顺序 显示：1234567 编解码/传输：1423756 音频顺序 一致 一致 音视频同步 编码音视频流时，会依靠参考时钟给每帧数据打上时间戳(PTS)；'>
+<meta property='og:url' content='https://frozen531.github.io/post/%E9%9F%B3%E8%A7%86%E9%A2%91/h264%E5%B8%A7%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='流媒体' /><meta property='article:published_time' content='2023-03-28T21:52:39&#43;08:00'/><meta property='article:modified_time' content='2023-03-28T21:52:39&#43;08:00'/>
+<meta name="twitter:title" content="H264帧基础知识">
+<meta name="twitter:description" content="1. 基础概念 1.1 帧类型 类型 说明 预测方式 信息 参考 被参考 大概压缩比 I帧 关键帧 帧内 包含完整的图像内容 无 用于为其他帧图像编码、解码做参考，其质量直接影响参考它的P帧、B帧 7 P帧 前向预测编码帧 帧间 与前面I或P帧的差别 参考前面的I帧或P帧，解码时需要用之前缓存的画面叠加上本帧的差别生成最终画面 可被前后的B帧参考，可能造成解码错误的扩散 20 B帧 双向预测编码帧 帧间 本帧与前后帧的差别 参考前面的I或P帧，和后面的P帧 不是参考帧，不会造成解码错误的扩散 50 1.2 GOP 视频序列被分为若干GOP(group of picture)，两个IDR帧间是一个GOP。
+GOP的长度过大：
+图像质量问题：一个GOP中的P、B帧都是由I帧预测得到，当I帧的质量较差时，会影响整个GOP的图像质量，直到下一个GOP才能恢复； 丢帧解码失败问题：当传输中丢失了GOP中的I帧，该GOP解码失败，视频会丢失整个GOP的内容； 降低编码效率：P/B帧编码复杂度高于I帧，过多的P/B帧会降低编码效率； 影响seek响应速度；当seek操作定位一个P/B帧时，GOP越长，需要解码的帧就越多，seek响应时间就越长。 1.3 IDR和I帧的区别 GOP的首帧为IDR帧（立即刷新帧），IDR帧是I帧，但I帧不一定是IDR帧。IDR帧承担随机访问功能，视频可以从任意一个IDR帧开始播放；
+内容 IDR I 区别 当出现IDR帧时，会清空DPB(decoded picture buffer：解码参考帧列表)，其后的帧不能再参考之前帧的信息，阻断误差的累积 普通I帧之后的的P/B帧仍可以参考I帧之前的其他帧 产生 每个GOP的首帧是IDR帧 在VBR码率控制下，当图像内容变化很大时，会动态调整I帧数量，即为普通I帧 1.4 PTS和DTS的区别 PTS和DTS用于指导播放器的行为。对于如下一个的视频序列
+1 2 IBBPBBP 1234567 内容 PTS DTS 名称 presentation time stamp:显示时间戳 decoding time stamp:解码时间戳 说明 告知播放器什么时候显示该帧数据 告知播放器什么时候解码该帧数据 视频顺序 显示：1234567 编解码/传输：1423756 音频顺序 一致 一致 音视频同步 编码音视频流时，会依靠参考时钟给每帧数据打上时间戳(PTS)；">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#1-基础概念">1. 基础概念</a>
+      <ul>
+        <li><a href="#11-帧类型">1.1 帧类型</a></li>
+        <li><a href="#12-gop">1.2 GOP</a></li>
+        <li><a href="#13-idr和i帧的区别">1.3 IDR和I帧的区别</a></li>
+        <li><a href="#14-pts和dts的区别">1.4 PTS和DTS的区别</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-h264-profile和level">2. H264 profile和level</a>
+      <ul>
+        <li><a href="#21-profile">2.1 profile</a></li>
+        <li><a href="#22-level">2.2 level</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-码率控制">3. 码率控制</a></li>
+    <li><a href="#4-h264的格式">4. H264的格式</a>
+      <ul>
+        <li><a href="#41-帧内预测">4.1 帧内预测</a></li>
+        <li><a href="#42-帧间预测">4.2 帧间预测</a></li>
+        <li><a href="#43-两种格式">4.3 两种格式</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-annexb格式">5. AnnexB格式</a>
+      <ul>
+        <li><a href="#51-格式">5.1 格式</a></li>
+        <li><a href="#52-nalu-header">5.2 NALU header</a></li>
+        <li><a href="#53-sps-pps-sei作用">5.3 SPS PPS SEI作用</a></li>
+        <li><a href="#54-nalu-start-code">5.4 NALU start-code</a></li>
+      </ul>
+    </li>
+    <li><a href="#6-avcc格式">6. AVCC格式</a>
+      <ul>
+        <li><a href="#61-extradatasequence-header结构详解">6.1 extradata/sequence header结构详解</a></li>
+      </ul>
+    </li>
+    <li><a href="#7-h264-annexb与avcc格式转换">7. H264 AnnexB与AVCC格式转换</a>
+      <ul>
+        <li><a href="#71-h264-annexb转为avcc">7.1 H264 Annexb转为AVCC</a></li>
+        <li><a href="#72-avcc-转为-h264-annexb">7.2 AVCC 转为 H264 Annexb</a></li>
+      </ul>
+    </li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E9%9F%B3%E8%A7%86%E9%A2%91/" style="background-color: #8B658B; color: #fff;">
+                音视频
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E9%9F%B3%E8%A7%86%E9%A2%91/h264%E5%B8%A7%E5%9F%BA%E7%A1%80%E7%9F%A5%E8%AF%86/">H264帧基础知识</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 28, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    2 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="1-基础概念">1. 基础概念</h2>
+<h3 id="11-帧类型">1.1 帧类型</h3>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>说明</th>
+<th>预测方式</th>
+<th>信息</th>
+<th>参考</th>
+<th>被参考</th>
+<th>大概压缩比</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>I帧</td>
+<td>关键帧</td>
+<td>帧内</td>
+<td>包含完整的图像内容</td>
+<td>无</td>
+<td>用于为其他帧图像编码、解码做参考，其质量直接影响参考它的P帧、B帧</td>
+<td>7</td>
+</tr>
+<tr>
+<td>P帧</td>
+<td>前向预测编码帧</td>
+<td>帧间</td>
+<td>与前面I或P帧的差别</td>
+<td>参考前面的I帧或P帧，解码时需要用之前缓存的画面叠加上本帧的差别生成最终画面</td>
+<td>可被前后的B帧参考，可能造成解码错误的扩散</td>
+<td>20</td>
+</tr>
+<tr>
+<td>B帧</td>
+<td>双向预测编码帧</td>
+<td>帧间</td>
+<td>本帧与前后帧的差别</td>
+<td>参考前面的I或P帧，和后面的P帧</td>
+<td>不是参考帧，不会造成解码错误的扩散</td>
+<td>50</td>
+</tr>
+</tbody>
+</table></div>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_%e7%bc%96%e7%a0%81%e5%8f%82%e8%80%83.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_编码参考"
+	
+	
+></p>
+<h3 id="12-gop">1.2 GOP</h3>
+<p>视频序列被分为若干GOP(group of picture)，两个IDR帧间是一个GOP。</p>
+<p>GOP的长度过大：</p>
+<ol>
+<li>图像质量问题：一个GOP中的P、B帧都是由I帧预测得到，当I帧的质量较差时，会影响整个GOP的图像质量，直到下一个GOP才能恢复；</li>
+<li>丢帧解码失败问题：当传输中丢失了GOP中的I帧，该GOP解码失败，视频会丢失整个GOP的内容；</li>
+<li>降低编码效率：P/B帧编码复杂度高于I帧，过多的P/B帧会降低编码效率；</li>
+<li>影响seek响应速度；当seek操作定位一个P/B帧时，GOP越长，需要解码的帧就越多，seek响应时间就越长。</li>
+</ol>
+<h3 id="13-idr和i帧的区别">1.3 IDR和I帧的区别</h3>
+<p>GOP的首帧为IDR帧（立即刷新帧），IDR帧是I帧，但I帧不一定是IDR帧。IDR帧承担随机访问功能，视频可以从任意一个IDR帧开始播放；</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>内容</th>
+<th>IDR</th>
+<th>I</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>区别</td>
+<td>当出现IDR帧时，会清空DPB(decoded picture buffer：解码参考帧列表)，其后的帧不能再参考之前帧的信息，阻断误差的累积</td>
+<td>普通I帧之后的的P/B帧仍可以参考I帧之前的其他帧</td>
+</tr>
+<tr>
+<td>产生</td>
+<td>每个GOP的首帧是IDR帧</td>
+<td>在VBR码率控制下，当图像内容变化很大时，会动态调整I帧数量，即为普通I帧</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="14-pts和dts的区别">1.4 PTS和DTS的区别</h3>
+<p>PTS和DTS用于指导播放器的行为。对于如下一个的视频序列</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>IBBPBBP
+</span></span><span style="display:flex;"><span>1234567
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>内容</th>
+<th>PTS</th>
+<th>DTS</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>名称</td>
+<td>presentation time stamp:显示时间戳</td>
+<td>decoding time stamp:解码时间戳</td>
+</tr>
+<tr>
+<td>说明</td>
+<td>告知播放器什么时候显示该帧数据</td>
+<td>告知播放器什么时候解码该帧数据</td>
+</tr>
+<tr>
+<td>视频顺序</td>
+<td>显示：1234567</td>
+<td>编解码/传输：1423756</td>
+</tr>
+<tr>
+<td>音频顺序</td>
+<td>一致</td>
+<td>一致</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>音视频同步</li>
+</ul>
+<p>编码音视频流时，会依靠参考时钟给每帧数据打上时间戳(PTS)；<br>
+在播放时，读取数据帧上时间戳，同时参考当前参考时钟上时间进行播放，可以选择：同步视频到音频、同步音频到视频、同步音频和视频到外部时钟。</p>
+<h2 id="2-h264-profile和level">2. H264 profile和level</h2>
+<h3 id="21-profile">2.1 profile</h3>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>profile</th>
+<th>名称</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BP(baseline profile)</td>
+<td>基本画质</td>
+<td>支持I/P帧，只支持无交错和CAVLC</td>
+</tr>
+<tr>
+<td>MP(main profile)</td>
+<td>主流画质</td>
+<td>支持I/P/B帧，支持无交错和交错，也支持CAVLC和CABAC</td>
+</tr>
+<tr>
+<td>HP(high profile)</td>
+<td>高级画质</td>
+<td>在main profile的基础上增加了8X8内部预测、自定义量化、无损视频编码和更多的YUV格式</td>
+</tr>
+</tbody>
+</table></div>
+<ul>
+<li>不同的profile，使用的算法不同；profile越高，编码效率和压缩率越高</li>
+<li>CAVLC是H264中使用的熵编码方式，无损压缩，CABAC的简化版，压缩效率不如CAVLC，实现简单。</li>
+</ul>
+<h3 id="22-level">2.2 level</h3>
+<p>level越高，视频的码率、分辨率、fps越高。</p>
+<h2 id="3-码率控制">3. 码率控制</h2>
+<p>？？？</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>内容</th>
+<th>CBR</th>
+<th>VBR</th>
+<th>AVBR</th>
+<th>CVBR</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>名称</td>
+<td>（Constant Bit Rate）固定比特率</td>
+<td>（Variable Bit Rate）可变比特率</td>
+<td>（Adaptive Variable Bit Rate）可变比特率</td>
+<td>(Constrained Variable Bit Rate)</td>
+</tr>
+<tr>
+<td>说明</td>
+<td>在码率统计时间内维持编码码率的平稳</td>
+<td>在码率统计时间内编码码率波动，保证图像质量平稳</td>
+<td>在码率统计时间内编码码率波动，从而保证编码图像质量平稳。码率控制内部会检测当前场景的运动静止状态，在运动时用较高码率编码，在静止时主动降低目标码率</td>
+<td>在图像内容静止时，节省带宽，有Motion发生时，利用前期节省的带宽来尽可能的提高图像质量，达到同时兼顾带宽和图像质量的目的</td>
+</tr>
+<tr>
+<td>QP调整</td>
+<td>当图像中发生运动时，增大QP；反之减小QP</td>
+<td>根据场景复杂度分配不同的码率，这样既保证了质量，有兼顾带宽限制</td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>优点</td>
+<td>压缩速度快</td>
+<td>优先考虑图像质量</td>
+<td>VBR和CBR的一种折衷选择</td>
+<td></td>
+</tr>
+<tr>
+<td>缺点</td>
+<td>每秒流量都相同容易导致空间浪费</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="4-h264的格式">4. H264的格式</h2>
+<p>由于视频数据在信息上存在空间、时间、结构、视觉等大量冗余信息，所以可以在保证视频质量的前提下，对数据进行压缩，降低存储和传输的数据量。</p>
+<ul>
+<li>空间冗余：单帧图像中，相邻像素的值常有相同或变化不大，有很强的关联性；</li>
+<li>结构冗余：图像中存在相同或类似的结构，如矩形图案；</li>
+<li>视觉冗余：对图像中亮度变化敏感而对颜色变化不敏感；对剧烈变化的边缘区域敏感而对缓慢变化的非边缘区域不敏感。</li>
+<li>时间冗余：在一段时间间隔里出现的场景相同或变化不大，帧与帧间有很强的关联性；</li>
+</ul>
+<ol>
+<li>根据当前以编码的信息对当前信号做预测，可以是帧间、帧内。</li>
+<li>预测值与当前值相减得到残差信号</li>
+<li>残差信号经过变换（通常为离散余弦变换），然后量化，熵编码去除冗余信息</li>
+</ol>
+<h3 id="41-帧内预测">4.1 帧内预测</h3>
+<p>利用空间、结构等做预测</p>
+<h3 id="42-帧间预测">4.2 帧间预测</h3>
+<p>利用时间冗余性做预测</p>
+<h3 id="43-两种格式">4.3 两种格式</h3>
+<p>H264的两种打包/封装方法：字节流AnnexB格式 和 AVCC格式。</p>
+<ul>
+<li>AnnexB格式用于网络发送，实时播放，可封装成RTP格式</li>
+<li>AVCC格式用于存储，如硬盘文件：MP4、MKV通常用该格式</li>
+</ul>
+<p>两者在NALU上格式一致，防竞争字节仍然存在，所有两个格式转换时不需要考虑NALU内部差异性。</p>
+<h2 id="5-annexb格式">5. AnnexB格式</h2>
+<h3 id="51-格式">5.1 格式</h3>
+<p>视频编码格式，主要包含NAL和VCL两个主要内容。</p>
+<ul>
+<li>VCL，(video coding layer:视频编码层)，负责高效显示视频内容。VCL层是对块、宏块及片语法级别的定义，最终输出压缩编码后的数据<strong>SODB</strong>(string of data byte,数据比特流)，数据 bit 流，最原始的编码数据。</li>
+</ul>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_H264_Annexb1.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_H264_Annexb1.png"
+	
+	
+></p>
+<ul>
+<li>
+<ul>
+<li>RBSP：Raw Byte Sequence Payload，原始字节序列载荷，在SODB的后面填加了结尾比特，RBSP trailing bits　一个bit“1”，若干比特“0”,以便字节对齐；</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>EBSP：Encapsulated Byte Sequence Payload，扩展字节序列载荷，在RBSP基础上填加了仿竞争字节（0x03），为防止编码数据中出现后续要添加的起始码，当发现连续2个字节为0，就会添加0x03，解码时再去掉；</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>EBSP前添加Nalu头构成NALU；</li>
+</ul>
+</li>
+<li>
+<ul>
+<li>NALU前添加起始码，由于nalu以起始码0x00000001寻找开始。</li>
+</ul>
+</li>
+<li>
+<p>NAL，(network abstraction layer：网络抽象层)，用于对数据进行打包和发送。在存储和传输前对SODB添加NAL头，组成NALU单元。NALU可以携带编码片，或者是序列参数集，或图像参数集等。</p>
+</li>
+</ul>
+<h3 id="52-nalu-header">5.2 NALU header</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>+---------------+
+</span></span><span style="display:flex;"><span>|0|1|2|3|4|5|6|7|
+</span></span><span style="display:flex;"><span>+-+-+-+-+-+-+-+-+
+</span></span><span style="display:flex;"><span>|F|NRI|   TYPE  |
+</span></span><span style="display:flex;"><span>+---------------+
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>bit位</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>F</td>
+<td>禁止位，0表示正常，1表示错误，一般为0</td>
+</tr>
+<tr>
+<td>NRI</td>
+<td>重要级别，11：非常重要，一般取值为01、10、11</td>
+</tr>
+<tr>
+<td>TYPE:nalu_unit_type</td>
+<td>NALU类型</td>
+</tr>
+</tbody>
+</table></div>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>nalu_unit_type</th>
+<th>NAL类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td>未使用</td>
+</tr>
+<tr>
+<td>1</td>
+<td>非IDR的片</td>
+</tr>
+<tr>
+<td>5</td>
+<td>一个序列的第一个图像叫IDR帧（立即刷新帧），IDR帧都是I帧</td>
+</tr>
+<tr>
+<td>6</td>
+<td>补充增强信息单元SEI</td>
+</tr>
+<tr>
+<td>7</td>
+<td>序列参数集SPS</td>
+</tr>
+<tr>
+<td>8</td>
+<td>图像参数集PPS</td>
+</tr>
+</tbody>
+</table></div>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 类型
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#458;font-weight:bold">int</span> type <span style="color:#000;font-weight:bold">=</span> code <span style="color:#000;font-weight:bold">&amp;</span> <span style="color:#099">0x1f</span>;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>nalu header常见取值如下：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>NALU header</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0x67,0x47,0x27</td>
+<td>SPS，重要级别分别为11,10,01</td>
+</tr>
+<tr>
+<td>0x68,0x48,0x28</td>
+<td>PPS，重要级别分别为11,10,01</td>
+</tr>
+<tr>
+<td>0x65,0x45,0x25</td>
+<td>IDR帧，重要级别分别为11,10,01</td>
+</tr>
+<tr>
+<td>0x61,0x41,0x21</td>
+<td>非IDR帧，重要级别分别为11,10,01</td>
+</tr>
+</tbody>
+</table></div>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_H264%e8%a3%b8%e6%95%b0%e6%8d%ae.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_H264裸数据"
+	
+	
+></p>
+<h3 id="53-sps-pps-sei作用">5.3 SPS PPS SEI作用</h3>
+<p>SPS信息对解码至关重要，如果该数据丢失，解码过程可能失败。</p>
+<ul>
+<li>SPS：保存一组编码后图像序列依赖全局参数</li>
+</ul>
+<blockquote>
+<p>包括：图像分辨率、profile、level</p>
+</blockquote>
+<ul>
+<li>PPS：保存每一帧编码后的图像所依赖的参数，如slice信息</li>
+</ul>
+<blockquote>
+<p>包括：熵编码模式选择标识(0:CAVLC 1:CABAC)</p>
+</blockquote>
+<ul>
+<li>SEI：向码流中加入额外信息</li>
+</ul>
+<h3 id="54-nalu-start-code">5.4 NALU start-code</h3>
+<p>NALU中数据不包含它的长度信息，所有添加起始码来标识包的起始和结束，所有Annex B格式使用起始码start-code：0x00 00 00 01或0x00 00 01解决这个问题。</p>
+<ul>
+<li>防竞争字节：为防止编码数据中存在start-code，当检测到连续两个或三个00时，插入新字节0x03。解码时逐字节读取NAL数据，统计NAL长度，然后再开始解码。</li>
+</ul>
+<h2 id="6-avcc格式">6. AVCC格式</h2>
+<ul>
+<li>Annex-B：没有NALU长度字节，使用start code分隔NALU，start code为三字节或四字节，0x000001或0x00000001，一般是四字节；SPS和PPS按流的方式写在一组GOP之前。</li>
+<li>AVCC：使用NALU长度，固定字节，通常为4字节，分隔NALU；一般在每个NALU头部为4字节大端格式的长度字节，在一组GOP的头部包含extradata结构，用于存储sequence-header、SPS、PPS数据。</li>
+<li>虽然AVCC格式不使用起始码，防竞争字节仍然存在</li>
+</ul>
+<h3 id="61-extradatasequence-header结构详解">6.1 extradata/sequence header结构详解</h3>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_H264_extradata.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_H264_extradata"
+	
+	
+></p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>name</th>
+<th>length,unit:bit</th>
+<th>value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>version</td>
+<td>8bit</td>
+<td>0x01</td>
+</tr>
+<tr>
+<td>avc profile</td>
+<td>8bit</td>
+<td>0x64</td>
+</tr>
+<tr>
+<td>avc compatibility</td>
+<td>8bit</td>
+<td>0x00</td>
+</tr>
+<tr>
+<td>avc level</td>
+<td>8bit</td>
+<td>0x0A</td>
+</tr>
+<tr>
+<td>NALULengthSizeMinusOne</td>
+<td>8bit</td>
+<td>0xFF，高6位保留，默认为1，低2位为11，表示NALU长度用3+1=4字节表示(0xFC，低2位为00，表示NALU长度用1个字节表示)</td>
+</tr>
+<tr>
+<td>number of sps nalus</td>
+<td>8bit</td>
+<td>0xE1，高3为保留，低5为表示有几个SPS，通常只有一个SPS</td>
+</tr>
+<tr>
+<td>SPS size</td>
+<td>16bit</td>
+<td>大端格式的SPS长度，0x0019，表示25字节SPS</td>
+</tr>
+<tr>
+<td>SPS NALU data</td>
+<td>SPS size x 8bit</td>
+<td>0x67到0x80，表示SPS数据</td>
+</tr>
+<tr>
+<td>number of pps nalus</td>
+<td>8bit</td>
+<td>0x01个PPS个数，通常只有一个PPS</td>
+</tr>
+<tr>
+<td>PPS size</td>
+<td>8bit</td>
+<td>0x07，表示PPS的数据长度</td>
+</tr>
+<tr>
+<td>PPS NALU data</td>
+<td>PPS size x 8bit</td>
+<td>0x68到0x30，表示PPS数据</td>
+</tr>
+</tbody>
+</table></div>
+<p>NALULengthSizeMinusOne解释：这个变量告诉我们用几个字节来存储NALU的长度。</p>
+<ul>
+<li>如果NALULengthSizeMinusOne是0，那么每个NALU使用一个字节的前缀来指定长度，那么每个NALU包的最大长度是255字节，这个明显太小了</li>
+<li>使用2个字节的前缀来指定长度，那么每个NALU包的最大长度是64K字节，也不一定够，一般分辨率达到1280*720 的图像编码出的I帧，可能大于64K。3字节是比较完美的，但是因为一些原因（例如对齐）没有被广泛支持</li>
+<li>因此4字节长度的前缀是目前使用最多的方式。</li>
+</ul>
+<h2 id="7-h264-annexb与avcc格式转换">7. H264 AnnexB与AVCC格式转换</h2>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_H264_%e6%a0%bc%e5%bc%8f.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_H264_格式"
+	
+	
+></p>
+<h3 id="71-h264-annexb转为avcc">7.1 H264 Annexb转为AVCC</h3>
+<ol>
+<li>对于一个GOP的开始，根据start-code，分离出SPS、PPS帧，并分别计算出长度</li>
+<li>根据SPS, PPS创建出extradata，附加到GOP的头部</li>
+<li>从IDR帧开始，搜索start-code，分离出每一个NALU，计算长度，然后将start-code转为4字节的NALU长度</li>
+</ol>
+<h3 id="72-avcc-转为-h264-annexb">7.2 AVCC 转为 H264 Annexb</h3>
+<ol>
+<li>对于一个GOP的开始，首先检索出extradata部分的数据</li>
+<li>根据extradata数据创建出SPS帧，并用4字节的start-code：0x00000001附加在SPS数据的头部</li>
+<li>根据extradata数据创建出PPS帧，并用4字节的start-code：0x00000001附加在PPS数据的头部，并将PPS数据连接到SPS后面</li>
+<li>根据NALU的长度字段，分离出每一个NALU，然后用用4字节的start-code：0x00000001替换长度字段</li>
+<li>在以上过程中需要计算每一个NALU的长度，尤其是GOP的IDR帧，一般在IDR帧前还有SPS与PPS帧，其长度需要一起计算。</li>
+</ol>
+<h2 id="参考">参考</h2>
+<ol>
+<li><a class="link" href="https://blog.csdn.net/qq_21743659/article/details/124007428"  target="_blank" rel="noopener"
+    >音视频学习-H264帧基础知识</a></li>
+<li><a class="link" href="https://blog.csdn.net/heli200482128/article/details/126058291"  target="_blank" rel="noopener"
+    >H264 Profile对比分析</a></li>
+<li><a class="link" href="https://blog.csdn.net/m0_60259116/article/details/124870967?spm=1001.2101.3001.6661.1&amp;utm_medium=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1-124870967-blog-124007428.235%5Ev27%5Epc_relevant_3mothn_strategy_and_data_recovery&amp;depth_1-utm_source=distribute.pc_relevant_t0.none-task-blog-2%7Edefault%7ECTRLIST%7ERate-1-124870967-blog-124007428.235%5Ev27%5Epc_relevant_3mothn_strategy_and_data_recovery&amp;utm_relevant_index=1"  target="_blank" rel="noopener"
+    >H264编码基础概念+格式分析</a></li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E6%B5%81%E5%AA%92%E4%BD%93/">流媒体</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/%E9%9F%B3%E8%A7%86%E9%A2%91/ps/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">数据流:PS和TS</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E9%9F%B3%E8%A7%86%E9%A2%91/rtp/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">流媒体传输协议:RTP</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

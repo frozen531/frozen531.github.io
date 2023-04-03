@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='MPEG(moving picture expert group)动态图像专家组开发的标准成为MPEG标准，主要用来阐明视像、音频的编码和解码过程，规定编码后组成位流的语法等。
+MPEG-1的编码系统由两部分组成：视像编码和声音编码、系统层上的多路复合；其中MPEG-1 system部分定义了如何将压缩后的音、视频及其他数据进行组合和实现同步，其目的在于生成单一数据位流，便于存储和传输。
+MPEG-2对MPEG-1进行扩展，其编码系统由两部分组成：视像编码和声音编码、数据打包和多路数据复合。
+MPEG-2将视像、声音和其他数据组合在一起，生成适合存储或传输的基本数据流。数据流由两种类型：PS和TS。这两类都由一个或多个打包的基本数据流PES组合生成。
+MPEG-2为了避免不同系统的复杂性和带宽浪费，引入profile(配置)和level(等级)。不同profile使用的编码算法不同，且不同profile按照分辨率和帧率、码率等定义有不同的level。
+MPEG定义数据位流结构，按照统一的规范组织视像数据流，保证解码器设计的通用性。MPEG-1将视像序列分成若干个GOP(group of picture：图像组)，把GOP中每帧图像分成许多slice，每个slice分成若干宏块，每个宏块又分为若干图块，如下图所示。
+术语 ES流（elementary stream）：基本码流，指编码后的音、视频数据，每个ES只包含一种数据类型。 PES （packet elementary stream）：将ES根据需要分割为不同长度的数据包，加上包头得到PES。通过将连续的长流分割为短流，便于在网络中分组发送。 TS（transport stream）：传输流。将视频、音频的ES流和辅助信息复合在一起用于实际传输的标准信息流。不同的PES根据共同或独立的时间基准组合成一个TS流。 PS （program stream）：节目流。总以0x000001BA开始，如果为PS文件，则有且只有一个结束码0x000001B9；网传PS通常没有结束码。 PS与TS的区别：
+TS是固定包长度为188字节，PS包长可变； TS用于出现错误相对较多的环境下；PS用在出现错误相对比较少的环境。信道环境差的情况下，当同步信息被破坏，对于TS流，接收端可检测后面包的同步信息，从而恢复同步，避免信息丢失；PS包变长，接收端无法在特定位置检查同步信息，丢失同步信息，无法正常播放。 从使用范围上看：
+TS、RTP适用于数据流传输，不具有存储属性； PS既有存储属性又可以做实时流传输。 PES PES 包中的部分字段解释：
+packet_start_code_prefix，PES包头起始串，0x00000001 stream_id，表示基本流的类型和编号。 PES_packet_length，表示 PES 包中在该字段后的数据字节数，该字段 16 比特。 PTS，表示显示时间戳。分为 3 段，共 33 比特。 DTS，表示解码时间戳。分为 3 段，共 33 比特。 ES_rate，基本流速率，在 PES 流情况中，指定解码器接收 PES 包字节的速率。 trick_mode_control，表示相关视频的特技方式，3 比特字段。这些特技方式包括：快进、慢动作、冻结帧、快速反向、慢反向等。 PES_packet_data_byte，表示来自包 stream_id 或 PID 所指示的基本流的连贯数据字节。该字段 8 比特一个单位。 PS基本封装格式 PS流是对PES的进一步封装，是将具有共同时间基准的一个或多个PES包组合而成的单一的数据流。
+PS流由PS包组成，PS包主要由固定包头、系统头和PES包组成。
+PSH：(Program stream pack header:ps包包头)，0x000001BA。存放系统时间、码率、帧号等信息； PS system header：(Partial system header，系统头)，0x000001BB，码率、类型说明等； PSM：(Program Stream Map:节目映射流)，0x000001BC，提供节目流中基本流的描述及其相互关系。存放版本号、描述子（basic、encrypt、video、clip、audio）、校验码等。 PES：负载类型：e0为视频、c0为音频、包长度等。 PS打包/解包过程 找到起始码0x000001BA，解析头部字段； 判断是否有PSM，根据PSM确定负载的ES流类型； 根据ES流类型解析出具体的ES流数据。 TS基本封装格式 TS数据包大小必须为188字节，，包括头部(TS Header)和荷载(Payload Data)2部分。TS Header主要包含传输流的头信息，用于传输和包分组，包括固定部分（4字节）和可选部分（adaptation field适配域）。'>
+<title>数据流:PS和TS</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E9%9F%B3%E8%A7%86%E9%A2%91/ps/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='数据流:PS和TS'>
+<meta property='og:description' content='MPEG(moving picture expert group)动态图像专家组开发的标准成为MPEG标准，主要用来阐明视像、音频的编码和解码过程，规定编码后组成位流的语法等。
+MPEG-1的编码系统由两部分组成：视像编码和声音编码、系统层上的多路复合；其中MPEG-1 system部分定义了如何将压缩后的音、视频及其他数据进行组合和实现同步，其目的在于生成单一数据位流，便于存储和传输。
+MPEG-2对MPEG-1进行扩展，其编码系统由两部分组成：视像编码和声音编码、数据打包和多路数据复合。
+MPEG-2将视像、声音和其他数据组合在一起，生成适合存储或传输的基本数据流。数据流由两种类型：PS和TS。这两类都由一个或多个打包的基本数据流PES组合生成。
+MPEG-2为了避免不同系统的复杂性和带宽浪费，引入profile(配置)和level(等级)。不同profile使用的编码算法不同，且不同profile按照分辨率和帧率、码率等定义有不同的level。
+MPEG定义数据位流结构，按照统一的规范组织视像数据流，保证解码器设计的通用性。MPEG-1将视像序列分成若干个GOP(group of picture：图像组)，把GOP中每帧图像分成许多slice，每个slice分成若干宏块，每个宏块又分为若干图块，如下图所示。
+术语 ES流（elementary stream）：基本码流，指编码后的音、视频数据，每个ES只包含一种数据类型。 PES （packet elementary stream）：将ES根据需要分割为不同长度的数据包，加上包头得到PES。通过将连续的长流分割为短流，便于在网络中分组发送。 TS（transport stream）：传输流。将视频、音频的ES流和辅助信息复合在一起用于实际传输的标准信息流。不同的PES根据共同或独立的时间基准组合成一个TS流。 PS （program stream）：节目流。总以0x000001BA开始，如果为PS文件，则有且只有一个结束码0x000001B9；网传PS通常没有结束码。 PS与TS的区别：
+TS是固定包长度为188字节，PS包长可变； TS用于出现错误相对较多的环境下；PS用在出现错误相对比较少的环境。信道环境差的情况下，当同步信息被破坏，对于TS流，接收端可检测后面包的同步信息，从而恢复同步，避免信息丢失；PS包变长，接收端无法在特定位置检查同步信息，丢失同步信息，无法正常播放。 从使用范围上看：
+TS、RTP适用于数据流传输，不具有存储属性； PS既有存储属性又可以做实时流传输。 PES PES 包中的部分字段解释：
+packet_start_code_prefix，PES包头起始串，0x00000001 stream_id，表示基本流的类型和编号。 PES_packet_length，表示 PES 包中在该字段后的数据字节数，该字段 16 比特。 PTS，表示显示时间戳。分为 3 段，共 33 比特。 DTS，表示解码时间戳。分为 3 段，共 33 比特。 ES_rate，基本流速率，在 PES 流情况中，指定解码器接收 PES 包字节的速率。 trick_mode_control，表示相关视频的特技方式，3 比特字段。这些特技方式包括：快进、慢动作、冻结帧、快速反向、慢反向等。 PES_packet_data_byte，表示来自包 stream_id 或 PID 所指示的基本流的连贯数据字节。该字段 8 比特一个单位。 PS基本封装格式 PS流是对PES的进一步封装，是将具有共同时间基准的一个或多个PES包组合而成的单一的数据流。
+PS流由PS包组成，PS包主要由固定包头、系统头和PES包组成。
+PSH：(Program stream pack header:ps包包头)，0x000001BA。存放系统时间、码率、帧号等信息； PS system header：(Partial system header，系统头)，0x000001BB，码率、类型说明等； PSM：(Program Stream Map:节目映射流)，0x000001BC，提供节目流中基本流的描述及其相互关系。存放版本号、描述子（basic、encrypt、video、clip、audio）、校验码等。 PES：负载类型：e0为视频、c0为音频、包长度等。 PS打包/解包过程 找到起始码0x000001BA，解析头部字段； 判断是否有PSM，根据PSM确定负载的ES流类型； 根据ES流类型解析出具体的ES流数据。 TS基本封装格式 TS数据包大小必须为188字节，，包括头部(TS Header)和荷载(Payload Data)2部分。TS Header主要包含传输流的头信息，用于传输和包分组，包括固定部分（4字节）和可选部分（adaptation field适配域）。'>
+<meta property='og:url' content='https://frozen531.github.io/post/%E9%9F%B3%E8%A7%86%E9%A2%91/ps/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='流媒体' /><meta property='article:published_time' content='2023-03-25T18:51:47&#43;08:00'/><meta property='article:modified_time' content='2023-03-25T18:51:47&#43;08:00'/>
+<meta name="twitter:title" content="数据流:PS和TS">
+<meta name="twitter:description" content="MPEG(moving picture expert group)动态图像专家组开发的标准成为MPEG标准，主要用来阐明视像、音频的编码和解码过程，规定编码后组成位流的语法等。
+MPEG-1的编码系统由两部分组成：视像编码和声音编码、系统层上的多路复合；其中MPEG-1 system部分定义了如何将压缩后的音、视频及其他数据进行组合和实现同步，其目的在于生成单一数据位流，便于存储和传输。
+MPEG-2对MPEG-1进行扩展，其编码系统由两部分组成：视像编码和声音编码、数据打包和多路数据复合。
+MPEG-2将视像、声音和其他数据组合在一起，生成适合存储或传输的基本数据流。数据流由两种类型：PS和TS。这两类都由一个或多个打包的基本数据流PES组合生成。
+MPEG-2为了避免不同系统的复杂性和带宽浪费，引入profile(配置)和level(等级)。不同profile使用的编码算法不同，且不同profile按照分辨率和帧率、码率等定义有不同的level。
+MPEG定义数据位流结构，按照统一的规范组织视像数据流，保证解码器设计的通用性。MPEG-1将视像序列分成若干个GOP(group of picture：图像组)，把GOP中每帧图像分成许多slice，每个slice分成若干宏块，每个宏块又分为若干图块，如下图所示。
+术语 ES流（elementary stream）：基本码流，指编码后的音、视频数据，每个ES只包含一种数据类型。 PES （packet elementary stream）：将ES根据需要分割为不同长度的数据包，加上包头得到PES。通过将连续的长流分割为短流，便于在网络中分组发送。 TS（transport stream）：传输流。将视频、音频的ES流和辅助信息复合在一起用于实际传输的标准信息流。不同的PES根据共同或独立的时间基准组合成一个TS流。 PS （program stream）：节目流。总以0x000001BA开始，如果为PS文件，则有且只有一个结束码0x000001B9；网传PS通常没有结束码。 PS与TS的区别：
+TS是固定包长度为188字节，PS包长可变； TS用于出现错误相对较多的环境下；PS用在出现错误相对比较少的环境。信道环境差的情况下，当同步信息被破坏，对于TS流，接收端可检测后面包的同步信息，从而恢复同步，避免信息丢失；PS包变长，接收端无法在特定位置检查同步信息，丢失同步信息，无法正常播放。 从使用范围上看：
+TS、RTP适用于数据流传输，不具有存储属性； PS既有存储属性又可以做实时流传输。 PES PES 包中的部分字段解释：
+packet_start_code_prefix，PES包头起始串，0x00000001 stream_id，表示基本流的类型和编号。 PES_packet_length，表示 PES 包中在该字段后的数据字节数，该字段 16 比特。 PTS，表示显示时间戳。分为 3 段，共 33 比特。 DTS，表示解码时间戳。分为 3 段，共 33 比特。 ES_rate，基本流速率，在 PES 流情况中，指定解码器接收 PES 包字节的速率。 trick_mode_control，表示相关视频的特技方式，3 比特字段。这些特技方式包括：快进、慢动作、冻结帧、快速反向、慢反向等。 PES_packet_data_byte，表示来自包 stream_id 或 PID 所指示的基本流的连贯数据字节。该字段 8 比特一个单位。 PS基本封装格式 PS流是对PES的进一步封装，是将具有共同时间基准的一个或多个PES包组合而成的单一的数据流。
+PS流由PS包组成，PS包主要由固定包头、系统头和PES包组成。
+PSH：(Program stream pack header:ps包包头)，0x000001BA。存放系统时间、码率、帧号等信息； PS system header：(Partial system header，系统头)，0x000001BB，码率、类型说明等； PSM：(Program Stream Map:节目映射流)，0x000001BC，提供节目流中基本流的描述及其相互关系。存放版本号、描述子（basic、encrypt、video、clip、audio）、校验码等。 PES：负载类型：e0为视频、c0为音频、包长度等。 PS打包/解包过程 找到起始码0x000001BA，解析头部字段； 判断是否有PSM，根据PSM确定负载的ES流类型； 根据ES流类型解析出具体的ES流数据。 TS基本封装格式 TS数据包大小必须为188字节，，包括头部(TS Header)和荷载(Payload Data)2部分。TS Header主要包含传输流的头信息，用于传输和包分组，包括固定部分（4字节）和可选部分（adaptation field适配域）。">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#术语">术语</a></li>
+    <li><a href="#pes">PES</a></li>
+    <li><a href="#ps基本封装格式">PS基本封装格式</a>
+      <ul>
+        <li><a href="#ps打包解包过程">PS打包/解包过程</a></li>
+      </ul>
+    </li>
+    <li><a href="#ts基本封装格式">TS基本封装格式</a>
+      <ul>
+        <li><a href="#patprogram-association-table节目关联表">PAT(Program Association Table，节目关联表)</a></li>
+        <li><a href="#pmtprogram-map-table节目映射表">PMT(Program Map Table，节目映射表)</a></li>
+        <li><a href="#cat条件访问表cat">CAT(条件访问表CAT)</a></li>
+        <li><a href="#nitnetwork-information-table网络信息表nit">NIT(Network Information Table,网络信息表NIT)</a></li>
+      </ul>
+    </li>
+    <li><a href="#ps与ts转换">PS与TS转换</a></li>
+    <li><a href="#ts流生成和解析">TS流生成和解析</a></li>
+    <li><a href="#参考">参考</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E9%9F%B3%E8%A7%86%E9%A2%91/" style="background-color: #8B658B; color: #fff;">
+                音视频
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E9%9F%B3%E8%A7%86%E9%A2%91/ps/">数据流:PS和TS</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Mar 25, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    1 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <p>MPEG(moving picture expert group)动态图像专家组开发的标准成为MPEG标准，主要用来阐明视像、音频的编码和解码过程，规定编码后组成位流的语法等。</p>
+<p>MPEG-1的编码系统由两部分组成：视像编码和声音编码、系统层上的多路复合；其中MPEG-1 system部分定义了如何将压缩后的音、视频及其他数据进行组合和实现同步，其目的在于生成单一数据位流，便于存储和传输。</p>
+<p>MPEG-2对MPEG-1进行扩展，其编码系统由两部分组成：视像编码和声音编码、数据打包和多路数据复合。</p>
+<p>MPEG-2将视像、声音和其他数据组合在一起，生成适合存储或传输的基本数据流。数据流由两种类型：PS和TS。这两类都由一个或多个打包的基本数据流PES组合生成。</p>
+<p>MPEG-2为了避免不同系统的复杂性和带宽浪费，引入profile(配置)和level(等级)。不同profile使用的编码算法不同，且不同profile按照分辨率和帧率、码率等定义有不同的level。</p>
+<p>MPEG定义数据位流结构，按照统一的规范组织视像数据流，保证解码器设计的通用性。MPEG-1将视像序列分成若干个GOP(group of picture：图像组)，把GOP中每帧图像分成许多slice，每个slice分成若干宏块，每个宏块又分为若干图块，如下图所示。</p>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_mpeg_1_%e8%a7%86%e5%83%8f%e6%95%b0%e6%8d%ae%e6%b5%81%e7%bb%93%e6%9e%84.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_mpeg_1_视像数据流结构"
+	
+	
+></p>
+<h2 id="术语">术语</h2>
+<ul>
+<li>ES流（elementary stream）：基本码流，指编码后的音、视频数据，每个ES只包含一种数据类型。</li>
+<li>PES （packet elementary stream）：将ES根据需要分割为不同长度的数据包，加上包头得到PES。通过将连续的长流分割为短流，便于在网络中分组发送。</li>
+<li>TS（transport stream）：传输流。将视频、音频的ES流和辅助信息<strong>复合</strong>在一起用于实际传输的标准信息流。不同的PES根据共同或独立的时间基准组合成一个TS流。</li>
+<li>PS （program stream）：节目流。总以0x000001BA开始，如果为PS文件，则有且只有一个结束码0x000001B9；网传PS通常没有结束码。</li>
+</ul>
+<p>PS与TS的区别：</p>
+<ol>
+<li>TS是固定包长度为188字节，PS包长可变；</li>
+<li>TS用于出现错误相对较多的环境下；PS用在出现错误相对比较少的环境。信道环境差的情况下，当同步信息被破坏，对于TS流，接收端可检测后面包的同步信息，从而恢复同步，避免信息丢失；PS包变长，接收端无法在特定位置检查同步信息，丢失同步信息，无法正常播放。</li>
+</ol>
+<p>从使用范围上看：</p>
+<ul>
+<li>TS、RTP适用于数据流传输，不具有存储属性；</li>
+<li>PS既有存储属性又可以做实时流传输。</li>
+</ul>
+<h2 id="pes">PES</h2>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_PES.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_PES"
+	
+	
+></p>
+<p>PES 包中的部分字段解释：</p>
+<ul>
+<li>packet_start_code_prefix，PES包头起始串，0x00000001</li>
+<li>stream_id，表示基本流的类型和编号。</li>
+<li>PES_packet_length，表示 PES 包中在该字段后的数据字节数，该字段 16 比特。</li>
+<li>PTS，表示显示时间戳。分为 3 段，共 33 比特。</li>
+<li>DTS，表示解码时间戳。分为 3 段，共 33 比特。</li>
+<li>ES_rate，基本流速率，在 PES 流情况中，指定解码器接收 PES 包字节的速率。</li>
+<li>trick_mode_control，表示相关视频的特技方式，3 比特字段。这些特技方式包括：快进、慢动作、冻结帧、快速反向、慢反向等。</li>
+<li>PES_packet_data_byte，表示来自包 stream_id 或 PID 所指示的基本流的连贯数据字节。该字段 8 比特一个单位。</li>
+</ul>
+<h2 id="ps基本封装格式">PS基本封装格式</h2>
+<p>PS流是对PES的进一步封装，是将具有共同时间基准的一个或多个PES包组合而成的单一的数据流。<br>
+PS流由PS包组成，PS包主要由固定包头、系统头和PES包组成。</p>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_PS%e5%88%86%e8%a3%85.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_PS分装"
+	
+	
+></p>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_PS.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_PS"
+	
+	
+></p>
+<ul>
+<li>PSH：(Program stream pack header:ps包包头)，0x000001BA。存放系统时间、码率、帧号等信息；</li>
+<li>PS system header：(Partial system header，系统头)，0x000001BB，码率、类型说明等；</li>
+<li>PSM：(Program Stream Map:节目映射流)，0x000001BC，提供节目流中基本流的描述及其相互关系。存放版本号、描述子（basic、encrypt、video、clip、audio）、校验码等。</li>
+<li>PES：负载类型：e0为视频、c0为音频、包长度等。</li>
+</ul>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_PS%e5%b0%81%e8%a3%85%e6%95%b0%e6%8d%ae%e8%a7%a3%e6%9e%90.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_PS封装数据解析"
+	
+	
+></p>
+<h3 id="ps打包解包过程">PS打包/解包过程</h3>
+<ol>
+<li>找到起始码0x000001BA，解析头部字段；</li>
+<li>判断是否有PSM，根据PSM确定负载的ES流类型；</li>
+<li>根据ES流类型解析出具体的ES流数据。</li>
+</ol>
+<h2 id="ts基本封装格式">TS基本封装格式</h2>
+<p>TS数据包大小必须为188字节，，包括头部(TS Header)和荷载(Payload Data)2部分。TS Header主要包含传输流的头信息，用于传输和包分组，包括固定部分（4字节）和可选部分（adaptation field适配域）。</p>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_TS.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_TS"
+	
+	
+></p>
+<p>TS包中PID用来识别TS包所承载的数据类型。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>PID</th>
+<th>类型</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0x0000</td>
+<td>PAT(Program Association Table:节目关联表)</td>
+</tr>
+<tr>
+<td>0x0001</td>
+<td>CAT(Conditional Access Table:条件访问表)</td>
+</tr>
+</tbody>
+</table></div>
+<p>TS流中是多路节目复用的，即多个节目的多个基本流复用后在同一个TS流上传输，那么怎么知道各个节目在传输流中的位置，并区分哪个流属于哪个节目呢？所以就还需要一些附加信息，这就是PSI（Program Specific Information，节目专用信息）。<br>
+标准中规定了4个PSI，分别是节目关联表PAT、节目映射表PMT、条件访问表CAT、网络信息表NIT。<br>
+这些表都由一个或多个子表组成，而子表又进一步由一个或多个section组成，在从PSI表到TS包的转换过程中，section起到了中介的作用。不同的表之间可以通过表标识（table_id）进行区分，属于同一个table_id的不同子表一般通过表的扩展标识（table_id_extension）、版本号（version_number）进行区分，对于子表还要加上其它的字段信息条件。其在这些表中的结构如下图：</p>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_TS_PSI%e7%bb%93%e6%9e%84.bmp"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_TS_PSI结构"
+	
+	
+></p>
+<h3 id="patprogram-association-table节目关联表">PAT(Program Association Table，节目关联表)</h3>
+<p>PAT（Program Association Table，节目关联表）的PID值固定为'0x0000&rsquo;， 是PSI的根节点。每个TS流中可能包含一个或多个PAT，所有的这些PAT共同组成了这个TS流中包含的节目列表。PAT列出了TS流中存在哪些节目流，指定了TS流中每个节目对应PMT所在TS包的PID。<br>
+当播放器对视频开始检索分析的时候，针对每个TS 包的header中pid成员进行判定，直到找到PAT表开始的地方进行有效数据起始分析。<br>
+PAT的第一条数据指定了NIT所在TS包的PID，其他数据指定了PMT所在TS包的PID，一个TS流含多少个节目就含有多少PMT。节目关联表PAT的结构图、结构代码、字段信息按顺序展示如下：</p>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_TS_PAT.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_TS_PAT"
+	
+	
+></p>
+<h3 id="pmtprogram-map-table节目映射表">PMT(Program Map Table，节目映射表)</h3>
+<p>解析TS流的时候首先要从PID为0的包里找到节目关联表PAT，因为在PAT中指定了PMT（Program Map Table，节目映射表）所在包的PID。由于PMT中指定了一路节目中各个基本流（视频、音频等）的映射关系，即该节目视频或音频所在TS包的PID，根据指定的PID就可以找到对应的音视频流。总结来说，PMT是用来区分单个节目中的各个基本流，PAT则是区分多路复用中的各个节目。节目映射表的结构图、代码结构、字段解释按顺序解释如下：</p>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_TS_PMT.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_TS_PMT"
+	
+	
+></p>
+<h3 id="cat条件访问表cat">CAT(条件访问表CAT)</h3>
+<p>CAT（Conditional Access Table，条件访问表）所在TS包的PID值为'0x0001&rsquo;，CAT中列出了条件控制信息（ECM）和条件管理信息（EMM）所在分组的PID，用于节目的加密与解密。CAT的结构图、代码结构按顺序展示如下（相关字段在上面的PAT和PMT中已经出现过了，不需要再解释，参考上面即可）：</p>
+<p><img src="/%e9%9f%b3%e8%a7%86%e9%a2%91_TS_PMT.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="音视频_TS_CAT"
+	
+	
+></p>
+<h3 id="nitnetwork-information-table网络信息表nit">NIT(Network Information Table,网络信息表NIT)</h3>
+<p>NIT（Network Information Table，网络信息表）的PID由PAT中的network_PID字段指定，但NIT的内容是私有的、由用户指定的。它提供TS流的传输信息以及网络自身特性信息，比如网络名称、频道频率、调制特征等信息。</p>
+<h2 id="ps与ts转换">PS与TS转换</h2>
+<h2 id="ts流生成和解析">TS流生成和解析</h2>
+<p>1）TS 流的生成流程大致如下：</p>
+<ol>
+<li>将原始的音视频数据编码后，组成基本码流（ES）；</li>
+<li>将基本码流（ES）打包成 PES；</li>
+<li>在 PES 中加入需要的信息，比如 PTS、DTS 等；</li>
+<li>将 PES 包的数据装载到一系列固定长度为 188 字节的传输包（TS Packet）中；</li>
+<li>在 TS 包中加入需要的信息，比如 PSI、PCR 等；</li>
+<li>连输输出 TS 包形成具有恒定码率的 TS 流。</li>
+</ol>
+<p>2）TS 流的解析流程大致如下：</p>
+<ol>
+<li>从 TS 流中解析出 TS 包；</li>
+<li>从 TS 包中获取流信息，比如 PSI、PCR 等；</li>
+<li>获取特定节目的音视频 PID；</li>
+<li>通过 PID 获取特定音视频相关的 TS 包，从中解析出 PES 包；</li>
+<li>从 PES 包中获取 PTS、DTS 等时间戳信息，并从 PES 中解析出基本码流（ES）；</li>
+<li>将基本码流数据交给解码器，解码出原始音视频数据。</li>
+</ol>
+<h2 id="参考">参考</h2>
+<ol>
+<li><a class="link" href="https://blog.csdn.net/jisuanji111111/article/details/120326420"  target="_blank" rel="noopener"
+    >网络流媒体&ndash;PS封装格式</a></li>
+<li><a class="link" href="https://blog.csdn.net/qq_37837061/article/details/116293819"  target="_blank" rel="noopener"
+    >PS和TS</a></li>
+<li><a class="link" href="https://blog.csdn.net/woshizhanhun/article/details/3589730?utm_medium=distribute.pc_relevant.none-task-blog-2~default~baidujs_baidulandingword~default-8-3589730-blog-116293819.pc_relevant_aa&amp;spm=1001.2101.3001.4242.5&amp;utm_relevant_index=11"  target="_blank" rel="noopener"
+    >有关视频传输中TS、PS的释疑（转）</a></li>
+<li><a class="link" href="https://cloud.tencent.com/developer/article/2021489"  target="_blank" rel="noopener"
+    >TS 格式：为什么直播回放的切片一般都用它？丨音视频基础</a></li>
+<li><a class="link" href="https://cloud.tencent.com/developer/article/1985862?from=article.detail.2216858&amp;areaSource=106000.14&amp;traceId=CfFGLGQIXIT7zpFPawge3"  target="_blank" rel="noopener"
+    >学习音视频技术要看什么书？世界读书日图书推荐</a></li>
+<li><a class="link" href="https://blog.csdn.net/m0_60259116/article/details/127211160"  target="_blank" rel="noopener"
+    >MPEG2 -TS流结构详细浅析</a></li>
+<li><a class="link" href="https://blog.csdn.net/m0_60259116/article/details/127414345"  target="_blank" rel="noopener"
+    >H264解码之PS流解析</a></li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E6%B5%81%E5%AA%92%E4%BD%93/">流媒体</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/%E9%9F%B3%E8%A7%86%E9%A2%91/rtp/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">流媒体传输协议:RTP</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
