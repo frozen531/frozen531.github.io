@@ -6,7 +6,121 @@
         <description>Recent content in 读书笔记 on 浅浅的行迹</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
-        <lastBuildDate>Sun, 05 Mar 2023 21:22:14 +0800</lastBuildDate><atom:link href="https://frozen531.github.io/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Tue, 27 Jun 2023 21:19:23 +0800</lastBuildDate><atom:link href="https://frozen531.github.io/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>01_计算机系统漫游</title>
+        <link>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/01_%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%BC%AB%E6%B8%B8/</link>
+        <pubDate>Tue, 27 Jun 2023 21:19:23 +0800</pubDate>
+        
+        <guid>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/01_%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%BC%AB%E6%B8%B8/</guid>
+        <description>&lt;p&gt;本章以最简单的hello进行一次旋风式的系统漫游。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#999;font-weight:bold;font-style:italic&#34;&gt;#include&lt;/span&gt; &lt;span style=&#34;color:#999;font-weight:bold;font-style:italic&#34;&gt;&amp;lt;stdio.h&amp;gt;&lt;/span&gt;&lt;span style=&#34;color:#999;font-weight:bold;font-style:italic&#34;&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#999;font-weight:bold;font-style:italic&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;main&lt;/span&gt;()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;printf&lt;/span&gt;(&lt;span style=&#34;color:#d14&#34;&gt;&amp;#34;hello world! &lt;/span&gt;&lt;span style=&#34;color:#d14&#34;&gt;\n&lt;/span&gt;&lt;span style=&#34;color:#d14&#34;&gt;&amp;#34;&lt;/span&gt;);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;1-从源程序到可执行文件&#34;&gt;1. 从源程序到可执行文件&lt;/h2&gt;
+&lt;p&gt;各种不同的高级语言经过不同的编译器后转换为统一的汇编语言。不同处理器体系架构对应的汇编指令也是不同的。&lt;/p&gt;
+&lt;p&gt;源程序到可执行文件的过程：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e6%ba%90%e6%96%87%e4%bb%b6%e7%bc%96%e8%af%91%e8%bf%87%e7%a8%8b.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;源文件编译过程.png&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;注：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;文件分为文本文件和二进制文件。文本文件是我们可以阅读并读懂的文件。&lt;/li&gt;
+&lt;li&gt;所有文件都是由字节序列构成。文本文件是由于字节序列（整数）对应了某些字符（根据某些标准：ASCII，GB2312等），我们可以读懂。&lt;/li&gt;
+&lt;li&gt;字节本质也是0和1的组合，在程序运行过程中，内存中的01序列既可以是数据（整数、浮点数、字符串），也可以是代码，分辨不同对象的唯一方法是上下文。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;2-计算机系统运行hello&#34;&gt;2. 计算机系统运行hello&lt;/h2&gt;
+&lt;p&gt;计算机系统是由硬件和系统软件构成，它们共同作用来运行应用程序。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e4%b8%80%e4%b8%aa%e5%85%b8%e5%9e%8b%e7%b3%bb%e7%bb%9f%e7%9a%84%e7%a1%ac%e4%bb%b6%e7%bb%84%e6%88%90.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;一个典型系统的硬件组成.png&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;冯.诺依曼体系结构中计算机5大部件：控制器、运算器、存储器、输入设备和输出设备。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;CPU：中央处理器，主要用来执行存储在主存中的指令。主要包含ALU(算数逻辑单元)、控制器和其他部件（寄存器组等）。PC指针始终指向下一条待执行指令。通过控制总线、地址总线和数据总线，读取指令、读写数据并执行指令。&lt;/li&gt;
+&lt;li&gt;主存储器：一组动态随机存储器（DRAM），物理内存。程序执行时会加载入内存。&lt;/li&gt;
+&lt;li&gt;总线：携带信息在各个组件间传递。包括地址总线（宽度决定了CPU的寻址能力）、控制总线（宽度决定了CPU对其他器件的控制能力）和数据总线（宽度决定了CPU与其他器件一次性传送的数据量）。&lt;/li&gt;
+&lt;li&gt;I/O设备：输入设备与输出设备。I/O设备通过控制器或适配器与I/O总线相连。主要区别在于它们的封装方式。每个PC都有一块主板，主板上包含有CPU、存储器、外围芯片组、扩展卡槽等。控制器是位于主板上的芯片组，而适配器是一块插在主板卡槽上的卡，称为接口卡。CPU通过总线想接口卡发送命令，接口卡根据CPU发送的命令控制外设工作。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;DMA(直接存储器存取)技术，可以不经过CPU直接将数据从磁盘到达主存，用于数据搬运。其他键盘输入、屏幕输出、指令执行等所有的操作都要在CPU走一遭。&lt;/p&gt;
+&lt;h2 id=&#34;3-存储设备的层次结构&#34;&gt;3. 存储设备的层次结构&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e5%ad%98%e5%82%a8%e5%99%a8%e5%b1%82%e6%ac%a1%e7%bb%93%e6%9e%84%e7%a4%ba%e6%84%8f%e5%9b%be.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;存储器层次结构示意图.png&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;由于CPU处理的信息都来自于主存，系统需要花费大量时间白信息从一个地方挪到（复制）另一个地方。再加上CPU的处理速度远高于主存，系统为极可能快的完成这些操作，通过在处理器与主存间加入高速缓存（静态随机访问存储器SRAM），提高速度。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;局部性原理&lt;/strong&gt;：程序具有访问局部区域里的数据和代码的趋势。&lt;/p&gt;
+&lt;p&gt;高速缓存利用局部性原理，存放经常访问的代码和数据，使得大部分内存操作都能在高速缓存中完成。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;L1高速缓存容量可达数万字节，其访问速度同寄存器一样快&lt;/li&gt;
+&lt;li&gt;L2高速缓存容量达数十万到数百万，比L1访问时间长5倍&lt;/li&gt;
+&lt;li&gt;存储器层次结构思想：下一层是上一层存储器的高速缓存&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;4-操作系统管理硬件&#34;&gt;4. 操作系统管理硬件&lt;/h2&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e6%93%8d%e4%bd%9c%e7%b3%bb%e7%bb%9f%e6%8f%90%e4%be%9b%e7%9a%84%e6%8a%bd%e8%b1%a1%e8%a1%a8%e7%a4%ba.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;操作系统提供的抽象表示.png&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;操作系统向下管理硬件，向上向应用程序提供接口。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;文件。Linux上一切皆文件。对于I/O设备，以文件的形式向应用程序提供统一的视图，通过统一的系统函数调用实现读写操作，程序员无需关心底层如何操作各种I/O设备。&lt;/li&gt;
+&lt;li&gt;进程。进程是操作系统对一个正在运行的程序的抽象。并发运行，每个进程好像独占使用硬件，实际上是通过CPU在进程间切换实现，这种交错执行的机制称为&lt;strong&gt;上下文切换&lt;/strong&gt;。这种转换是由操作系统内核管理的。&lt;/li&gt;
+&lt;li&gt;线程。一个进程通常包含多个线程。线程相比进程更容易共享数据（同样的代码和全局数据），每个线程都运行在进程的上下文中，比进程更高效。&lt;/li&gt;
+&lt;li&gt;虚拟内存。为进程提供一个独占内存的假象。每个进程看到的地址都是一致的，称之为虚拟地址空间。在每个进程最高地址都有一段内核虚拟内存，内核是操作系统常驻主存的部分，用来执行应用程序中的系统调用，是系统管理全部进程所用代码和数据结构的集合，其并非是一个独立的进程。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;5-并发与并行&#34;&gt;5. 并发与并行&lt;/h2&gt;
+&lt;p&gt;并发：指一个同时具有多个活动的系统。&lt;br&gt;
+并行：用并发是一个系统运行的更快。&lt;/p&gt;
+&lt;p&gt;要想让系统运行的更快、更多，按照系统层次结构由高到低顺序强调三个层次。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;线程级并发，在一个进程中执行多个控制流。&lt;/li&gt;
+&lt;li&gt;指令集并行，处理器同时执行多条指令。&lt;/li&gt;
+&lt;li&gt;单指令、多数据并行（SIMD），允许一条指令产生多个可并行执行的操作。主要用来提高处理视频、音频等数据的执行速度。&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        <item>
         <title>18_运行时环境</title>
         <link>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/c%E5%92%8C%E6%8C%87%E9%92%88/18_%E8%BF%90%E8%A1%8C%E6%97%B6%E7%8E%AF%E5%A2%83/</link>
         <pubDate>Sun, 05 Mar 2023 21:22:14 +0800</pubDate>
