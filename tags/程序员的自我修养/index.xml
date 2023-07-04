@@ -6,7 +6,455 @@
         <description>Recent content in 程序员的自我修养 on 浅浅的行迹</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
-        <lastBuildDate>Sun, 05 Feb 2023 22:26:47 +0800</lastBuildDate><atom:link href="https://frozen531.github.io/tags/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Tue, 04 Jul 2023 21:26:55 +0800</lastBuildDate><atom:link href="https://frozen531.github.io/tags/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>04_静态链接</title>
+        <link>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/04_%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5/</link>
+        <pubDate>Tue, 04 Jul 2023 21:26:55 +0800</pubDate>
+        
+        <guid>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/04_%E9%9D%99%E6%80%81%E9%93%BE%E6%8E%A5/</guid>
+        <description>&lt;p&gt;代码分模块进行编写，多个模块间可能出现符号相互引用的关系。&lt;br&gt;
+以&lt;code&gt;.c&lt;/code&gt;作为一个编译单元，对于外部符号，代码中可以如下方式指明符号类型：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;用&lt;code&gt;extern&lt;/code&gt;表明此符号为外部导入或导出符号；&lt;/li&gt;
+&lt;li&gt;非&lt;code&gt;static&lt;/code&gt;关键字修饰，默认该符号导出，可被其他模块引用。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;对于&lt;code&gt;extern&lt;/code&gt;修饰的外部引用的符号，编译器只需要信任。当执行到链接生成可执行文件时，再寻找外部符号的定义。静态链接的过程就是寻找外部符号，将多个编译单元合成一个可执行文件的过程。主要分为两步：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;空间与地址分配&lt;/li&gt;
+&lt;li&gt;符号解析与重定位&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;空间与地址分配&#34;&gt;空间与地址分配&lt;/h2&gt;
+&lt;p&gt;链接的空间地址分配包含两个含义：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;在生成的可执行文件中的空间位置&lt;/li&gt;
+&lt;li&gt;可执行文件被装载后在虚拟空间中的虚拟地址（重点讨论）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;主要做2大操作：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;扫描输入的目标文件，获取各个段的长度、属性和位置，将其合并&lt;/li&gt;
+&lt;li&gt;统一输入文件中的符号表到全局符号表中，便于后面的符号解析和重定位&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;示例代码&#34;&gt;示例代码&lt;/h3&gt;
+&lt;p&gt;以如下代码为例：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;11
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;12
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;13
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;14
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;15
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;16
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;17
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;18
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;19
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;20
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;21
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;22
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;23
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;24
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;25
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;26
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;//a.c
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;extern&lt;/span&gt; &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; shared;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;main&lt;/span&gt;()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; a &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;100&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;swap&lt;/span&gt;(&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;amp;&lt;/span&gt;a, &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;amp;&lt;/span&gt;shared);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;//b.c
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; shared &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;swap&lt;/span&gt;(&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;*&lt;/span&gt;a, &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;*&lt;/span&gt;b)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;*&lt;/span&gt;a &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;^=&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;*&lt;/span&gt;b &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;^=&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;*&lt;/span&gt;a &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;^=&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;*&lt;/span&gt;b;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;//makefile
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;TARGET&lt;/span&gt;:&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt;static_app
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;all&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        gcc &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;c a.c b.c
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        gcc &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;o &lt;span style=&#34;color:#a61717;background-color:#e3d2d2&#34;&gt;$&lt;/span&gt;(TARGET) &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;*&lt;/span&gt;.o
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;clean&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        rm &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;*&lt;/span&gt;.o &lt;span style=&#34;color:#a61717;background-color:#e3d2d2&#34;&gt;$&lt;/span&gt;(TARGET)
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;objdump--h查看各个段信息&#34;&gt;&lt;code&gt;objdump -h&lt;/code&gt;查看各个段信息&lt;/h3&gt;
+&lt;p&gt;使用&lt;code&gt;objdump -h ELF文件名&lt;/code&gt;，查看各个段的内容。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;11
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;12
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;13
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;14
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;15
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;16
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;17
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;18
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;19
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;20
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;21
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;22
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;23
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;24
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;25
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;26
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;27
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;28
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;29
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;30
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;31
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;32
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;33
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;34
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;35
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;36
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;37
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;38
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;39
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;40
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;41
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;42
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;43
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;44
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;45
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;46
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;47
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;48
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;49
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;50
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;51
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;52
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;53
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;54
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;55
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;56
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;57
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;58
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;59
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;60
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;61
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;62
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;63
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;64
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;65
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;66
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;67
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;68
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;69
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;70
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;71
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;72
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;73
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;74
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;75
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;76
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;77
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;78
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;79
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;80
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;81
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;82
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;83
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;84
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;85
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;86
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;87
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;88
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;89
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;90
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;91
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;92
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;93
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;94
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;95
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;96
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ objdump -h a.o
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;a.o:     file format elf64-x86-64
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Sections:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Idx Name          Size      VMA               LMA               File off  Algn
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt; .text         &lt;span style=&#34;color:#099&#34;&gt;00000027&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000040&lt;/span&gt;  2**2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, RELOC, READONLY, CODE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt; .data         &lt;span style=&#34;color:#099&#34;&gt;00000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000068&lt;/span&gt;  2**2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;2&lt;/span&gt; .bss          &lt;span style=&#34;color:#099&#34;&gt;00000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000068&lt;/span&gt;  2**2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  ALLOC
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;3&lt;/span&gt; .comment      0000002b  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000068&lt;/span&gt;  2**0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, READONLY
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;4&lt;/span&gt; .note.GNU-stack &lt;span style=&#34;color:#099&#34;&gt;00000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000093&lt;/span&gt;  2**0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, READONLY
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;5&lt;/span&gt; .eh_frame     &lt;span style=&#34;color:#099&#34;&gt;00000038&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000098&lt;/span&gt;  2**3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, RELOC, READONLY, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ objdump -h b.o
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;b.o:     file format elf64-x86-64
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Sections:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Idx Name          Size      VMA               LMA               File off  Algn
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt; .text         0000004a  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000040&lt;/span&gt;  2**2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt; .data         &lt;span style=&#34;color:#099&#34;&gt;00000004&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  0000008c  2**2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;2&lt;/span&gt; .bss          &lt;span style=&#34;color:#099&#34;&gt;00000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000090&lt;/span&gt;  2**2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  ALLOC
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;3&lt;/span&gt; .comment      0000002b  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000090&lt;/span&gt;  2**0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, READONLY
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;4&lt;/span&gt; .note.GNU-stack &lt;span style=&#34;color:#099&#34;&gt;00000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  000000bb  2**0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, READONLY
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;5&lt;/span&gt; .eh_frame     &lt;span style=&#34;color:#099&#34;&gt;00000038&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  000000c0  2**3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, RELOC, READONLY, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ objdump -h static_app
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;static_app:     file format elf64-x86-64
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Sections:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Idx Name          Size      VMA               LMA               File off  Algn
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt; .interp       0000001c  &lt;span style=&#34;color:#099&#34;&gt;0000000000400238&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400238&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000238&lt;/span&gt;  2**0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt; .note.ABI-tag &lt;span style=&#34;color:#099&#34;&gt;00000020&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400254&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400254&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000254&lt;/span&gt;  2**2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;2&lt;/span&gt; .note.gnu.build-id &lt;span style=&#34;color:#099&#34;&gt;00000024&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400274&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400274&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000274&lt;/span&gt;  2**2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;3&lt;/span&gt; .gnu.hash     0000001c  &lt;span style=&#34;color:#099&#34;&gt;0000000000400298&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400298&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000298&lt;/span&gt;  2**3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;4&lt;/span&gt; .dynsym       &lt;span style=&#34;color:#099&#34;&gt;00000048&lt;/span&gt;  00000000004002b8  00000000004002b8  000002b8  2**3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;5&lt;/span&gt; .dynstr       &lt;span style=&#34;color:#099&#34;&gt;00000038&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400300&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400300&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000300&lt;/span&gt;  2**0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;6&lt;/span&gt; .gnu.version  &lt;span style=&#34;color:#099&#34;&gt;00000006&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400338&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400338&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000338&lt;/span&gt;  2**1
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;7&lt;/span&gt; .gnu.version_r &lt;span style=&#34;color:#099&#34;&gt;00000020&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400340&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400340&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000340&lt;/span&gt;  2**3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;8&lt;/span&gt; .rela.dyn     &lt;span style=&#34;color:#099&#34;&gt;00000018&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400360&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400360&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000360&lt;/span&gt;  2**3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  &lt;span style=&#34;color:#099&#34;&gt;9&lt;/span&gt; .rela.plt     &lt;span style=&#34;color:#099&#34;&gt;00000018&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400378&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400378&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000378&lt;/span&gt;  2**3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;10&lt;/span&gt; .init         &lt;span style=&#34;color:#099&#34;&gt;00000018&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400390&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400390&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000390&lt;/span&gt;  2**2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;11&lt;/span&gt; .plt          &lt;span style=&#34;color:#099&#34;&gt;00000020&lt;/span&gt;  00000000004003b0  00000000004003b0  000003b0  2**4
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;12&lt;/span&gt; .text         &lt;span style=&#34;color:#099&#34;&gt;00000238&lt;/span&gt;  00000000004003d0  00000000004003d0  000003d0  2**4
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;13&lt;/span&gt; .fini         0000000e  &lt;span style=&#34;color:#099&#34;&gt;0000000000400608&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400608&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000608&lt;/span&gt;  2**2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;14&lt;/span&gt; .rodata       &lt;span style=&#34;color:#099&#34;&gt;00000004&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400618&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400618&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000618&lt;/span&gt;  2**2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;15&lt;/span&gt; .eh_frame_hdr &lt;span style=&#34;color:#099&#34;&gt;00000034&lt;/span&gt;  000000000040061c  000000000040061c  0000061c  2**2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;16&lt;/span&gt; .eh_frame     000000c4  &lt;span style=&#34;color:#099&#34;&gt;0000000000400650&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000400650&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00000650&lt;/span&gt;  2**3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;17&lt;/span&gt; .ctors        &lt;span style=&#34;color:#099&#34;&gt;00000010&lt;/span&gt;  0000000000600e28  0000000000600e28  00000e28  2**3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;18&lt;/span&gt; .dtors        &lt;span style=&#34;color:#099&#34;&gt;00000010&lt;/span&gt;  0000000000600e38  0000000000600e38  00000e38  2**3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;19&lt;/span&gt; .jcr          &lt;span style=&#34;color:#099&#34;&gt;00000008&lt;/span&gt;  0000000000600e48  0000000000600e48  00000e48  2**3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;20&lt;/span&gt; .dynamic      &lt;span style=&#34;color:#099&#34;&gt;00000190&lt;/span&gt;  0000000000600e50  0000000000600e50  00000e50  2**3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;21&lt;/span&gt; .got          &lt;span style=&#34;color:#099&#34;&gt;00000008&lt;/span&gt;  0000000000600fe0  0000000000600fe0  00000fe0  2**3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;22&lt;/span&gt; .got.plt      &lt;span style=&#34;color:#099&#34;&gt;00000020&lt;/span&gt;  0000000000600fe8  0000000000600fe8  00000fe8  2**3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;23&lt;/span&gt; .data         &lt;span style=&#34;color:#099&#34;&gt;00000014&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000601008&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000601008&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;00001008&lt;/span&gt;  2**3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, ALLOC, LOAD, DATA
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;24&lt;/span&gt; .bss          &lt;span style=&#34;color:#099&#34;&gt;00000010&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000601020&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000601020&lt;/span&gt;  0000101c  2**3
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  ALLOC
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; &lt;span style=&#34;color:#099&#34;&gt;25&lt;/span&gt; .comment      0000002a  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  &lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt;  0000101c  2**0
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;                  CONTENTS, READONLY
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;静态编译按照各个.o文件中段的属性，位置等，将同属性的段合并为一个，最终生成可执行文件。&lt;code&gt;static_app&lt;/code&gt;中的&lt;code&gt;.text&lt;/code&gt;段会包含&lt;code&gt;main()&lt;/code&gt;和&lt;code&gt;swap()&lt;/code&gt;的定义。同样，每个全局变量也会在可执行文件中拥有自己的地址。&lt;br&gt;
+链接后，各个段拥有了自己的虚拟地址，VMA(虚拟地址)和LMA(装载地址)通常情况下是一致的。&lt;/p&gt;
+&lt;h2 id=&#34;符号解析与重定位&#34;&gt;符号解析与重定位&lt;/h2&gt;
+&lt;p&gt;该部分为链接的核心部分。&lt;/p&gt;
+&lt;p&gt;经过地址和空间分配，每个段已经拥有了自己的虚拟地址，由于每个符号在段中的相对位置固定，所以也同样拥有了虚拟地址，这个值将被用来重定位操作。&lt;br&gt;
+单个模块编译过程中，对于外部定义的符号，先用默认值代替。每个对外部符号的引用都是一个重定位的入口，待到链接过程，链接器会查找全局符号表，找到相应符号并对其进行重定位操作。&lt;br&gt;
+重定位即将代码中外部符号的默认值改为链接后的真实值，包括外部变量值和外部函数调用地址。&lt;/p&gt;
+&lt;h3 id=&#34;objdump--d查看反汇编&#34;&gt;&lt;code&gt;objdump -d&lt;/code&gt;查看反汇编&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;11
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;12
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;13
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;14
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;15
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;16
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;17
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;18
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;19
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ objdump -d a.o
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;a.o:     file format elf64-x86-64
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;Disassembly of section .text:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#099&#34;&gt;0000000000000000&lt;/span&gt; &amp;lt;main&amp;gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   0:   &lt;span style=&#34;color:#099&#34;&gt;55&lt;/span&gt;                      push   %rbp
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   1:   &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;89&lt;/span&gt; e5                mov    %rsp,%rbp
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   4:   &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;83&lt;/span&gt; ec &lt;span style=&#34;color:#099&#34;&gt;10&lt;/span&gt;             sub    &lt;span style=&#34;color:#008080&#34;&gt;$0&lt;/span&gt;x10,%rsp
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   8:   c7 &lt;span style=&#34;color:#099&#34;&gt;45&lt;/span&gt; &lt;span style=&#34;color:#0086b3&#34;&gt;fc&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;64&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt;    movl   &lt;span style=&#34;color:#008080&#34;&gt;$0&lt;/span&gt;x64,-0x4&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;   f:   &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; 8d &lt;span style=&#34;color:#099&#34;&gt;45&lt;/span&gt; &lt;span style=&#34;color:#0086b3&#34;&gt;fc&lt;/span&gt;             lea    -0x4&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%rax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  13:   be &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt;          mov    &lt;span style=&#34;color:#008080&#34;&gt;$0&lt;/span&gt;x0,%esi
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  18:   &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;89&lt;/span&gt; c7                mov    %rax,%rdi
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  1b:   b8 &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt;          mov    &lt;span style=&#34;color:#008080&#34;&gt;$0&lt;/span&gt;x0,%eax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  20:   e8 &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt;          callq  &lt;span style=&#34;color:#099&#34;&gt;25&lt;/span&gt; &amp;lt;main+0x25&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  25:   c9                      leaveq
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  26:   c3                      retq
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;code&gt;main()&lt;/code&gt;函数也是一个函数调用过程，将调用方的bp入栈保存，bp=sp，sp-=0x10，重新构建新的栈帧。&lt;br&gt;
+&lt;code&gt;callq  25 &amp;lt;main+0x25&amp;gt;&lt;/code&gt;在调用&lt;code&gt;swap()&lt;/code&gt;上直接用下一条指令地址代替，重定位会将其改为&lt;code&gt;swap()&lt;/code&gt;的相对或绝对地址(取决于是绝对寻址还是相对寻址)，见下面&lt;code&gt;callq  4004dc &amp;lt;swap&amp;gt;&lt;/code&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;11
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;12
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;13
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;14
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;15
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;16
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;17
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;18
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;19
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;20
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;21
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;22
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;23
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;24
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;25
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;26
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;27
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;28
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;29
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;30
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;31
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;32
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;33
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;34
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;35
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;36
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;37
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;38
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;39
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;40
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;41
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;42
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;43
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;44
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ objdump -d static_app
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;00000000004004b4 &amp;lt;main&amp;gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004b4:       &lt;span style=&#34;color:#099&#34;&gt;55&lt;/span&gt;                      push   %rbp
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004b5:       &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;89&lt;/span&gt; e5                mov    %rsp,%rbp
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004b8:       &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;83&lt;/span&gt; ec &lt;span style=&#34;color:#099&#34;&gt;10&lt;/span&gt;             sub    &lt;span style=&#34;color:#008080&#34;&gt;$0&lt;/span&gt;x10,%rsp
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004bc:       c7 &lt;span style=&#34;color:#099&#34;&gt;45&lt;/span&gt; &lt;span style=&#34;color:#0086b3&#34;&gt;fc&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;64&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt;    movl   &lt;span style=&#34;color:#008080&#34;&gt;$0&lt;/span&gt;x64,-0x4&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004c3:       &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; 8d &lt;span style=&#34;color:#099&#34;&gt;45&lt;/span&gt; &lt;span style=&#34;color:#0086b3&#34;&gt;fc&lt;/span&gt;             lea    -0x4&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%rax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004c7:       be &lt;span style=&#34;color:#099&#34;&gt;18&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;10&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;60&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt;          mov    &lt;span style=&#34;color:#008080&#34;&gt;$0&lt;/span&gt;x601018,%esi
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004cc:       &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;89&lt;/span&gt; c7                mov    %rax,%rdi
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004cf:       b8 &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt;          mov    &lt;span style=&#34;color:#008080&#34;&gt;$0&lt;/span&gt;x0,%eax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004d4:       e8 &lt;span style=&#34;color:#099&#34;&gt;03&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt;          callq  4004dc &amp;lt;swap&amp;gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004d9:       c9                      leaveq
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004da:       c3                      retq
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004db:       &lt;span style=&#34;color:#099&#34;&gt;90&lt;/span&gt;                      nop
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;00000000004004dc &amp;lt;swap&amp;gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004dc:       &lt;span style=&#34;color:#099&#34;&gt;55&lt;/span&gt;                      push   %rbp
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004dd:       &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;89&lt;/span&gt; e5                mov    %rsp,%rbp
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004e0:       &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;89&lt;/span&gt; 7d f8             mov    %rdi,-0x8&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004e4:       &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;89&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;75&lt;/span&gt; f0             mov    %rsi,-0x10&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004e8:       &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; 8b &lt;span style=&#34;color:#099&#34;&gt;45&lt;/span&gt; f8             mov    -0x8&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%rax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004ec:       8b &lt;span style=&#34;color:#099&#34;&gt;10&lt;/span&gt;                   mov    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rax&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%edx
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004ee:       &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; 8b &lt;span style=&#34;color:#099&#34;&gt;45&lt;/span&gt; f0             mov    -0x10&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%rax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004f2:       8b &lt;span style=&#34;color:#099&#34;&gt;08&lt;/span&gt;                   mov    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rax&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%ecx
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004f4:       &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; 8b &lt;span style=&#34;color:#099&#34;&gt;45&lt;/span&gt; f8             mov    -0x8&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%rax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004f8:       8b &lt;span style=&#34;color:#099&#34;&gt;30&lt;/span&gt;                   mov    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rax&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%esi
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004fa:       &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; 8b &lt;span style=&#34;color:#099&#34;&gt;45&lt;/span&gt; f0             mov    -0x10&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%rax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  4004fe:       8b &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt;                   mov    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rax&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%eax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  400500:       &lt;span style=&#34;color:#099&#34;&gt;31&lt;/span&gt; c6                   xor    %eax,%esi
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  400502:       &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; 8b &lt;span style=&#34;color:#099&#34;&gt;45&lt;/span&gt; f8             mov    -0x8&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%rax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  400506:       &lt;span style=&#34;color:#099&#34;&gt;89&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;30&lt;/span&gt;                   mov    %esi,&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rax&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  400508:       &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; 8b &lt;span style=&#34;color:#099&#34;&gt;45&lt;/span&gt; f8             mov    -0x8&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%rax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  40050c:       8b &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt;                   mov    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rax&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%eax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  40050e:       &lt;span style=&#34;color:#099&#34;&gt;31&lt;/span&gt; c1                   xor    %eax,%ecx
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  400510:       &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; 8b &lt;span style=&#34;color:#099&#34;&gt;45&lt;/span&gt; f0             mov    -0x10&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%rax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  400514:       &lt;span style=&#34;color:#099&#34;&gt;89&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;08&lt;/span&gt;                   mov    %ecx,&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rax&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  400516:       &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; 8b &lt;span style=&#34;color:#099&#34;&gt;45&lt;/span&gt; f0             mov    -0x10&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%rax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  40051a:       8b &lt;span style=&#34;color:#099&#34;&gt;00&lt;/span&gt;                   mov    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rax&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%eax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  40051c:       &lt;span style=&#34;color:#099&#34;&gt;31&lt;/span&gt; c2                   xor    %eax,%edx
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  40051e:       &lt;span style=&#34;color:#099&#34;&gt;48&lt;/span&gt; 8b &lt;span style=&#34;color:#099&#34;&gt;45&lt;/span&gt; f8             mov    -0x8&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rbp&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;,%rax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  400522:       &lt;span style=&#34;color:#099&#34;&gt;89&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;10&lt;/span&gt;                   mov    %edx,&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rax&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  400524:       5d                      pop    %rbp
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  400525:       c3                      retq
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;  400526:       &lt;span style=&#34;color:#099&#34;&gt;90&lt;/span&gt;                      nop
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;common块&#34;&gt;COMMON块&lt;/h2&gt;
+&lt;p&gt;COMMON机制存在的原因是：编译器和链接器允许不同类型的弱符号存在，本质原因链接器无法判断各符号的类型是否一致。&lt;/p&gt;
+&lt;p&gt;COMMON快机制，规定：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;同名的强符号在多个文件中出现，链接器会报错，不允许；&lt;/li&gt;
+&lt;li&gt;同名的弱符号在多个文件中出现，链接器按占用内存最大的分配；&lt;/li&gt;
+&lt;li&gt;同名的有一个强符号和多个弱符号，以强符号为准分配内存。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;未初始化的全局变量是典型的弱符号，其类型是SHN_COMMON。&lt;code&gt;readelf -s&lt;/code&gt;可查看。&lt;/p&gt;
+&lt;p&gt;由于在编译阶段，无法知道弱符号实际占用的内存大小，所以未在&lt;code&gt;.bss&lt;/code&gt;段为其分配空间；在链接确定弱符号内存大小后，最终会在可执行文件的&lt;code&gt;.bss&lt;/code&gt;段为其分配空间。&lt;/p&gt;
+</description>
+        </item>
+        <item>
         <title>02_编译和链接</title>
         <link>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E7%A8%8B%E5%BA%8F%E5%91%98%E7%9A%84%E8%87%AA%E6%88%91%E4%BF%AE%E5%85%BB/02_%E7%BC%96%E8%AF%91%E5%92%8C%E9%93%BE%E6%8E%A5/</link>
         <pubDate>Sun, 05 Feb 2023 22:26:47 +0800</pubDate>
@@ -597,8 +1045,8 @@
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
 &lt;/div&gt;&lt;p&gt;该&lt;code&gt;ELF&lt;/code&gt;文件一共有上述有&lt;code&gt;13&lt;/code&gt;个表项，第一个为无效的段描述符，故有效段为&lt;code&gt;12&lt;/code&gt;个。&lt;/p&gt;
-&lt;h1 id=&#34;链接的接口-符号&#34;&gt;链接的接口-符号&lt;/h1&gt;
-&lt;h2 id=&#34;链接与符号&#34;&gt;链接与符号&lt;/h2&gt;
+&lt;h2 id=&#34;链接的接口-符号&#34;&gt;链接的接口-符号&lt;/h2&gt;
+&lt;h3 id=&#34;链接与符号&#34;&gt;链接与符号&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;
 &lt;p&gt;链接的过程是通过将目标文件之间地址的引用（对函数和变量的地址的引用），将多个不同的目标文件拼接成一个整体。&lt;/p&gt;
@@ -607,21 +1055,7 @@
 &lt;p&gt;符号：函数和变量统称为符号&lt;/p&gt;
 &lt;/li&gt;
 &lt;/ul&gt;
-&lt;table&gt;
-&lt;thead&gt;
-&lt;tr&gt;
-&lt;th&gt;全局符号&lt;/th&gt;
-&lt;th&gt;局部符号&lt;/th&gt;
-&lt;/tr&gt;
-&lt;/thead&gt;
-&lt;tbody&gt;
-&lt;tr&gt;
-&lt;td&gt;定义在本文件中的全局符号，可以被其他文件引用&lt;!-- raw HTML omitted --&gt;本目标文件中引用的全局符号，却没有定义在本目标文件中&lt;/td&gt;
-&lt;td&gt;static修饰的变量&lt;/td&gt;
-&lt;/tr&gt;
-&lt;/tbody&gt;
-&lt;/table&gt;
-&lt;p&gt;查看符号类型：&lt;code&gt;readelf -s app.o &lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;ELF类型的文件中包含有符号表，可以通过&lt;code&gt;readelf&lt;/code&gt;、&lt;code&gt;objdump&lt;/code&gt;、&lt;code&gt;nm&lt;/code&gt;查看。查看符号类型：&lt;code&gt;readelf -s app.o &lt;/code&gt;&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
 &lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
 &lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
@@ -668,7 +1102,79 @@
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    15: &lt;span style=&#34;color:#099&#34;&gt;0000000000000022&lt;/span&gt;    &lt;span style=&#34;color:#099&#34;&gt;51&lt;/span&gt; FUNC    GLOBAL DEFAULT    &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt; main
 &lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;&lt;h2 id=&#34;符号修饰和函数签名&#34;&gt;符号修饰和函数签名&lt;/h2&gt;
+&lt;/div&gt;&lt;p&gt;符号绑定Bind关系有：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;LOCAL 局部符号，其他编译单元不可见，该类型的符号不用于链接，只用于调试和程序崩溃时核心转储&lt;/li&gt;
+&lt;li&gt;GLOBAL 外部符号，包含本文件定义的全局变量和本文件引用的全局变量，用于链接使用&lt;/li&gt;
+&lt;li&gt;WEAK 弱引用，有强符号和弱符号&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;符号类型Type有：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;OBJECT，数据对象，如变量、数组等&lt;/li&gt;
+&lt;li&gt;FUNC，函数或其他可执行代码&lt;/li&gt;
+&lt;li&gt;SECTION，段表，必须是LOCAL的&lt;/li&gt;
+&lt;li&gt;FILE，一般为目标文件对应的文件名，一定是LOCAL，ABS&lt;/li&gt;
+&lt;li&gt;NOTYPE，&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;符号所在段Ndx：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;UND(UNDEF) ，该符号为本目标文件的引用，符号未定义&lt;/li&gt;
+&lt;li&gt;ABS，表示该符号包含一个绝对的值，如文件名的符号&lt;/li&gt;
+&lt;li&gt;COM(COMMON)，符号在COMMON块中，通常未初始化的全局变量是该类型&lt;/li&gt;
+&lt;li&gt;数字，如果该符号定义在本目标文件中，则数字表示符号所在段在段表中的下标，可以通过&lt;code&gt;readelf -a SimpleSection.o&lt;/code&gt;和&lt;code&gt;objdump -x SimpleSection.o&lt;/code&gt;查看段表&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;符号值Value：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;在目标文件中&lt;/li&gt;
+&lt;/ul&gt;
+&lt;ol&gt;
+&lt;li&gt;定义在目标文件中的非COMMON符号，为符号相对于所在段的偏移地址；&lt;/li&gt;
+&lt;li&gt;定义在目标文件中的COMMON符号，表示符号的对齐属性；&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;在可执行文件中，为符号的虚拟地址&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;nm中常见的符号类型，对于每一个符号来说，其类型如果是小写的，则表明该符号是local的；大写则表明该符号是global(external)的。&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/lgfun/article/details/103600880&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;linux——nm命令：查看符号表&lt;/a&gt;。&lt;code&gt;nm -n 目标文件&lt;/code&gt;可以以地址排序。&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;类型&lt;/th&gt;
+&lt;th&gt;说明&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;A（abs）&lt;/td&gt;
+&lt;td&gt;该符号的值在今后的链接中将不再改变；&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;B（bss）&lt;/td&gt;
+&lt;td&gt;该符号放在BSS段中，通常是那些未初始化的局部全局变量；&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;C（common）&lt;/td&gt;
+&lt;td&gt;common，未初始化的全局变量；&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;D（data）&lt;/td&gt;
+&lt;td&gt;该符号放在普通的数据段中，通常是那些已经初始化的全局变量；&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;T（text）&lt;/td&gt;
+&lt;td&gt;该符号放在代码段中，通常是那些全局非静态函数；&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;U（undef）&lt;/td&gt;
+&lt;td&gt;该符号未定义过，需要自其他对象文件中链接进来；&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;W（weak）&lt;/td&gt;
+&lt;td&gt;未明确指定的弱链接符号；同链接的其他对象文件中有它的定义就用上，否则就用一个系统特别指定的默认值。&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;h3 id=&#34;符号修饰和函数签名&#34;&gt;符号修饰和函数签名&lt;/h3&gt;
 &lt;ul&gt;
 &lt;li&gt;函数签名&lt;/li&gt;
 &lt;/ul&gt;
@@ -699,8 +1205,19 @@
 &lt;/tr&gt;
 &lt;/tbody&gt;
 &lt;/table&gt;
-&lt;p&gt;上面两个是为了解决同名的函数和变量导致的符号冲突问题。不同的编译器厂商对符号的修饰方法可能不同，所以函数签名也回不一样。&lt;/p&gt;
-&lt;h2 id=&#34;extern-c&#34;&gt;extern &amp;ldquo;C&amp;rdquo;&lt;/h2&gt;
+&lt;p&gt;上面两个是为了解决同名的函数和变量导致的符号冲突问题。不同的编译器厂商对符号的修饰方法可能不同，所以函数签名也会不一样。&lt;/p&gt;
+&lt;h3 id=&#34;extern-c&#34;&gt;extern &amp;ldquo;C&amp;rdquo;&lt;/h3&gt;
+&lt;p&gt;C和C++间允许相互调用，两者调用的阻碍在于C和C++符号修饰不一致导致的未定义的引用，一下c/c++方式特指符号修饰方式。&lt;/p&gt;
+&lt;p&gt;需要明确：&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/qq_29344757/article/details/73332501&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;c语言和c++的相互调用&lt;/a&gt;&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;gcc和g++都可以编译C和C++代码，通过文件后缀名&lt;code&gt;.c&lt;/code&gt;和&lt;code&gt;.cpp&lt;/code&gt;判别是哪种文件；&lt;/li&gt;
+&lt;li&gt;gcc，.c以c方式编译，.cpp以c++方式编译，但编译c++时不会主动链接stdc++，需要手动添加-lstdc++&lt;/li&gt;
+&lt;li&gt;g++，.c和.cpp都以c++方式编译&lt;/li&gt;
+&lt;li&gt;只有编译c++文件时才会定义&lt;code&gt;__cplusplus&lt;/code&gt;，而非用g++编译就添加&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;c中调用c&#34;&gt;C++中调用C&lt;/h4&gt;
+&lt;p&gt;作为c++代码，一定不会用c方式编译，因为很多c++特性c编译不支持，如函数重载、类等，所以可以指定c代码用c的方式编译。&lt;/p&gt;
 &lt;p&gt;由于&lt;code&gt;C&lt;/code&gt;语言和&lt;code&gt;C++&lt;/code&gt;在符号修饰上有不同的规则，为了&lt;code&gt;C++&lt;/code&gt;与&lt;code&gt;C&lt;/code&gt;兼容，提出&lt;code&gt;extern &amp;quot;C&amp;quot;&lt;/code&gt;关键字。下面代码段中编译器会将大括号内部的代码当作&lt;code&gt;C&lt;/code&gt;语言处理，以&lt;code&gt;C&lt;/code&gt;语言的符号修饰规则进行修饰。&lt;/p&gt;
 &lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
 &lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
@@ -751,7 +1268,54 @@
 &lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#999;font-weight:bold;font-style:italic&#34;&gt;#endif
 &lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
 &lt;/div&gt;
-&lt;/div&gt;</description>
+&lt;/div&gt;&lt;h4 id=&#34;c调用c函数&#34;&gt;C调用C++函数&lt;/h4&gt;
+&lt;ol&gt;
+&lt;li&gt;c代码用c++方式编译&lt;/li&gt;
+&lt;li&gt;c++以c方式编译，这个麻烦且很多c++特性不支持&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;强符号和弱符号弱引用&#34;&gt;强符号和弱符号/弱引用&lt;/h3&gt;
+&lt;p&gt;两者都特指全局符号：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;强符号：初始化的全局符号，包括全局变量和函数&lt;/li&gt;
+&lt;li&gt;弱符号：未初始化的全局变量或函数&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;注意：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;当出现同名强符号时，会报符号重复定义的error；&lt;/li&gt;
+&lt;li&gt;当出现同名弱符号时，不会报错，符号以最大类型分配空间，位于COMMON块；&lt;/li&gt;
+&lt;li&gt;当同一个符号既出现强符号又有弱符号时，以强符号为准。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;当然，GCC可以通过&lt;code&gt;__attribute__((weak))&lt;/code&gt;和&lt;code&gt;__attribute__((weakref))&lt;/code&gt;将符号声明为弱符号或弱引用，这样做的好处有：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;很好的添加或删除功能，只要不包含功能实现的代码或库，就可以删掉这个功能。&lt;/li&gt;
+&lt;li&gt;很容易的让用户改写功能实现。&lt;/li&gt;
+&lt;li&gt;对于未定义的弱引用，编译器会将其置为0，运行时报错或通过if判断是否为0，安全运行。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;__attribute__&lt;/span&gt;((weak)) &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; a &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;3&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;__attribute__&lt;/span&gt;((weakref)) &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;foo&lt;/span&gt;();    &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// 这个实测会报错，GNU是需要别名alias，具体操作未知
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;main&lt;/span&gt;()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;if&lt;/span&gt;(foo) &lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;foo&lt;/span&gt;();
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;return&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;http://www.eepw.com.cn/zhuanlan/249719.html&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;C语言进阶小技巧，弱符号和弱引用&lt;/a&gt;&lt;/p&gt;
+</description>
         </item>
         
     </channel>

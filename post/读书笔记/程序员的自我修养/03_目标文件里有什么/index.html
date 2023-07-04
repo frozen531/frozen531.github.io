@@ -225,9 +225,14 @@ ELF文件类型 说明 实例 可重定位文件(relocatable file) 包含代码�
   </ul>
 
   <ul>
-    <li><a href="#链接与符号">链接与符号</a></li>
-    <li><a href="#符号修饰和函数签名">符号修饰和函数签名</a></li>
-    <li><a href="#extern-c">extern &ldquo;C&rdquo;</a></li>
+    <li><a href="#链接的接口-符号">链接的接口-符号</a>
+      <ul>
+        <li><a href="#链接与符号">链接与符号</a></li>
+        <li><a href="#符号修饰和函数签名">符号修饰和函数签名</a></li>
+        <li><a href="#extern-c">extern &ldquo;C&rdquo;</a></li>
+        <li><a href="#强符号和弱符号弱引用">强符号和弱符号/弱引用</a></li>
+      </ul>
+    </li>
   </ul>
 </nav>
         </div>
@@ -292,7 +297,7 @@ ELF文件类型 说明 实例 可重定位文件(relocatable file) 包含代码�
 
 
                 <time class="article-time--reading">
-                    6 minute read
+                    7 minute read
                 </time>
             </div>
         
@@ -836,8 +841,8 @@ ELF文件类型 说明 实例 可重定位文件(relocatable file) 包含代码�
 </span></span></code></pre></td></tr></table>
 </div>
 </div><p>该<code>ELF</code>文件一共有上述有<code>13</code>个表项，第一个为无效的段描述符，故有效段为<code>12</code>个。</p>
-<h1 id="链接的接口-符号">链接的接口-符号</h1>
-<h2 id="链接与符号">链接与符号</h2>
+<h2 id="链接的接口-符号">链接的接口-符号</h2>
+<h3 id="链接与符号">链接与符号</h3>
 <ul>
 <li>
 <p>链接的过程是通过将目标文件之间地址的引用（对函数和变量的地址的引用），将多个不同的目标文件拼接成一个整体。</p>
@@ -846,21 +851,7 @@ ELF文件类型 说明 实例 可重定位文件(relocatable file) 包含代码�
 <p>符号：函数和变量统称为符号</p>
 </li>
 </ul>
-<div class="table-wrapper"><table>
-<thead>
-<tr>
-<th>全局符号</th>
-<th>局部符号</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>定义在本文件中的全局符号，可以被其他文件引用<!-- raw HTML omitted -->本目标文件中引用的全局符号，却没有定义在本目标文件中</td>
-<td>static修饰的变量</td>
-</tr>
-</tbody>
-</table></div>
-<p>查看符号类型：<code>readelf -s app.o </code></p>
+<p>ELF类型的文件中包含有符号表，可以通过<code>readelf</code>、<code>objdump</code>、<code>nm</code>查看。查看符号类型：<code>readelf -s app.o </code></p>
 <div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
 <table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
 <pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
@@ -907,7 +898,79 @@ ELF文件类型 说明 实例 可重定位文件(relocatable file) 包含代码�
 </span></span><span style="display:flex;"><span>    15: <span style="color:#099">0000000000000022</span>    <span style="color:#099">51</span> FUNC    GLOBAL DEFAULT    <span style="color:#099">1</span> main
 </span></span></code></pre></td></tr></table>
 </div>
-</div><h2 id="符号修饰和函数签名">符号修饰和函数签名</h2>
+</div><p>符号绑定Bind关系有：</p>
+<ol>
+<li>LOCAL 局部符号，其他编译单元不可见，该类型的符号不用于链接，只用于调试和程序崩溃时核心转储</li>
+<li>GLOBAL 外部符号，包含本文件定义的全局变量和本文件引用的全局变量，用于链接使用</li>
+<li>WEAK 弱引用，有强符号和弱符号</li>
+</ol>
+<p>符号类型Type有：</p>
+<ol>
+<li>OBJECT，数据对象，如变量、数组等</li>
+<li>FUNC，函数或其他可执行代码</li>
+<li>SECTION，段表，必须是LOCAL的</li>
+<li>FILE，一般为目标文件对应的文件名，一定是LOCAL，ABS</li>
+<li>NOTYPE，</li>
+</ol>
+<p>符号所在段Ndx：</p>
+<ol>
+<li>UND(UNDEF) ，该符号为本目标文件的引用，符号未定义</li>
+<li>ABS，表示该符号包含一个绝对的值，如文件名的符号</li>
+<li>COM(COMMON)，符号在COMMON块中，通常未初始化的全局变量是该类型</li>
+<li>数字，如果该符号定义在本目标文件中，则数字表示符号所在段在段表中的下标，可以通过<code>readelf -a SimpleSection.o</code>和<code>objdump -x SimpleSection.o</code>查看段表</li>
+</ol>
+<p>符号值Value：</p>
+<ul>
+<li>在目标文件中</li>
+</ul>
+<ol>
+<li>定义在目标文件中的非COMMON符号，为符号相对于所在段的偏移地址；</li>
+<li>定义在目标文件中的COMMON符号，表示符号的对齐属性；</li>
+</ol>
+<ul>
+<li>在可执行文件中，为符号的虚拟地址</li>
+</ul>
+<p>nm中常见的符号类型，对于每一个符号来说，其类型如果是小写的，则表明该符号是local的；大写则表明该符号是global(external)的。<a class="link" href="https://blog.csdn.net/lgfun/article/details/103600880"  target="_blank" rel="noopener"
+    >linux——nm命令：查看符号表</a>。<code>nm -n 目标文件</code>可以以地址排序。</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A（abs）</td>
+<td>该符号的值在今后的链接中将不再改变；</td>
+</tr>
+<tr>
+<td>B（bss）</td>
+<td>该符号放在BSS段中，通常是那些未初始化的局部全局变量；</td>
+</tr>
+<tr>
+<td>C（common）</td>
+<td>common，未初始化的全局变量；</td>
+</tr>
+<tr>
+<td>D（data）</td>
+<td>该符号放在普通的数据段中，通常是那些已经初始化的全局变量；</td>
+</tr>
+<tr>
+<td>T（text）</td>
+<td>该符号放在代码段中，通常是那些全局非静态函数；</td>
+</tr>
+<tr>
+<td>U（undef）</td>
+<td>该符号未定义过，需要自其他对象文件中链接进来；</td>
+</tr>
+<tr>
+<td>W（weak）</td>
+<td>未明确指定的弱链接符号；同链接的其他对象文件中有它的定义就用上，否则就用一个系统特别指定的默认值。</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="符号修饰和函数签名">符号修饰和函数签名</h3>
 <ul>
 <li>函数签名</li>
 </ul>
@@ -938,8 +1001,19 @@ ELF文件类型 说明 实例 可重定位文件(relocatable file) 包含代码�
 </tr>
 </tbody>
 </table></div>
-<p>上面两个是为了解决同名的函数和变量导致的符号冲突问题。不同的编译器厂商对符号的修饰方法可能不同，所以函数签名也回不一样。</p>
-<h2 id="extern-c">extern &ldquo;C&rdquo;</h2>
+<p>上面两个是为了解决同名的函数和变量导致的符号冲突问题。不同的编译器厂商对符号的修饰方法可能不同，所以函数签名也会不一样。</p>
+<h3 id="extern-c">extern &ldquo;C&rdquo;</h3>
+<p>C和C++间允许相互调用，两者调用的阻碍在于C和C++符号修饰不一致导致的未定义的引用，一下c/c++方式特指符号修饰方式。</p>
+<p>需要明确：<a class="link" href="https://blog.csdn.net/qq_29344757/article/details/73332501"  target="_blank" rel="noopener"
+    >c语言和c++的相互调用</a></p>
+<ol>
+<li>gcc和g++都可以编译C和C++代码，通过文件后缀名<code>.c</code>和<code>.cpp</code>判别是哪种文件；</li>
+<li>gcc，.c以c方式编译，.cpp以c++方式编译，但编译c++时不会主动链接stdc++，需要手动添加-lstdc++</li>
+<li>g++，.c和.cpp都以c++方式编译</li>
+<li>只有编译c++文件时才会定义<code>__cplusplus</code>，而非用g++编译就添加</li>
+</ol>
+<h4 id="c中调用c">C++中调用C</h4>
+<p>作为c++代码，一定不会用c方式编译，因为很多c++特性c编译不支持，如函数重载、类等，所以可以指定c代码用c的方式编译。</p>
 <p>由于<code>C</code>语言和<code>C++</code>在符号修饰上有不同的规则，为了<code>C++</code>与<code>C</code>兼容，提出<code>extern &quot;C&quot;</code>关键字。下面代码段中编译器会将大括号内部的代码当作<code>C</code>语言处理，以<code>C</code>语言的符号修饰规则进行修饰。</p>
 <div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
 <table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
@@ -990,7 +1064,54 @@ ELF文件类型 说明 实例 可重定位文件(relocatable file) 包含代码�
 </span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#endif
 </span></span></span></code></pre></td></tr></table>
 </div>
+</div><h4 id="c调用c函数">C调用C++函数</h4>
+<ol>
+<li>c代码用c++方式编译</li>
+<li>c++以c方式编译，这个麻烦且很多c++特性不支持</li>
+</ol>
+<h3 id="强符号和弱符号弱引用">强符号和弱符号/弱引用</h3>
+<p>两者都特指全局符号：</p>
+<ol>
+<li>强符号：初始化的全局符号，包括全局变量和函数</li>
+<li>弱符号：未初始化的全局变量或函数</li>
+</ol>
+<p>注意：</p>
+<ol>
+<li>当出现同名强符号时，会报符号重复定义的error；</li>
+<li>当出现同名弱符号时，不会报错，符号以最大类型分配空间，位于COMMON块；</li>
+<li>当同一个符号既出现强符号又有弱符号时，以强符号为准。</li>
+</ol>
+<p>当然，GCC可以通过<code>__attribute__((weak))</code>和<code>__attribute__((weakref))</code>将符号声明为弱符号或弱引用，这样做的好处有：</p>
+<ol>
+<li>很好的添加或删除功能，只要不包含功能实现的代码或库，就可以删掉这个功能。</li>
+<li>很容易的让用户改写功能实现。</li>
+<li>对于未定义的弱引用，编译器会将其置为0，运行时报错或通过if判断是否为0，安全运行。</li>
+</ol>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#900;font-weight:bold">__attribute__</span>((weak)) <span style="color:#458;font-weight:bold">int</span> a <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">3</span>;
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">__attribute__</span>((weakref)) <span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">foo</span>();    <span style="color:#998;font-style:italic">// 这个实测会报错，GNU是需要别名alias，具体操作未知
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> <span style="color:#900;font-weight:bold">main</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span>(foo) <span style="color:#900;font-weight:bold">foo</span>();
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">return</span> <span style="color:#099">0</span>;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></td></tr></table>
 </div>
+</div><p><a class="link" href="http://www.eepw.com.cn/zhuanlan/249719.html"  target="_blank" rel="noopener"
+    >C语言进阶小技巧，弱符号和弱引用</a></p>
+
 </section>
 
 
