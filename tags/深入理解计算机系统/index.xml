@@ -6,7 +6,230 @@
         <description>Recent content in 深入理解计算机系统 on 浅浅的行迹</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
-        <lastBuildDate>Tue, 27 Jun 2023 21:19:23 +0800</lastBuildDate><atom:link href="https://frozen531.github.io/tags/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Tue, 04 Jul 2023 22:19:20 +0800</lastBuildDate><atom:link href="https://frozen531.github.io/tags/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>07_链接</title>
+        <link>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/07_%E9%93%BE%E6%8E%A5/</link>
+        <pubDate>Tue, 04 Jul 2023 22:19:20 +0800</pubDate>
+        
+        <guid>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/07_%E9%93%BE%E6%8E%A5/</guid>
+        <description>&lt;h2 id=&#34;0-前言&#34;&gt;0. 前言&lt;/h2&gt;
+&lt;p&gt;看这章前建议先阅读《程序员的自我修养》，里面有很多关于库与链接的描述。因为《深入理解计算机系统》是译本，有很多拗口的名称，通过建议书籍，你可以更方便的理解书中描述的过程。&lt;/p&gt;
+&lt;p&gt;这里先列出一些关于链接的基础知识，简化后续章节的描述。&lt;/p&gt;
+&lt;h3 id=&#34;01-目标文件&#34;&gt;0.1 目标文件&lt;/h3&gt;
+&lt;p&gt;目标文件有三种：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;可重定位目标文件：可用于链接生成可执行文件，如&lt;code&gt;.o&lt;/code&gt;文件&lt;/li&gt;
+&lt;li&gt;可执行目标文件：可被直接复制到内存中执行，如&lt;code&gt;a.out&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;共享目标文件：一种特殊类型的可重定位目标文件，可在加载或运行时被动态的加载进内存并链接，如&lt;code&gt;.so&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;经过编译器和汇编器后生成可重定位目标文件，经过链接器生成可执行目标文件。目标文件是二进制文件，&lt;/p&gt;
+&lt;h3 id=&#34;02-典型的elf可重定位目标文件&#34;&gt;0.2 典型的ELF可重定位目标文件&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e5%85%b8%e5%9e%8b%e7%9a%84ELF%e5%8f%af%e9%87%8d%e5%ae%9a%e4%bd%8d%e7%9b%ae%e6%a0%87%e6%96%87%e4%bb%b6.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;典型的ELF可重定位目标文件.png&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;.symtab&lt;/code&gt;符号表中记录了符号的如下内容：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;name&lt;/code&gt;，在字符串表中的偏移&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;type&lt;/code&gt;，变量/函数&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;binding&lt;/code&gt;，static/非static&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;section&lt;/code&gt;，符号所在的段，对于上图中的代码与数据的段，用数字表示；此外还有3种特殊的伪节：&lt;code&gt;ABS&lt;/code&gt;(不该被重定位的符号)、&lt;code&gt;UND&lt;/code&gt;(未定义的符号)、&lt;code&gt;COM&lt;/code&gt;(未初始化的全局符号)。只有可重定位文件中才有伪节，可执行文件中没有&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;value&lt;/code&gt;，距符号所在节起始位置的偏移，对于&lt;code&gt;COM&lt;/code&gt;符号，表示对齐要求。在可执行文件中，为绝对地址（虚拟地址）&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;size&lt;/code&gt;，符号的大小，对于&lt;code&gt;COM&lt;/code&gt;符号，表示最小的大小。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/c%e4%b8%ad%e7%9a%84%e5%8f%98%e9%87%8f%e4%b8%8e%e5%87%bd%e6%95%b0.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;c中的变量与函数.png&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;对于COM块，是针对弱符号的，有如下规则：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;出现多个同名强符号，编译报错；&lt;/li&gt;
+&lt;li&gt;出现一个强符号，多个弱符号，以强符号为主；&lt;/li&gt;
+&lt;li&gt;出现多个弱符号，以内存最大的为主。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;03-查看elf命令&#34;&gt;0.3 查看ELF命令&lt;/h3&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/qq_42570601/article/details/127360128&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;使用readelf和objdump查看ELF常见段&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;code&gt;readelf -h&lt;/code&gt;，查看ELF头&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;readelf -s&lt;/code&gt;、&lt;code&gt;objdump -t&lt;/code&gt;、&lt;code&gt;nm&lt;/code&gt;，查看符号表。&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;readelf -S&lt;/code&gt; 、&lt;code&gt;objdump -h&lt;/code&gt;，查看段表结构&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;objdump -d&lt;/code&gt;，查看反汇编代码，&lt;code&gt;objdump -dx&lt;/code&gt;可以看到重定位入口地址计算类型&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;readelf -d&lt;/code&gt;，查看依赖的动态库&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id=&#34;04-链接&#34;&gt;0.4 链接&lt;/h3&gt;
+&lt;p&gt;代码经预处理器、编译器和汇编器之后生成可重定位目标文件，要想生成最终的可执行文件，需要经过链接器。链接可分为静态链接和动态链接。&lt;/p&gt;
+&lt;p&gt;链接最重要的是符号解析和重定位。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;符号解析：确定全局符号唯一的定义&lt;/li&gt;
+&lt;li&gt;重定位：确定每个符号最终的内存地址并修改堆这些符号的引用&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;1-静态链接&#34;&gt;1. 静态链接&lt;/h2&gt;
+&lt;h3 id=&#34;生成静态库&#34;&gt;生成静态库&lt;/h3&gt;
+&lt;p&gt;&lt;code&gt;.a&lt;/code&gt;文件是一组&lt;code&gt;.o&lt;/code&gt;文件的集合。使用&lt;code&gt;ar&lt;/code&gt;工具做此打包操作。&lt;/p&gt;
+&lt;p&gt;&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/humadivinity/article/details/107390085&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;Linux 合并多个.a 静态库文件&lt;/a&gt;&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;11
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;12
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;13
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;14
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;15
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;16
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;17
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;# 1. 将多个*.o打包成libtarget.a&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ar rcs libtarget.a a.o b.o c.o
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;# 2. 将多个.a合成一个.a&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;#（1）先编写一个mri 脚本，如newLib.mri,内容如下&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;create newLib.a
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;addlib oldlib1.a 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;addlib oldlib2.a 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;addlib oldlib3.a 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;save
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;end
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt; 
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;#(2)执行该脚本&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ar -M &amp;lt;./newLib.mri
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;静态链接过程&#34;&gt;静态链接过程&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e9%93%be%e6%8e%a5%e8%bf%87%e7%a8%8b.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;链接过程.png&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;链接器按照命令行中参数从左只有进行链接操作。链接器维护可重定位文件集合E，未解析符号集合U和已定位符号集合D。链接初始状态，E、U、D为空。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;地址与空间分配：确定集合E后，便可根据可重定位文件各段属性合并文件，确定虚拟地址。&lt;/li&gt;
+&lt;li&gt;重定位：根据.rel中的重定位入口，修正对应值与地址。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;鉴于链接过程中从左只有遍历文件，未定义符号只能由后续.o中的符号定义来补全，所以顺序也会影响链接成功与否。&lt;/p&gt;
+&lt;h3 id=&#34;加载&#34;&gt;加载&lt;/h3&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e5%8f%af%e6%89%a7%e8%a1%8c%e6%96%87%e4%bb%b6%e4%b8%8e%e5%8a%a0%e8%bd%bd.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;可执行文件与加载.png&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;加载：将可执行文件复制到内存并运行的过程。&lt;br&gt;
+内核内存是操作系统驻留在内存中的部分，是内核中代码和数据的保留。&lt;/p&gt;
+&lt;h2 id=&#34;2-动态链接&#34;&gt;2. 动态链接&lt;/h2&gt;
+&lt;p&gt;为解决同样的库代码在多个不用进程中被包含，消耗内存资源这一问题，产生了共享库与动态链接。&lt;/p&gt;
+&lt;p&gt;动态链接：在运行和加载时，可以加载共享库到任意内存地址，并和一个在内存中的程序连接起来的过程。&lt;/p&gt;
+&lt;h3 id=&#34;共享库链接过程&#34;&gt;共享库链接过程&lt;/h3&gt;
+&lt;p&gt;与位置无关的共享库，使用&lt;code&gt;-fPIC&lt;/code&gt;编译选项，使得共享库代码在内存中可只存在一份代码，当然数据还是各个进程中存有一份。&lt;/p&gt;
+&lt;p&gt;共享库的基本思想：在创建可执行文件时，静态执行一些链接，复制一些重定位和符号表信息，待到程序加载时，动态完成链接过程。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e5%85%b1%e4%ba%ab%e5%ba%93%e9%93%be%e6%8e%a5%e8%bf%87%e7%a8%8b.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;共享库链接过程.png&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;GOT(global offset table)，全局偏移量表。&lt;br&gt;
+PLT(procedure linkage table)，过程链接表。&lt;/p&gt;
+&lt;h3 id=&#34;显示加载共享库&#34;&gt;显示加载共享库&lt;/h3&gt;
+&lt;p&gt;编译时需要加&lt;code&gt;-ldl&lt;/code&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;dlopen()&lt;/code&gt;、&lt;code&gt;dlsym()&lt;/code&gt;、&lt;code&gt;dlclose()&lt;/code&gt;可在程序运行过程中，动态加载与卸载共享库。&lt;/p&gt;
+&lt;h2 id=&#34;3-库打桩机制&#34;&gt;3. 库打桩机制&lt;/h2&gt;
+&lt;p&gt;所谓打桩，是用自己的代码替换库函数的实现，一般是调试代码，也可完全改变其实现。打桩可以发生在编译时、链接时、运行时。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;编译时，通过预处理器打桩&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#999;font-weight:bold;font-style:italic&#34;&gt;#define malloc(size)    mymalloc(size)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#999;font-weight:bold;font-style:italic&#34;&gt;#define free(ptr)       myfree(ptr)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;链接时&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;通过&lt;code&gt;--wrap func&lt;/code&gt;告知链接器，将对符号&lt;code&gt;func&lt;/code&gt;的引用解析成&lt;code&gt;__wrap_func&lt;/code&gt;，对&lt;code&gt;__real_func&lt;/code&gt;的引用解析成&lt;code&gt;func&lt;/code&gt;。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gcc -Wl,--wrap,malloc -Wl,--wrap,free -o intl int.o mymalloc.o
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;__wrap_malloc&lt;/span&gt;(&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;size_t&lt;/span&gt; size)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;void&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;*&lt;/span&gt;ptr &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;__real_malloc&lt;/span&gt;(size);    &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// 本质上调用malloc(size)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;运行时&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;在程序运行前，通过&lt;code&gt;LD_PRELOAD&lt;/code&gt;指定库的搜索顺序。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-shell&#34; data-lang=&#34;shell&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ &lt;span style=&#34;color:#008080&#34;&gt;LD_PRELOAD&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt;“./mymalloc.so”
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;$ ./intr
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;</description>
+        </item>
+        <item>
         <title>01_计算机系统漫游</title>
         <link>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/01_%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%BC%AB%E6%B8%B8/</link>
         <pubDate>Tue, 27 Jun 2023 21:19:23 +0800</pubDate>

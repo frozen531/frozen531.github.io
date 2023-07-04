@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='0. 前言 看这章前建议先阅读《程序员的自我修养》，里面有很多关于库与链接的描述。因为《深入理解计算机系统》是译本，有很多拗口的名称，通过建议书籍，你可以更方便的理解书中描述的过程。
+这里先列出一些关于链接的基础知识，简化后续章节的描述。
+0.1 目标文件 目标文件有三种：
+可重定位目标文件：可用于链接生成可执行文件，如.o文件 可执行目标文件：可被直接复制到内存中执行，如a.out 共享目标文件：一种特殊类型的可重定位目标文件，可在加载或运行时被动态的加载进内存并链接，如.so 经过编译器和汇编器后生成可重定位目标文件，经过链接器生成可执行目标文件。目标文件是二进制文件，
+0.2 典型的ELF可重定位目标文件 .symtab符号表中记录了符号的如下内容：
+name，在字符串表中的偏移 type，变量/函数 binding，static/非static section，符号所在的段，对于上图中的代码与数据的段，用数字表示；此外还有3种特殊的伪节：ABS(不该被重定位的符号)、UND(未定义的符号)、COM(未初始化的全局符号)。只有可重定位文件中才有伪节，可执行文件中没有 value，距符号所在节起始位置的偏移，对于COM符号，表示对齐要求。在可执行文件中，为绝对地址（虚拟地址） size，符号的大小，对于COM符号，表示最小的大小。 对于COM块，是针对弱符号的，有如下规则：
+出现多个同名强符号，编译报错； 出现一个强符号，多个弱符号，以强符号为主； 出现多个弱符号，以内存最大的为主。 0.3 查看ELF命令 使用readelf和objdump查看ELF常见段
+readelf -h，查看ELF头 readelf -s、objdump -t、nm，查看符号表。 readelf -S 、objdump -h，查看段表结构 objdump -d，查看反汇编代码，objdump -dx可以看到重定位入口地址计算类型 readelf -d，查看依赖的动态库 0.4 链接 代码经预处理器、编译器和汇编器之后生成可重定位目标文件，要想生成最终的可执行文件，需要经过链接器。链接可分为静态链接和动态链接。
+链接最重要的是符号解析和重定位。
+符号解析：确定全局符号唯一的定义 重定位：确定每个符号最终的内存地址并修改堆这些符号的引用 1. 静态链接 生成静态库 .a文件是一组.o文件的集合。使用ar工具做此打包操作。
+Linux 合并多个.a 静态库文件
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 # 1.'>
+<title>07_链接</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/07_%E9%93%BE%E6%8E%A5/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='07_链接'>
+<meta property='og:description' content='0. 前言 看这章前建议先阅读《程序员的自我修养》，里面有很多关于库与链接的描述。因为《深入理解计算机系统》是译本，有很多拗口的名称，通过建议书籍，你可以更方便的理解书中描述的过程。
+这里先列出一些关于链接的基础知识，简化后续章节的描述。
+0.1 目标文件 目标文件有三种：
+可重定位目标文件：可用于链接生成可执行文件，如.o文件 可执行目标文件：可被直接复制到内存中执行，如a.out 共享目标文件：一种特殊类型的可重定位目标文件，可在加载或运行时被动态的加载进内存并链接，如.so 经过编译器和汇编器后生成可重定位目标文件，经过链接器生成可执行目标文件。目标文件是二进制文件，
+0.2 典型的ELF可重定位目标文件 .symtab符号表中记录了符号的如下内容：
+name，在字符串表中的偏移 type，变量/函数 binding，static/非static section，符号所在的段，对于上图中的代码与数据的段，用数字表示；此外还有3种特殊的伪节：ABS(不该被重定位的符号)、UND(未定义的符号)、COM(未初始化的全局符号)。只有可重定位文件中才有伪节，可执行文件中没有 value，距符号所在节起始位置的偏移，对于COM符号，表示对齐要求。在可执行文件中，为绝对地址（虚拟地址） size，符号的大小，对于COM符号，表示最小的大小。 对于COM块，是针对弱符号的，有如下规则：
+出现多个同名强符号，编译报错； 出现一个强符号，多个弱符号，以强符号为主； 出现多个弱符号，以内存最大的为主。 0.3 查看ELF命令 使用readelf和objdump查看ELF常见段
+readelf -h，查看ELF头 readelf -s、objdump -t、nm，查看符号表。 readelf -S 、objdump -h，查看段表结构 objdump -d，查看反汇编代码，objdump -dx可以看到重定位入口地址计算类型 readelf -d，查看依赖的动态库 0.4 链接 代码经预处理器、编译器和汇编器之后生成可重定位目标文件，要想生成最终的可执行文件，需要经过链接器。链接可分为静态链接和动态链接。
+链接最重要的是符号解析和重定位。
+符号解析：确定全局符号唯一的定义 重定位：确定每个符号最终的内存地址并修改堆这些符号的引用 1. 静态链接 生成静态库 .a文件是一组.o文件的集合。使用ar工具做此打包操作。
+Linux 合并多个.a 静态库文件
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 # 1.'>
+<meta property='og:url' content='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/07_%E9%93%BE%E6%8E%A5/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='深入理解计算机系统' /><meta property='article:published_time' content='2023-07-04T22:19:20&#43;08:00'/><meta property='article:modified_time' content='2023-07-04T22:19:20&#43;08:00'/>
+<meta name="twitter:title" content="07_链接">
+<meta name="twitter:description" content="0. 前言 看这章前建议先阅读《程序员的自我修养》，里面有很多关于库与链接的描述。因为《深入理解计算机系统》是译本，有很多拗口的名称，通过建议书籍，你可以更方便的理解书中描述的过程。
+这里先列出一些关于链接的基础知识，简化后续章节的描述。
+0.1 目标文件 目标文件有三种：
+可重定位目标文件：可用于链接生成可执行文件，如.o文件 可执行目标文件：可被直接复制到内存中执行，如a.out 共享目标文件：一种特殊类型的可重定位目标文件，可在加载或运行时被动态的加载进内存并链接，如.so 经过编译器和汇编器后生成可重定位目标文件，经过链接器生成可执行目标文件。目标文件是二进制文件，
+0.2 典型的ELF可重定位目标文件 .symtab符号表中记录了符号的如下内容：
+name，在字符串表中的偏移 type，变量/函数 binding，static/非static section，符号所在的段，对于上图中的代码与数据的段，用数字表示；此外还有3种特殊的伪节：ABS(不该被重定位的符号)、UND(未定义的符号)、COM(未初始化的全局符号)。只有可重定位文件中才有伪节，可执行文件中没有 value，距符号所在节起始位置的偏移，对于COM符号，表示对齐要求。在可执行文件中，为绝对地址（虚拟地址） size，符号的大小，对于COM符号，表示最小的大小。 对于COM块，是针对弱符号的，有如下规则：
+出现多个同名强符号，编译报错； 出现一个强符号，多个弱符号，以强符号为主； 出现多个弱符号，以内存最大的为主。 0.3 查看ELF命令 使用readelf和objdump查看ELF常见段
+readelf -h，查看ELF头 readelf -s、objdump -t、nm，查看符号表。 readelf -S 、objdump -h，查看段表结构 objdump -d，查看反汇编代码，objdump -dx可以看到重定位入口地址计算类型 readelf -d，查看依赖的动态库 0.4 链接 代码经预处理器、编译器和汇编器之后生成可重定位目标文件，要想生成最终的可执行文件，需要经过链接器。链接可分为静态链接和动态链接。
+链接最重要的是符号解析和重定位。
+符号解析：确定全局符号唯一的定义 重定位：确定每个符号最终的内存地址并修改堆这些符号的引用 1. 静态链接 生成静态库 .a文件是一组.o文件的集合。使用ar工具做此打包操作。
+Linux 合并多个.a 静态库文件
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 # 1.">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#0-前言">0. 前言</a>
+      <ul>
+        <li><a href="#01-目标文件">0.1 目标文件</a></li>
+        <li><a href="#02-典型的elf可重定位目标文件">0.2 典型的ELF可重定位目标文件</a></li>
+        <li><a href="#03-查看elf命令">0.3 查看ELF命令</a></li>
+        <li><a href="#04-链接">0.4 链接</a></li>
+      </ul>
+    </li>
+    <li><a href="#1-静态链接">1. 静态链接</a>
+      <ul>
+        <li><a href="#生成静态库">生成静态库</a></li>
+        <li><a href="#静态链接过程">静态链接过程</a></li>
+        <li><a href="#加载">加载</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-动态链接">2. 动态链接</a>
+      <ul>
+        <li><a href="#共享库链接过程">共享库链接过程</a></li>
+        <li><a href="#显示加载共享库">显示加载共享库</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-库打桩机制">3. 库打桩机制</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="background-color: #c1c1f6; color: #fff;">
+                读书笔记
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/07_%E9%93%BE%E6%8E%A5/">07_链接</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jul 04, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    1 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="0-前言">0. 前言</h2>
+<p>看这章前建议先阅读《程序员的自我修养》，里面有很多关于库与链接的描述。因为《深入理解计算机系统》是译本，有很多拗口的名称，通过建议书籍，你可以更方便的理解书中描述的过程。</p>
+<p>这里先列出一些关于链接的基础知识，简化后续章节的描述。</p>
+<h3 id="01-目标文件">0.1 目标文件</h3>
+<p>目标文件有三种：</p>
+<ul>
+<li>可重定位目标文件：可用于链接生成可执行文件，如<code>.o</code>文件</li>
+<li>可执行目标文件：可被直接复制到内存中执行，如<code>a.out</code></li>
+<li>共享目标文件：一种特殊类型的可重定位目标文件，可在加载或运行时被动态的加载进内存并链接，如<code>.so</code></li>
+</ul>
+<p>经过编译器和汇编器后生成可重定位目标文件，经过链接器生成可执行目标文件。目标文件是二进制文件，</p>
+<h3 id="02-典型的elf可重定位目标文件">0.2 典型的ELF可重定位目标文件</h3>
+<p><img src="/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e5%85%b8%e5%9e%8b%e7%9a%84ELF%e5%8f%af%e9%87%8d%e5%ae%9a%e4%bd%8d%e7%9b%ae%e6%a0%87%e6%96%87%e4%bb%b6.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="典型的ELF可重定位目标文件.png"
+	
+	
+></p>
+<p><code>.symtab</code>符号表中记录了符号的如下内容：</p>
+<ul>
+<li><code>name</code>，在字符串表中的偏移</li>
+<li><code>type</code>，变量/函数</li>
+<li><code>binding</code>，static/非static</li>
+<li><code>section</code>，符号所在的段，对于上图中的代码与数据的段，用数字表示；此外还有3种特殊的伪节：<code>ABS</code>(不该被重定位的符号)、<code>UND</code>(未定义的符号)、<code>COM</code>(未初始化的全局符号)。只有可重定位文件中才有伪节，可执行文件中没有</li>
+<li><code>value</code>，距符号所在节起始位置的偏移，对于<code>COM</code>符号，表示对齐要求。在可执行文件中，为绝对地址（虚拟地址）</li>
+<li><code>size</code>，符号的大小，对于<code>COM</code>符号，表示最小的大小。</li>
+</ul>
+<p><img src="/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/c%e4%b8%ad%e7%9a%84%e5%8f%98%e9%87%8f%e4%b8%8e%e5%87%bd%e6%95%b0.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="c中的变量与函数.png"
+	
+	
+></p>
+<p>对于COM块，是针对弱符号的，有如下规则：</p>
+<ol>
+<li>出现多个同名强符号，编译报错；</li>
+<li>出现一个强符号，多个弱符号，以强符号为主；</li>
+<li>出现多个弱符号，以内存最大的为主。</li>
+</ol>
+<h3 id="03-查看elf命令">0.3 查看ELF命令</h3>
+<p><a class="link" href="https://blog.csdn.net/qq_42570601/article/details/127360128"  target="_blank" rel="noopener"
+    >使用readelf和objdump查看ELF常见段</a></p>
+<ul>
+<li><code>readelf -h</code>，查看ELF头</li>
+<li><code>readelf -s</code>、<code>objdump -t</code>、<code>nm</code>，查看符号表。</li>
+<li><code>readelf -S</code> 、<code>objdump -h</code>，查看段表结构</li>
+<li><code>objdump -d</code>，查看反汇编代码，<code>objdump -dx</code>可以看到重定位入口地址计算类型</li>
+<li><code>readelf -d</code>，查看依赖的动态库</li>
+</ul>
+<h3 id="04-链接">0.4 链接</h3>
+<p>代码经预处理器、编译器和汇编器之后生成可重定位目标文件，要想生成最终的可执行文件，需要经过链接器。链接可分为静态链接和动态链接。</p>
+<p>链接最重要的是符号解析和重定位。</p>
+<ul>
+<li>符号解析：确定全局符号唯一的定义</li>
+<li>重定位：确定每个符号最终的内存地址并修改堆这些符号的引用</li>
+</ul>
+<h2 id="1-静态链接">1. 静态链接</h2>
+<h3 id="生成静态库">生成静态库</h3>
+<p><code>.a</code>文件是一组<code>.o</code>文件的集合。使用<code>ar</code>工具做此打包操作。</p>
+<p><a class="link" href="https://blog.csdn.net/humadivinity/article/details/107390085"  target="_blank" rel="noopener"
+    >Linux 合并多个.a 静态库文件</a></p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 1. 将多个*.o打包成libtarget.a</span>
+</span></span><span style="display:flex;"><span>ar rcs libtarget.a a.o b.o c.o
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 2. 将多个.a合成一个.a</span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#（1）先编写一个mri 脚本，如newLib.mri,内容如下</span>
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>create newLib.a
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>addlib oldlib1.a 
+</span></span><span style="display:flex;"><span>addlib oldlib2.a 
+</span></span><span style="display:flex;"><span>addlib oldlib3.a 
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span>save
+</span></span><span style="display:flex;"><span>end
+</span></span><span style="display:flex;"><span> 
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#(2)执行该脚本</span>
+</span></span><span style="display:flex;"><span>ar -M &lt;./newLib.mri
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="静态链接过程">静态链接过程</h3>
+<p><img src="/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e9%93%be%e6%8e%a5%e8%bf%87%e7%a8%8b.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="链接过程.png"
+	
+	
+></p>
+<p>链接器按照命令行中参数从左只有进行链接操作。链接器维护可重定位文件集合E，未解析符号集合U和已定位符号集合D。链接初始状态，E、U、D为空。</p>
+<ul>
+<li>地址与空间分配：确定集合E后，便可根据可重定位文件各段属性合并文件，确定虚拟地址。</li>
+<li>重定位：根据.rel中的重定位入口，修正对应值与地址。</li>
+</ul>
+<p>鉴于链接过程中从左只有遍历文件，未定义符号只能由后续.o中的符号定义来补全，所以顺序也会影响链接成功与否。</p>
+<h3 id="加载">加载</h3>
+<p><img src="/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e5%8f%af%e6%89%a7%e8%a1%8c%e6%96%87%e4%bb%b6%e4%b8%8e%e5%8a%a0%e8%bd%bd.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="可执行文件与加载.png"
+	
+	
+></p>
+<p>加载：将可执行文件复制到内存并运行的过程。<br>
+内核内存是操作系统驻留在内存中的部分，是内核中代码和数据的保留。</p>
+<h2 id="2-动态链接">2. 动态链接</h2>
+<p>为解决同样的库代码在多个不用进程中被包含，消耗内存资源这一问题，产生了共享库与动态链接。</p>
+<p>动态链接：在运行和加载时，可以加载共享库到任意内存地址，并和一个在内存中的程序连接起来的过程。</p>
+<h3 id="共享库链接过程">共享库链接过程</h3>
+<p>与位置无关的共享库，使用<code>-fPIC</code>编译选项，使得共享库代码在内存中可只存在一份代码，当然数据还是各个进程中存有一份。</p>
+<p>共享库的基本思想：在创建可执行文件时，静态执行一些链接，复制一些重定位和符号表信息，待到程序加载时，动态完成链接过程。</p>
+<p><img src="/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e5%85%b1%e4%ba%ab%e5%ba%93%e9%93%be%e6%8e%a5%e8%bf%87%e7%a8%8b.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="共享库链接过程.png"
+	
+	
+></p>
+<p>GOT(global offset table)，全局偏移量表。<br>
+PLT(procedure linkage table)，过程链接表。</p>
+<h3 id="显示加载共享库">显示加载共享库</h3>
+<p>编译时需要加<code>-ldl</code>。</p>
+<p><code>dlopen()</code>、<code>dlsym()</code>、<code>dlclose()</code>可在程序运行过程中，动态加载与卸载共享库。</p>
+<h2 id="3-库打桩机制">3. 库打桩机制</h2>
+<p>所谓打桩，是用自己的代码替换库函数的实现，一般是调试代码，也可完全改变其实现。打桩可以发生在编译时、链接时、运行时。</p>
+<ul>
+<li>编译时，通过预处理器打桩</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#define malloc(size)    mymalloc(size)
+</span></span></span><span style="display:flex;"><span><span style="color:#999;font-weight:bold;font-style:italic">#define free(ptr)       myfree(ptr)
+</span></span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>链接时</li>
+</ul>
+<p>通过<code>--wrap func</code>告知链接器，将对符号<code>func</code>的引用解析成<code>__wrap_func</code>，对<code>__real_func</code>的引用解析成<code>func</code>。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>gcc -Wl,--wrap,malloc -Wl,--wrap,free -o intl int.o mymalloc.o
+</span></span></code></pre></td></tr></table>
+</div>
+</div><div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">void</span> <span style="color:#900;font-weight:bold">__wrap_malloc</span>(<span style="color:#458;font-weight:bold">size_t</span> size)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">void</span> <span style="color:#000;font-weight:bold">*</span>ptr <span style="color:#000;font-weight:bold">=</span> <span style="color:#900;font-weight:bold">__real_malloc</span>(size);    <span style="color:#998;font-style:italic">// 本质上调用malloc(size)
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>运行时</li>
+</ul>
+<p>在程序运行前，通过<code>LD_PRELOAD</code>指定库的搜索顺序。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-shell" data-lang="shell"><span style="display:flex;"><span>$ <span style="color:#008080">LD_PRELOAD</span><span style="color:#000;font-weight:bold">=</span>“./mymalloc.so”
+</span></span><span style="display:flex;"><span>$ ./intr
+</span></span></code></pre></td></tr></table>
+</div>
+</div>
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/">深入理解计算机系统</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/01_%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%BC%AB%E6%B8%B8/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">01_计算机系统漫游</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
