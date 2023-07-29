@@ -492,13 +492,17 @@ Linux 合并多个.a 静态库文件
 	
 	
 ></p>
-<p>GOT(global offset table)，全局偏移量表。<br>
-PLT(procedure linkage table)，过程链接表。</p>
+<p>为了实现上述目标，采用了<strong>GOT</strong>(global offset table)，数据段的一部分，全局偏移量表和<strong>PLT</strong>(procedure linkage table)，过程链接表，代码段的一部分。两者均为数组结构。</p>
+<ul>
+<li>共享对象内部的函数调用和静态全局变量引用通过相对寻址来编译；</li>
+<li>共享对象中对全局变量（内部定义和外部定义）的引用，使用GOT表，进行间接引用</li>
+<li>程序访问共享对象定义的函数，为了提高性能，采用延迟绑定（lazy binding），将过程地址的绑定推迟到第一次调用该过程时。通过PLT表，再增加一次间接调用。即过程调用-&gt;PLT-&gt;GOT-&gt;真正地址。</li>
+</ul>
 <h3 id="显示加载共享库">显示加载共享库</h3>
 <p>编译时需要加<code>-ldl</code>。</p>
-<p><code>dlopen()</code>、<code>dlsym()</code>、<code>dlclose()</code>可在程序运行过程中，动态加载与卸载共享库。</p>
+<p><code>dlopen()</code>、<code>dlsym()</code>、<code>dlclose()</code>可在程序运行过程中，动态加载与卸载共享库。<code>dlerror()</code>查看错误信息。</p>
 <h2 id="3-库打桩机制">3. 库打桩机制</h2>
-<p>所谓打桩，是用自己的代码替换库函数的实现，一般是调试代码，也可完全改变其实现。打桩可以发生在编译时、链接时、运行时。</p>
+<p>所谓库打桩，就是允许截获对共享库函数的调用，取而代之执行自己的代码。一般可以做调试使用，也可完全改变其实现。打桩可以发生在编译时、链接时、运行时。</p>
 <ul>
 <li>编译时，通过预处理器打桩</li>
 </ul>

@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content='0. 前言 我们平时编程使用的是高级语言，这些高级语言经编译器编译成遵循目标机器指令集的汇编语言，汇编语言是机器代码的文本表示，所谓的机器代码即0和1的二进制程序。
+阅读和理解汇编语言的好处在于：
+理解编译器的优化能力，分析程序中低效率代码，优化代码，提高程序运行效率； 了解程序在运行时的行为，如多线程如何做到数据共享和保持数据私有等； 了解和防御程序漏洞，如缓冲器溢出等 Intel系列处理器俗称x86，指代整个32位微处理器系列，从i386开始直到Pentium4。
+x86-64是指支持64位扩展，从Pentium4E开始，并引入超线程、多核等。
+每个处理器设计都是向后兼容。
+由于这章涉及到了汇编语言，笔记中关于8086CPU指令的描述摘自王爽老师的《汇编语言》。
+查看汇编文件 1 gcc -Og -o target p1.c p2.c 已知源文件经过编译器生成可执行文件target，编译过程中会按照指定的优化等级对源代码进行优化。过高等级的优化会使代码严重变形，不易理解。-O1和-O2是较好的选择。gcc -O0 -O1 -O2 -O3 -Os 编译优化等级
+-g ：生成调试信息 -Og ：告诉编译器生成符合原始C代码结构的机器代码， -O0 ：最少的优化，此为编译器默认选项 -O 或 -O1 ：有限优化 -O2 ：高度优化 -Os ：在O2的基础性优化，但不缩减代码尺寸 -O3 ：最大程度优化 有两种方式可以查看汇编代码，两者的结果会有细微差别，例如表示大小指示符的后缀q，movq和mov、retq和ret，这些后缀通常省略是没有问题的。
+gcc -S可生成汇编程序p1.s objdump -d反汇编(disassemlber)目标文件 汇编代码格式 汇编代码格式有两种：ATT格式和Intel格式。对比如下两段汇编代码：
+ATT 1 2 3 4 5 6 pushq %rbx movq %rdx, %rbx call mult2 movq %rax, (%rbx) popq %rbx ret Intel 1 2 3 4 5 6 push rbx mov rdx, rbx call mult2 mov QWORD PTR [rbx], rax pop rbx ret 在如下方面有所不同，通过下面表述可知学习8086汇编语言时使用的是Intel格式，本书中x86-64使用ATT格式。'>
+<title>03_程序的机器级表示</title>
+
+<link rel='canonical' href='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/03_%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9C%BA%E5%99%A8%E7%BA%A7%E8%A1%A8%E7%A4%BA/'>
+
+<link rel="stylesheet" href="/scss/style.min.5be32ca3f6e1a997c75795c4359147cc6d4fbd34948c0acd51e31d237033978a.css"><meta property='og:title' content='03_程序的机器级表示'>
+<meta property='og:description' content='0. 前言 我们平时编程使用的是高级语言，这些高级语言经编译器编译成遵循目标机器指令集的汇编语言，汇编语言是机器代码的文本表示，所谓的机器代码即0和1的二进制程序。
+阅读和理解汇编语言的好处在于：
+理解编译器的优化能力，分析程序中低效率代码，优化代码，提高程序运行效率； 了解程序在运行时的行为，如多线程如何做到数据共享和保持数据私有等； 了解和防御程序漏洞，如缓冲器溢出等 Intel系列处理器俗称x86，指代整个32位微处理器系列，从i386开始直到Pentium4。
+x86-64是指支持64位扩展，从Pentium4E开始，并引入超线程、多核等。
+每个处理器设计都是向后兼容。
+由于这章涉及到了汇编语言，笔记中关于8086CPU指令的描述摘自王爽老师的《汇编语言》。
+查看汇编文件 1 gcc -Og -o target p1.c p2.c 已知源文件经过编译器生成可执行文件target，编译过程中会按照指定的优化等级对源代码进行优化。过高等级的优化会使代码严重变形，不易理解。-O1和-O2是较好的选择。gcc -O0 -O1 -O2 -O3 -Os 编译优化等级
+-g ：生成调试信息 -Og ：告诉编译器生成符合原始C代码结构的机器代码， -O0 ：最少的优化，此为编译器默认选项 -O 或 -O1 ：有限优化 -O2 ：高度优化 -Os ：在O2的基础性优化，但不缩减代码尺寸 -O3 ：最大程度优化 有两种方式可以查看汇编代码，两者的结果会有细微差别，例如表示大小指示符的后缀q，movq和mov、retq和ret，这些后缀通常省略是没有问题的。
+gcc -S可生成汇编程序p1.s objdump -d反汇编(disassemlber)目标文件 汇编代码格式 汇编代码格式有两种：ATT格式和Intel格式。对比如下两段汇编代码：
+ATT 1 2 3 4 5 6 pushq %rbx movq %rdx, %rbx call mult2 movq %rax, (%rbx) popq %rbx ret Intel 1 2 3 4 5 6 push rbx mov rdx, rbx call mult2 mov QWORD PTR [rbx], rax pop rbx ret 在如下方面有所不同，通过下面表述可知学习8086汇编语言时使用的是Intel格式，本书中x86-64使用ATT格式。'>
+<meta property='og:url' content='https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/03_%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9C%BA%E5%99%A8%E7%BA%A7%E8%A1%A8%E7%A4%BA/'>
+<meta property='og:site_name' content='浅浅的行迹'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='深入理解计算机系统' /><meta property='article:published_time' content='2023-07-29T15:59:22&#43;08:00'/><meta property='article:modified_time' content='2023-07-29T15:59:22&#43;08:00'/>
+<meta name="twitter:title" content="03_程序的机器级表示">
+<meta name="twitter:description" content="0. 前言 我们平时编程使用的是高级语言，这些高级语言经编译器编译成遵循目标机器指令集的汇编语言，汇编语言是机器代码的文本表示，所谓的机器代码即0和1的二进制程序。
+阅读和理解汇编语言的好处在于：
+理解编译器的优化能力，分析程序中低效率代码，优化代码，提高程序运行效率； 了解程序在运行时的行为，如多线程如何做到数据共享和保持数据私有等； 了解和防御程序漏洞，如缓冲器溢出等 Intel系列处理器俗称x86，指代整个32位微处理器系列，从i386开始直到Pentium4。
+x86-64是指支持64位扩展，从Pentium4E开始，并引入超线程、多核等。
+每个处理器设计都是向后兼容。
+由于这章涉及到了汇编语言，笔记中关于8086CPU指令的描述摘自王爽老师的《汇编语言》。
+查看汇编文件 1 gcc -Og -o target p1.c p2.c 已知源文件经过编译器生成可执行文件target，编译过程中会按照指定的优化等级对源代码进行优化。过高等级的优化会使代码严重变形，不易理解。-O1和-O2是较好的选择。gcc -O0 -O1 -O2 -O3 -Os 编译优化等级
+-g ：生成调试信息 -Og ：告诉编译器生成符合原始C代码结构的机器代码， -O0 ：最少的优化，此为编译器默认选项 -O 或 -O1 ：有限优化 -O2 ：高度优化 -Os ：在O2的基础性优化，但不缩减代码尺寸 -O3 ：最大程度优化 有两种方式可以查看汇编代码，两者的结果会有细微差别，例如表示大小指示符的后缀q，movq和mov、retq和ret，这些后缀通常省略是没有问题的。
+gcc -S可生成汇编程序p1.s objdump -d反汇编(disassemlber)目标文件 汇编代码格式 汇编代码格式有两种：ATT格式和Intel格式。对比如下两段汇编代码：
+ATT 1 2 3 4 5 6 pushq %rbx movq %rdx, %rbx call mult2 movq %rax, (%rbx) popq %rbx ret Intel 1 2 3 4 5 6 push rbx mov rdx, rbx call mult2 mov QWORD PTR [rbx], rax pop rbx ret 在如下方面有所不同，通过下面表述可知学习8086汇编语言时使用的是Intel格式，本书中x86-64使用ATT格式。">
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/%E5%A4%B4%E5%83%8F2_hu72597446b9794a98393f1392c32f2c33_372735_300x0_resize_q75_box.jpg" width="300"
+                            height="300" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+                    <span class="emoji">🍥</span>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">浅浅的行迹</a></h1>
+            <h2 class="site-description"></h2>
+        </div>
+    </header><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>主页</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>归档</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>搜索</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/page/links/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>链接</span>
+            </a>
+        </li>
+        
+
+        <div class="menu-bottom-section">
+            
+            
+                <li id="dark-mode-toggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                    <span>Dark Mode</span>
+                </li>
+            
+        </div>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ul>
+    <li><a href="#0-前言">0. 前言</a>
+      <ul>
+        <li><a href="#查看汇编文件">查看汇编文件</a></li>
+        <li><a href="#汇编代码格式">汇编代码格式</a></li>
+      </ul>
+    </li>
+    <li><a href="#1-数据表示及处理">1. 数据表示及处理</a>
+      <ul>
+        <li><a href="#数据访问">数据访问</a></li>
+        <li><a href="#基础指令">基础指令</a></li>
+      </ul>
+    </li>
+    <li><a href="#2-程序的流程控制">2. 程序的流程控制</a>
+      <ul>
+        <li><a href="#条件码访问及使用">条件码访问及使用</a></li>
+        <li><a href="#选择结构">选择结构</a></li>
+        <li><a href="#循环结构">循环结构</a></li>
+      </ul>
+    </li>
+    <li><a href="#3-过程描述-运行栈">3. 过程描述-运行栈</a></li>
+    <li><a href="#4-数据结构的表示">4. 数据结构的表示</a>
+      <ul>
+        <li><a href="#数组">数组</a></li>
+        <li><a href="#结构和联合">结构和联合</a></li>
+      </ul>
+    </li>
+    <li><a href="#5-运行时内存异常">5. 运行时内存异常</a></li>
+  </ul>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="main-article">
+    <header class="article-header">
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/" style="background-color: #c1c1f6; color: #fff;">
+                读书笔记
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/03_%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9C%BA%E5%99%A8%E7%BA%A7%E8%A1%A8%E7%A4%BA/">03_程序的机器级表示</a>
+        </h2>
+    
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Jul 29, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    4 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h2 id="0-前言">0. 前言</h2>
+<p>我们平时编程使用的是高级语言，这些高级语言经编译器编译成遵循目标机器指令集的汇编语言，汇编语言是机器代码的文本表示，所谓的机器代码即0和1的二进制程序。</p>
+<p>阅读和理解汇编语言的好处在于：</p>
+<ol>
+<li>理解编译器的优化能力，分析程序中低效率代码，优化代码，提高程序运行效率；</li>
+<li>了解程序在运行时的行为，如多线程如何做到数据共享和保持数据私有等；</li>
+<li>了解和防御程序漏洞，如缓冲器溢出等</li>
+</ol>
+<p>Intel系列处理器俗称x86，指代整个32位微处理器系列，从i386开始直到Pentium4。<br>
+x86-64是指支持64位扩展，从Pentium4E开始，并引入超线程、多核等。<br>
+每个处理器设计都是向后兼容。</p>
+<p>由于这章涉及到了汇编语言，笔记中关于8086CPU指令的描述摘自王爽老师的《汇编语言》。</p>
+<h3 id="查看汇编文件">查看汇编文件</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>gcc -Og -o target p1.c p2.c
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>已知源文件经过编译器生成可执行文件target，编译过程中会按照指定的优化等级对源代码进行优化。过高等级的优化会使代码严重变形，不易理解。<code>-O1</code>和<code>-O2</code>是较好的选择。<a class="link" href="https://blog.csdn.net/lyndon_li/article/details/123671102"  target="_blank" rel="noopener"
+    >gcc -O0 -O1 -O2 -O3 -Os 编译优化等级</a></p>
+<ul>
+<li>-g ：生成调试信息</li>
+<li>-Og ：告诉编译器生成符合原始C代码结构的机器代码，</li>
+<li>-O0 ：最少的优化，此为编译器默认选项</li>
+<li>-O 或 -O1 ：有限优化</li>
+<li>-O2 ：高度优化</li>
+<li>-Os ：在O2的基础性优化，但不缩减代码尺寸</li>
+<li>-O3 ：最大程度优化</li>
+</ul>
+<p>有两种方式可以查看汇编代码，两者的结果会有细微差别，例如表示大小指示符的后缀q，<code>movq</code>和<code>mov</code>、<code>retq</code>和<code>ret</code>，这些后缀通常省略是没有问题的。</p>
+<ol>
+<li><code>gcc -S</code>可生成汇编程序p1.s</li>
+<li><code>objdump -d</code>反汇编(disassemlber)目标文件</li>
+</ol>
+<h3 id="汇编代码格式">汇编代码格式</h3>
+<p>汇编代码格式有两种：ATT格式和Intel格式。对比如下两段汇编代码：</p>
+<ul>
+<li>ATT</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>pushq %rbx
+</span></span><span style="display:flex;"><span>movq %rdx, %rbx
+</span></span><span style="display:flex;"><span>call mult2
+</span></span><span style="display:flex;"><span>movq %rax, (%rbx)
+</span></span><span style="display:flex;"><span>popq %rbx
+</span></span><span style="display:flex;"><span>ret
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>Intel</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>push rbx
+</span></span><span style="display:flex;"><span>mov rdx, rbx
+</span></span><span style="display:flex;"><span>call mult2
+</span></span><span style="display:flex;"><span>mov QWORD PTR [rbx], rax
+</span></span><span style="display:flex;"><span>pop rbx
+</span></span><span style="display:flex;"><span>ret
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>在如下方面有所不同，通过下面表述可知学习8086汇编语言时使用的是Intel格式，本书中x86-64使用ATT格式。</p>
+<ol>
+<li>Intel格式省略了指示大小的后缀，使用mov而非movq；</li>
+<li>Intel格式省略了%，使用rbx而非%rbx；</li>
+<li>使用不同方式描述内存中位置，QWORD PTR [rbx]而非(%rbx)；</li>
+<li>带多操作数的情况下，操作数顺序相反。如mov指令。</li>
+</ol>
+<h2 id="1-数据表示及处理">1. 数据表示及处理</h2>
+<p>程序=数据结构+算法。这里面都涉及到数据的表示、存放与处理。</p>
+<h3 id="数据访问">数据访问</h3>
+<p>对于数据访问需要知道两点：数据位置和数据尺寸：</p>
+<ul>
+<li>数据可以存放在内存和寄存器中</li>
+<li>数据尺寸根据处理器位数不同可以有byte、word、double word等。</li>
+</ul>
+<h4 id="8086cpu指令">8086CPU指令</h4>
+<p>8086CPU是16位处理器，有<strong>14</strong>个16位寄存器，包括：</p>
+<ul>
+<li>通用寄存器：<code>AX BX CX DX</code>，可拆分程高8位和低8位使用，如<code>AH，AL</code></li>
+<li>指令执行相关：<code>CS:IP</code></li>
+<li>栈相关：<code>SS:SP</code></li>
+<li>段寄存器：<code>DS</code>（数据段） <code>CS</code>（代码段） <code>SS</code>（栈段） <code>ES</code>（附加段），通过<code>段地址x16+偏移地址</code>，实现20位地址总线的寻址范围。</li>
+<li>其他内存寻址寄存器：<code>SI DI BP</code>，注意此处的内存寻址以下下搭配是合法的，当包含<code>BP</code>时，默认段地址是<code>SS</code>。</li>
+</ul>
+<blockquote>
+<ol start="0">
+<li>直接寻址：<code>[idata]</code></li>
+<li>寄存器间接寻址：<code>[SI] [DI] [BX] [BP] </code></li>
+<li>寄存器相对寻址：<code>[BX+idata] [BP+idata] [SI+idata] [DI+idata]</code></li>
+<li>基址变址寻址：<code>[BX+SI] [BX+DI] [BP+SI] [BP+DI]</code></li>
+<li>相对基址变址寻址<code>[BX+SI+idata] [BX+DI+idata] [BP+SI+idata] [BP+DI+idata]</code></li>
+</ol>
+</blockquote>
+<ul>
+<li>标志寄存器又称程序状态字：<code>PSW</code>。该寄存器按位起作用。</li>
+</ul>
+<p><img src="/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/PSW%e7%8a%b6%e6%80%81%e5%ad%97%e5%86%85%e5%ae%b9.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="PSW状态字内容.png"
+	
+	
+></p>
+<blockquote>
+<p>ZF：零标志位，记录执行指令后结果是否为0 <br>
+PF：奇偶标志位，记录指令执行后，所有bit位中1的个数是否为偶数 <br>
+SF：符号标志位，记录执行指令后，结果是否为负。对于有符号数计算，可以通过SF判断结果正负；对于无符号数运算没有意义 <br>
+CF：进位标志位，一般来说，对于无符号数运算，记录运算结果的最高有效位向更高位的进位值，或从更高位的借位值 <br>
+OF：溢出标志位，在进行有符号数运算时，如果超出了表示范围称为溢出 <br>
+DF：方向标志位，在串处理指令<code>movsb</code>、<code>movsw</code>中，控制每次操作后<code>si</code>、<code>di</code>的增减。<code>cld</code>将<code>df</code>置位<code>0</code>，<code>std</code>将<code>df</code>位置<code>1</code> <br>
+TF：单步中断标志位，值为1，则产生单步中断，引发中断过程。  <br>
+IF：中断允许标志位，正对可屏蔽中断，值为1，可处理可屏蔽中断，否则不处理。<code>cli</code>置0，<code>sti</code>置1</p>
+</blockquote>
+<p>8086中可以处理两种尺寸的数据，byte和word。两种方法指定数据尺寸。</p>
+<ul>
+<li>通过寄存器指明</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic">#word操作</span>
+</span></span><span style="display:flex;"><span>mov ax, <span style="color:#099">1</span>   <span style="color:#998;font-style:italic"># (ax)=1</span>
+</span></span><span style="display:flex;"><span>mov bx, ds:<span style="color:#000;font-weight:bold">[</span>0<span style="color:#000;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#byte操作</span>
+</span></span><span style="display:flex;"><span>mov al, <span style="color:#099">1</span>   
+</span></span><span style="display:flex;"><span>mov bl, ds:<span style="color:#000;font-weight:bold">[</span>0<span style="color:#000;font-weight:bold">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>没有寄存器名的情况下，用操作符<code>X ptr</code>指明内存单元的长度</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic">#word操作</span>
+</span></span><span style="display:flex;"><span>mov byte ptr ds:<span style="color:#000;font-weight:bold">[</span>0<span style="color:#000;font-weight:bold">]</span>, <span style="color:#099">1</span>
+</span></span><span style="display:flex;"><span>inc byte ptr <span style="color:#000;font-weight:bold">[</span>bx<span style="color:#000;font-weight:bold">]</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#byte操作</span>
+</span></span><span style="display:flex;"><span>mov word ptr ds:<span style="color:#000;font-weight:bold">[</span>0<span style="color:#000;font-weight:bold">]</span>, <span style="color:#099">1</span>
+</span></span><span style="display:flex;"><span>inc word ptr <span style="color:#000;font-weight:bold">[</span>bx<span style="color:#000;font-weight:bold">]</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="x86-64">x86-64</h4>
+<p>x86-64位系统可以表示并处理8~64bit（1~8byte）的数据，数据类型表示如下：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>C声明</th>
+<th>Inter数据类型</th>
+<th>汇编代码后缀</th>
+<th>大小(字节)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>char</td>
+<td>字节</td>
+<td>b（byte）</td>
+<td>1</td>
+</tr>
+<tr>
+<td>short</td>
+<td>字</td>
+<td>w（word）</td>
+<td>2</td>
+</tr>
+<tr>
+<td>int</td>
+<td>双字</td>
+<td>l（double words）</td>
+<td>4</td>
+</tr>
+<tr>
+<td>long</td>
+<td>四字</td>
+<td>q（quard words）</td>
+<td>8</td>
+</tr>
+<tr>
+<td>char*</td>
+<td>四字</td>
+<td>q（quard words）</td>
+<td>8</td>
+</tr>
+<tr>
+<td>float</td>
+<td>单精度</td>
+<td>s（single float）</td>
+<td>4</td>
+</tr>
+<tr>
+<td>double</td>
+<td>双精度</td>
+<td>l（double float）</td>
+<td>8</td>
+</tr>
+</tbody>
+</table></div>
+<p>汇编代码中通过增加上述后缀来指明处理数据的长度，如上例中的<code>movq</code>处理8字节数据。注意：浮点数的表示和计算用完全不同的指令和寄存器。</p>
+<p>64位整数寄存器有如下16个，均可拆成32、16、8位寄存器使用。</p>
+<p><img src="/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/x86-64%e6%95%b4%e6%95%b0%e5%af%84%e5%ad%98%e5%99%a8.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="x86-64整数寄存器.png"
+	
+	
+></p>
+<p>对于低字节使用规则：</p>
+<ol>
+<li>生成1字节和2字节数字的指令会保持剩下的字节不变</li>
+<li>生成4字节数字的指令会把高位4字节置0</li>
+</ol>
+<p>在内存寻址上，增加了比例变址寻址。</p>
+<blockquote>
+<p>比例变址寻址：<code>Imm(rb, ri, s)</code>：一个立即数偏移Imm，一个机制寄存器rb，一个编制寄存器ri和一个比例因子s（bixushi 1\2\4\8）。有效地址计算为<code>M[Imm+R[rb]+R[ri]*s]</code>。</p>
+</blockquote>
+<h3 id="基础指令">基础指令</h3>
+<p>指令集中包含有众多指令，下面列举常用指令。</p>
+<h4 id="数据传送指令">数据传送指令</h4>
+<p>根据操作的数据大小不同，通过增加后缀，指明数据尺寸。</p>
+<ul>
+<li>当有一个操作数为寄存器，另一个为内存或立即数时，mov通常指明目的寄存器对应数据大小</li>
+<li>当目的和源都是寄存器时，允许进行目的到源的字长扩展，会涉及到有符号和无符号数扩展</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 单个寄存器操作数</span>
+</span></span><span style="display:flex;"><span>movb <span style="color:#008080">$0</span>xAA, %dl <span style="color:#998;font-style:italic"># %dl=0xAA</span>
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"># 零扩展数据传送指令</span>
+</span></span><span style="display:flex;"><span>movzbq %dl, %rax
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">#符号扩展数据传送指令</span>
+</span></span><span style="display:flex;"><span>movsbq %dl, %rax
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>需要注意：</p>
+<ol>
+<li>x86-64中，传送指令的两个操作室不能都指向内存位置。</li>
+<li>当执行强制类型转换既涉及大小变化又涉及符号变化是，操作影响改变大小。</li>
+</ol>
+<h4 id="入栈出栈指令">入栈出栈指令</h4>
+<p>加后缀指明操作数尺寸，注意尺寸与寄存器大小间的匹配</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-fallback" data-lang="fallback"><span style="display:flex;"><span>pushq %rbx
+</span></span><span style="display:flex;"><span>popq %rbx
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="获取有效地址指令">获取有效地址指令</h4>
+<p>加后缀指明操作数尺寸，注意尺寸与寄存器大小间的匹配 <br>
+除了取有效地址外还可以进行一些计算</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span><span style="color:#998;font-style:italic"># %rax = %rdi + 4 * %rsi</span>
+</span></span><span style="display:flex;"><span>leaq <span style="color:#000;font-weight:bold">(</span>%rdi, %rsi, 4<span style="color:#000;font-weight:bold">)</span> %rax 
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="算数逻辑移位指令">算数/逻辑/移位指令</h4>
+<p>列举基础整数算术操作，通过增加后缀指定操作数尺寸</p>
+<ul>
+<li>一元操作</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>inc D <span style="color:#998;font-style:italic"># 加一操作 D = D + 1</span>
+</span></span><span style="display:flex;"><span>dec D <span style="color:#998;font-style:italic"># 减一操作 D = D 1 1</span>
+</span></span><span style="display:flex;"><span>neg D <span style="color:#998;font-style:italic"># 取负操作 D = -D</span>
+</span></span><span style="display:flex;"><span>not D <span style="color:#998;font-style:italic"># 取补操作 D = ~D</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>二元操作</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>add s, d <span style="color:#998;font-style:italic">#加 d = s + d</span>
+</span></span><span style="display:flex;"><span>sub s, d <span style="color:#998;font-style:italic">#减 d = s - d</span>
+</span></span><span style="display:flex;"><span>imul s, d <span style="color:#998;font-style:italic">#承 d = s *+* d</span>
+</span></span><span style="display:flex;"><span>xor s, d <span style="color:#998;font-style:italic">#异或 d = s ^ d</span>
+</span></span><span style="display:flex;"><span>or s, d <span style="color:#998;font-style:italic">#或 d = s | d</span>
+</span></span><span style="display:flex;"><span>and s, d <span style="color:#998;font-style:italic">#与 d = s &amp; d</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><ul>
+<li>移位</li>
+</ul>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-bash" data-lang="bash"><span style="display:flex;"><span>sal k, d <span style="color:#998;font-style:italic">#左移 d = d &lt;&lt; k</span>
+</span></span><span style="display:flex;"><span>shl k, d <span style="color:#998;font-style:italic">#左移 等价于 sal</span>
+</span></span><span style="display:flex;"><span>sar k, d <span style="color:#998;font-style:italic">#算数右移 d = d &gt;&gt;A k</span>
+</span></span><span style="display:flex;"><span>shr k, d <span style="color:#998;font-style:italic">#逻辑右移 d = d &lt;&lt;L k</span>
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="特殊的算术操作">特殊的算术操作</h4>
+<p>指两个64位操作数做乘法，结果位128位，称为八字(oct word)。操作类似8086CPU中的乘/除法，使用AX和DX两个寄存器存储操作数和结果。</p>
+<h2 id="2-程序的流程控制">2. 程序的流程控制</h2>
+<p>程序设计基本结构：顺序、选择和循环。顺序结构是指按照程序指令出现的顺序执行直至结束，称为直线代码行为。选择和循环都涉及到条件判断。</p>
+<h3 id="条件码访问及使用">条件码访问及使用</h3>
+<h4 id="条件码">条件码</h4>
+<p><strong>测试数据值</strong>是实现条件判断常见的方法。同8086一样，x86-64也拥有程序状态寄存器，本书中称<code>CF</code>（无符号溢出）、<code>ZF</code>（零）、<code>SF</code>（负数）、<code>OF</code>（有符号溢出）为条件码。以下两种方式可修改条件码：</p>
+<ol>
+<li>上面所有的<strong>整数算法操作</strong>都会修改条件码，同时会改变参与计算的寄存器值；</li>
+<li><code>CMP</code>和<code>TEST</code>指令，修改条件码，但不改变参与的寄存器值。同过增加后缀操作不同尺寸的数值，如：<code>cmpw</code>比较字节等；</li>
+</ol>
+<blockquote>
+<p><code>CMP S1 S2</code>，等同于<code>SUB S1 S2</code>，比较两者大小<code>S2-S1</code> <br>
+<code>TEST S1 S2</code>，等同于<code>AND S1 S2</code>，测试两者值，常见<code>test S S</code>，判断值S是正数、负数或0；或一个擦作数为掩码，知识哪些位应该被测试。</p>
+</blockquote>
+<h4 id="访问条件码">访问条件码</h4>
+<p>x86-64提供了访问条件码的指令。常见使用条件码的三种方法：</p>
+<ol>
+<li>根据条件码，将<strong>单字节</strong>寄存器或内存置0或1。例如C语言中的三目表达式：<code>int ret = a &gt; b ? 1 : 0</code>。汇编指令为<code>set D</code>，添加后缀，代表条件码的组合。根据使用对象不同，可划分为三组后缀：</li>
+</ol>
+<blockquote>
+<ul>
+<li>a. 有符号/无符号均可使用：<code>e(equal)</code>、<code>z(zero)</code>、<code>n(not)</code>，例如：<code>sete D</code>判断<code>ZF</code>是否为0，是，D置1，否置0。同<code>setnz D</code>。</li>
+<li>b. 有符号数：<code>s(sign)</code>、<code>g(greater)</code>、<code>l(less)</code>，例如：<code>setng</code>表示不大于，<code>sets</code>表示负数。</li>
+<li>c. 无符号数：<code>a(above)</code>、<code>b(below)</code>，例如：<code>setna</code>表示不大于</li>
+</ul>
+</blockquote>
+<ol start="2">
+<li>根据条件码跳转执行，<code>jmp label</code>无条件跳转到标号位置处执行。接后缀表示条件判断，后缀使用方法同上。如：<code>jz L1</code>，相等跳转到L1处。jmp涉及到一个绝对位置和相对位置跳转，标号会被替换成相应的值。</li>
+<li>可以有条件的传送数据（未介绍）。</li>
+</ol>
+<h3 id="选择结构">选择结构</h3>
+<p>在编译过程中，编译器会对代码进行优化处理，形式如C语言描述（汇编语言的直译），常用以<code>!t</code>判断，也可以判断<code>t</code>。</p>
+<h4 id="if-else">if-else</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// C语言
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">if</span>(test<span style="color:#000;font-weight:bold">-</span>expr)
+</span></span><span style="display:flex;"><span>    then<span style="color:#000;font-weight:bold">-</span>statement
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">else</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">else</span><span style="color:#000;font-weight:bold">-</span>statement
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// C语言描述
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    t<span style="color:#000;font-weight:bold">=</span>test<span style="color:#000;font-weight:bold">-</span>expr;
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span>(<span style="color:#000;font-weight:bold">!</span>t)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">goto</span> <span style="color:#0086b3">false</span>;
+</span></span><span style="display:flex;"><span>    then<span style="color:#000;font-weight:bold">-</span>statement
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">goto</span> done;
+</span></span><span style="display:flex;"><span><span style="color:#0086b3">false</span><span style="color:#000;font-weight:bold">:</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">else</span><span style="color:#000;font-weight:bold">-</span>statement
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">done</span>:
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="if-else-if-else">if-else if-else</h4>
+<p>如上多嵌套。</p>
+<h4 id="switch">switch</h4>
+<p>当分支众多（例如4个以上）时，会构建一个跳转表（数组），在跳转表中记录各个值对应的标号地址进行跳转。好处在于：执行判断语句的时间与判断个数无关。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">switch</span>(a)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">case</span> <span style="color:#000;font-weight:bold">-</span><span style="color:#099">2</span><span style="color:#000;font-weight:bold">:</span>    <span style="color:#998;font-style:italic">// L2标号，代表跳转地址
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">case</span> <span style="color:#099">0</span><span style="color:#000;font-weight:bold">:</span>    <span style="color:#998;font-style:italic">// L4
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">case</span> <span style="color:#099">1</span><span style="color:#000;font-weight:bold">:</span>     <span style="color:#998;font-style:italic">// L5
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        <span style="color:#000;font-weight:bold">break</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">case</span> <span style="color:#099">3</span><span style="color:#000;font-weight:bold">:</span>    <span style="color:#998;font-style:italic">// L6
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>        <span style="color:#000;font-weight:bold">break</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">default</span><span style="color:#000;font-weight:bold">:</span>    <span style="color:#998;font-style:italic">// L3
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>编译器会将分支映射入跳转表中，当测试值进入后，会计算其执行路径对应的下标值，直接跳转进入。<br>
+注意：</p>
+<ol>
+<li>数组下标从0开，但是测试值是任意整数，编译器会将其做一个偏移，移入0及其以上，所以偏移计算是a+=2；</li>
+<li>数组下标是连续的，所以对于case中没有提到的值，进入defalut分支。所以数组中值如下：</li>
+</ol>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#000;font-weight:bold">static</span> <span style="color:#458;font-weight:bold">void</span><span style="color:#000;font-weight:bold">*</span> jt[<span style="color:#099">6</span>] <span style="color:#000;font-weight:bold">=</span> {L2, L3, L4, L5, L3, L6};
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="循环结构">循环结构</h3>
+<h4 id="dowhile">do&hellip;while</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// C语言
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">do</span>
+</span></span><span style="display:flex;"><span>    body<span style="color:#000;font-weight:bold">-</span>statement
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">while</span>(test<span style="color:#000;font-weight:bold">-</span>expr);
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// C语言描述
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#900;font-weight:bold">loop</span>:
+</span></span><span style="display:flex;"><span>    body<span style="color:#000;font-weight:bold">-</span>statement
+</span></span><span style="display:flex;"><span>    t<span style="color:#000;font-weight:bold">=</span>test<span style="color:#000;font-weight:bold">-</span>expr;
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span>(t)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">goto</span> loop;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="while">while</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">12
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">13
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">14
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">15
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">16
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">17
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">18
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">19
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">20
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">21
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">22
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// C语言
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">while</span>(test<span style="color:#000;font-weight:bold">-</span>expr)
+</span></span><span style="display:flex;"><span>    body<span style="color:#000;font-weight:bold">-</span>statement
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// C语言描述:方式一：跳转到中间(jump to middile)
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">goto</span> test;
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">loop</span>:
+</span></span><span style="display:flex;"><span>    body<span style="color:#000;font-weight:bold">-</span>statement
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">test</span>:
+</span></span><span style="display:flex;"><span>    t<span style="color:#000;font-weight:bold">=</span>test<span style="color:#000;font-weight:bold">-</span>expr;
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span>(t)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">goto</span> loop;
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// C语言描述:方式二：guarded-do，转成do-while形式
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    t<span style="color:#000;font-weight:bold">=</span>test<span style="color:#000;font-weight:bold">-</span>expr;
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span>(<span style="color:#000;font-weight:bold">!</span>t)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">goto</span> done;
+</span></span><span style="display:flex;"><span><span style="color:#900;font-weight:bold">loop</span>:
+</span></span><span style="display:flex;"><span>    body<span style="color:#000;font-weight:bold">-</span>statement
+</span></span><span style="display:flex;"><span>    t<span style="color:#000;font-weight:bold">=</span>test<span style="color:#000;font-weight:bold">-</span>expr;
+</span></span><span style="display:flex;"><span>    <span style="color:#000;font-weight:bold">if</span>(t)
+</span></span><span style="display:flex;"><span>        <span style="color:#000;font-weight:bold">goto</span> loop;
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h4 id="for">for</h4>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">11
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#998;font-style:italic">// C语言
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">for</span>(init<span style="color:#000;font-weight:bold">-</span>expr; test<span style="color:#000;font-weight:bold">-</span>expr; update<span style="color:#000;font-weight:bold">-</span>expr)
+</span></span><span style="display:flex;"><span>    body<span style="color:#000;font-weight:bold">-</span>statement
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 转成while，其最后的汇编形式同while
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>init<span style="color:#000;font-weight:bold">-</span>expr;
+</span></span><span style="display:flex;"><span><span style="color:#000;font-weight:bold">while</span>(test<span style="color:#000;font-weight:bold">-</span>expr)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    body<span style="color:#000;font-weight:bold">-</span>statement
+</span></span><span style="display:flex;"><span>    update<span style="color:#000;font-weight:bold">-</span>expr;
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="3-过程描述-运行栈">3. 过程描述-运行栈</h2>
+<p>函数调用使用了栈提供的先进后出的机制。在内存空间中，栈的增长方向是从高到低。栈指针减少适当的量可以为局部变量在栈上分配内存，栈指针增加，可以用来释放内存。</p>
+<p>实际上，许多函数不需要栈帧，当所有局部变量都可以保存到寄存器中，而且该函数不会调用其他函数时，就可以这样处理。</p>
+<p><img src="/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e6%a0%88%e5%b8%a7.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="栈帧.png"
+	
+	
+></p>
+<ul>
+<li>数据传送</li>
+</ul>
+<blockquote>
+<ol>
+<li>入参通过寄存器或栈传送。x86-64中，当函数参数个数多于6个时，使用栈传送。用来传送参数的寄存器有：<code>%rdi</code>、<code>%rsi</code>、<code>%rdx</code>、<code>%rcx</code>、<code>%r8</code>、<code>%r9</code>\</li>
+<li>返回值存放在<code>%rax</code>中</li>
+</ol>
+</blockquote>
+<ul>
+<li>局部变量</li>
+</ul>
+<p>寄存器<code>%rbx</code>、<code>%rbp</code>、和<code>%r12~%r15</code>可用来存放局部变量，如果函数栈中使用这些寄存器，那么被使用的寄存器需要保存到栈中，如图被保存的寄存器部分。有些局部变量必须保存到栈中，如：</p>
+<blockquote>
+<ol>
+<li>寄存器数量不足以存放所有的局部变量；</li>
+<li>对一个局部变量使用&amp;取地址，由于需要取到地址，所以该局部变量必须在栈中；</li>
+<li>数组或联合体</li>
+</ol>
+</blockquote>
+<p>做如下举例，明确内存中栈帧存放位置。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">9
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">long</span> <span style="color:#900;font-weight:bold">call_proc</span>()
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">long</span> x1 <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">1</span>;    <span style="color:#998;font-style:italic">// 存在栈上，因为需要取地址
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#458;font-weight:bold">int</span> x2 <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">2</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">short</span> x3 <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">3</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">char</span> x4 <span style="color:#000;font-weight:bold">=</span> <span style="color:#099">4</span>;
+</span></span><span style="display:flex;"><span>    <span style="color:#900;font-weight:bold">proc</span>(x1, <span style="color:#000;font-weight:bold">&amp;</span>x1, x2, <span style="color:#000;font-weight:bold">&amp;</span>x2, x3, <span style="color:#000;font-weight:bold">&amp;</span>x3, x4, <span style="color:#000;font-weight:bold">&amp;</span>x4);   <span style="color:#998;font-style:italic">// x4和&amp;x4需要存放到栈中
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#000;font-weight:bold">return</span> (x1<span style="color:#000;font-weight:bold">+</span>x2)<span style="color:#000;font-weight:bold">*</span>(x3<span style="color:#000;font-weight:bold">+</span>x4);
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p><img src="/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e5%87%bd%e6%95%b0%e6%a0%88%e5%b8%a7%e4%b8%be%e4%be%8b.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="函数栈帧举例.png"
+	
+	
+></p>
+<ul>
+<li>变长栈帧</li>
+</ul>
+<p>现在的编译器能够预先确定需要为栈帧分配多少空间，但对于有些函数，需要的局部存储是变长的，此时为了管理变长栈帧，x86-64使用寄存器%rbp作为帧指针。只需要将%rbp作为栈使用寄存器，保存之前的状态值，并设置当前栈顶指针。</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 4
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 5
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 6
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 7
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 8
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f"> 9
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">10
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">long</span> <span style="color:#900;font-weight:bold">vframe</span>(<span style="color:#458;font-weight:bold">long</span> n, <span style="color:#458;font-weight:bold">long</span> idx, <span style="color:#458;font-weight:bold">long</span> <span style="color:#000;font-weight:bold">*</span>q)
+</span></span><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">long</span> i;
+</span></span><span style="display:flex;"><span>    <span style="color:#458;font-weight:bold">long</span> <span style="color:#000;font-weight:bold">*</span>p[n]; <span style="color:#998;font-style:italic">// 变长
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>    <span style="color:#998;font-style:italic">//...
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 汇编%rbp
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span>pushq <span style="color:#000;font-weight:bold">%</span>rbp
+</span></span><span style="display:flex;"><span>movq <span style="color:#000;font-weight:bold">%</span>rsp, <span style="color:#000;font-weight:bold">%</span>rbp
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h2 id="4-数据结构的表示">4. 数据结构的表示</h2>
+<p>局部的数组、结构体和联合体一定放在栈中。</p>
+<h3 id="数组">数组</h3>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span>T A[N];
+</span></span></code></pre></td></tr></table>
+</div>
+</div><p>数组是在内存中分配一个<code>sizeof(T)*N字</code>节的连续区域，数组名<code>A</code>是一个指向数组开头的指针。数组引用<code>A[i]</code>等同于表达式<code>*(A+i)</code>。假设数组起始地址为<code>xa</code>，T为<code>int</code>，对数组需要有如下认知：</p>
+<div class="table-wrapper"><table>
+<thead>
+<tr>
+<th>表达式</th>
+<th>类型</th>
+<th>值</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>A</td>
+<td>int*</td>
+<td>xa</td>
+</tr>
+<tr>
+<td>A[0]</td>
+<td>int</td>
+<td>M[xa]</td>
+</tr>
+<tr>
+<td>&amp;A[i]</td>
+<td>int*</td>
+<td>xa + 4i</td>
+</tr>
+<tr>
+<td>A[i]</td>
+<td>int</td>
+<td>M[xa + 4i]</td>
+</tr>
+<tr>
+<td>&amp;A[i] - A</td>
+<td>long</td>
+<td>i</td>
+</tr>
+</tbody>
+</table></div>
+<p>多维数组在内存中按照“行优先”的顺序排列。对于多维数组：</p>
+<div class="highlight"><div style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;">
+<table style="border-spacing:0;padding:0;margin:0;border:0;"><tr><td style="vertical-align:top;padding:0;margin:0;border:0;">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">1
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">2
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">3
+</span><span style="white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f">4
+</span></code></pre></td>
+<td style="vertical-align:top;padding:0;margin:0;border:0;;width:100%">
+<pre tabindex="0" style="background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-c" data-lang="c"><span style="display:flex;"><span><span style="color:#458;font-weight:bold">int</span> A[<span style="color:#099">5</span>][<span style="color:#099">3</span>]
+</span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic">// 等价于
+</span></span></span><span style="display:flex;"><span><span style="color:#998;font-style:italic"></span><span style="color:#000;font-weight:bold">typedef</span> <span style="color:#458;font-weight:bold">int</span> <span style="color:#458;font-weight:bold">row3_t</span>[<span style="color:#099">3</span>];
+</span></span><span style="display:flex;"><span><span style="color:#458;font-weight:bold">row3_t</span> A[<span style="color:#099">5</span>];
+</span></span></code></pre></td></tr></table>
+</div>
+</div><h3 id="结构和联合">结构和联合</h3>
+<p>两者都是创建一个数据类型，将不同类型的对象居合到一个对象中。用名字来引用各个组成部分。</p>
+<p>当我们知道一个数据结构中两个不同字段的使用是互斥的，可以将这两个声明为联合的一部分，而不是结构的一部分，这样可以减少分配内存空间的总量。</p>
+<p>数据对齐。计算机系统对基本数据类型的合法地址做出了一些限制，要求某种类型对象的地址必须是2、4或8的整数倍，这种对齐限制可以简化处理器和内存系统之间接口的硬件设计。否则一个数据可能需要多次访问内存获取数据。</p>
+<p>对齐原则：任何K字节的基本对象的地址必须是K的倍数。<br>
+有效省内存方式：按照大小降序排列元素。</p>
+<p><img src="/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e5%af%b9%e9%bd%90.png"
+	
+	
+	
+	loading="lazy"
+	
+		alt="对齐.png"
+	
+	
+></p>
+<h2 id="5-运行时内存异常">5. 运行时内存异常</h2>
+<p>数组引用不进行任何边界检查，当函数调用过程中，数组越界写入导致栈中局部变化、保存的寄存器值甚至返回地址被破坏，导致缓冲区溢出，程序崩溃。</p>
+<p>库函数<code>gets()</code>、<code>strcpy()</code>、<code>strcat()</code>和<code>sprintf()</code>都是不安全的函数，不会判断字符串空间是否足够。</p>
+<p>缓冲区溢出也被黑客用来攻击计算机。常见的保护措施有：</p>
+<ol>
+<li>栈随机化：每次程序运行，栈的位置都有变化。可以将栈起始地址设定在一个范围内，程序每次随机运行在某个地址</li>
+<li>检测何时栈被破坏，增加栈保护者机制，在栈帧中任何局部缓冲区和栈状态之间存储一个随机产生的特殊的值，哨兵值(guard value)，检测该值是否被某个操作改变，发现改变，异常终止程序</li>
+<li>限制内存的读、写和可执行权限，限制哪部分内存可存储可执行代码</li>
+</ol>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/">深入理解计算机系统</a>
+        
+    </section>
+
+
+    </footer>
+
+
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/07_%E9%93%BE%E6%8E%A5/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">07_链接</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="">
+    <a href="/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/01_%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F%E6%BC%AB%E6%B8%B8/">
+        
+        
+
+        <div class="article-details">
+            <h2 class="article-title">01_计算机系统漫游</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+        2023 浅浅的行迹
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.16.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

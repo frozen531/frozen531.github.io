@@ -6,7 +6,803 @@
         <description>Recent content in 读书笔记 on 浅浅的行迹</description>
         <generator>Hugo -- gohugo.io</generator>
         <language>en-us</language>
-        <lastBuildDate>Tue, 04 Jul 2023 22:19:20 +0800</lastBuildDate><atom:link href="https://frozen531.github.io/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.xml" rel="self" type="application/rss+xml" /><item>
+        <lastBuildDate>Sat, 29 Jul 2023 15:59:22 +0800</lastBuildDate><atom:link href="https://frozen531.github.io/categories/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>03_程序的机器级表示</title>
+        <link>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/03_%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9C%BA%E5%99%A8%E7%BA%A7%E8%A1%A8%E7%A4%BA/</link>
+        <pubDate>Sat, 29 Jul 2023 15:59:22 +0800</pubDate>
+        
+        <guid>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/03_%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9C%BA%E5%99%A8%E7%BA%A7%E8%A1%A8%E7%A4%BA/</guid>
+        <description>&lt;h2 id=&#34;0-前言&#34;&gt;0. 前言&lt;/h2&gt;
+&lt;p&gt;我们平时编程使用的是高级语言，这些高级语言经编译器编译成遵循目标机器指令集的汇编语言，汇编语言是机器代码的文本表示，所谓的机器代码即0和1的二进制程序。&lt;/p&gt;
+&lt;p&gt;阅读和理解汇编语言的好处在于：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;理解编译器的优化能力，分析程序中低效率代码，优化代码，提高程序运行效率；&lt;/li&gt;
+&lt;li&gt;了解程序在运行时的行为，如多线程如何做到数据共享和保持数据私有等；&lt;/li&gt;
+&lt;li&gt;了解和防御程序漏洞，如缓冲器溢出等&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;Intel系列处理器俗称x86，指代整个32位微处理器系列，从i386开始直到Pentium4。&lt;br&gt;
+x86-64是指支持64位扩展，从Pentium4E开始，并引入超线程、多核等。&lt;br&gt;
+每个处理器设计都是向后兼容。&lt;/p&gt;
+&lt;p&gt;由于这章涉及到了汇编语言，笔记中关于8086CPU指令的描述摘自王爽老师的《汇编语言》。&lt;/p&gt;
+&lt;h3 id=&#34;查看汇编文件&#34;&gt;查看汇编文件&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;gcc -Og -o target p1.c p2.c
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;已知源文件经过编译器生成可执行文件target，编译过程中会按照指定的优化等级对源代码进行优化。过高等级的优化会使代码严重变形，不易理解。&lt;code&gt;-O1&lt;/code&gt;和&lt;code&gt;-O2&lt;/code&gt;是较好的选择。&lt;a class=&#34;link&#34; href=&#34;https://blog.csdn.net/lyndon_li/article/details/123671102&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;gcc -O0 -O1 -O2 -O3 -Os 编译优化等级&lt;/a&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;-g ：生成调试信息&lt;/li&gt;
+&lt;li&gt;-Og ：告诉编译器生成符合原始C代码结构的机器代码，&lt;/li&gt;
+&lt;li&gt;-O0 ：最少的优化，此为编译器默认选项&lt;/li&gt;
+&lt;li&gt;-O 或 -O1 ：有限优化&lt;/li&gt;
+&lt;li&gt;-O2 ：高度优化&lt;/li&gt;
+&lt;li&gt;-Os ：在O2的基础性优化，但不缩减代码尺寸&lt;/li&gt;
+&lt;li&gt;-O3 ：最大程度优化&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;有两种方式可以查看汇编代码，两者的结果会有细微差别，例如表示大小指示符的后缀q，&lt;code&gt;movq&lt;/code&gt;和&lt;code&gt;mov&lt;/code&gt;、&lt;code&gt;retq&lt;/code&gt;和&lt;code&gt;ret&lt;/code&gt;，这些后缀通常省略是没有问题的。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;code&gt;gcc -S&lt;/code&gt;可生成汇编程序p1.s&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;objdump -d&lt;/code&gt;反汇编(disassemlber)目标文件&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;汇编代码格式&#34;&gt;汇编代码格式&lt;/h3&gt;
+&lt;p&gt;汇编代码格式有两种：ATT格式和Intel格式。对比如下两段汇编代码：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;ATT&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pushq %rbx
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;movq %rdx, %rbx
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;call mult2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;movq %rax, (%rbx)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;popq %rbx
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ret
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;Intel&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;push rbx
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mov rdx, rbx
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;call mult2
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mov QWORD PTR [rbx], rax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pop rbx
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;ret
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;在如下方面有所不同，通过下面表述可知学习8086汇编语言时使用的是Intel格式，本书中x86-64使用ATT格式。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Intel格式省略了指示大小的后缀，使用mov而非movq；&lt;/li&gt;
+&lt;li&gt;Intel格式省略了%，使用rbx而非%rbx；&lt;/li&gt;
+&lt;li&gt;使用不同方式描述内存中位置，QWORD PTR [rbx]而非(%rbx)；&lt;/li&gt;
+&lt;li&gt;带多操作数的情况下，操作数顺序相反。如mov指令。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h2 id=&#34;1-数据表示及处理&#34;&gt;1. 数据表示及处理&lt;/h2&gt;
+&lt;p&gt;程序=数据结构+算法。这里面都涉及到数据的表示、存放与处理。&lt;/p&gt;
+&lt;h3 id=&#34;数据访问&#34;&gt;数据访问&lt;/h3&gt;
+&lt;p&gt;对于数据访问需要知道两点：数据位置和数据尺寸：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;数据可以存放在内存和寄存器中&lt;/li&gt;
+&lt;li&gt;数据尺寸根据处理器位数不同可以有byte、word、double word等。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h4 id=&#34;8086cpu指令&#34;&gt;8086CPU指令&lt;/h4&gt;
+&lt;p&gt;8086CPU是16位处理器，有&lt;strong&gt;14&lt;/strong&gt;个16位寄存器，包括：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;通用寄存器：&lt;code&gt;AX BX CX DX&lt;/code&gt;，可拆分程高8位和低8位使用，如&lt;code&gt;AH，AL&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;指令执行相关：&lt;code&gt;CS:IP&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;栈相关：&lt;code&gt;SS:SP&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;段寄存器：&lt;code&gt;DS&lt;/code&gt;（数据段） &lt;code&gt;CS&lt;/code&gt;（代码段） &lt;code&gt;SS&lt;/code&gt;（栈段） &lt;code&gt;ES&lt;/code&gt;（附加段），通过&lt;code&gt;段地址x16+偏移地址&lt;/code&gt;，实现20位地址总线的寻址范围。&lt;/li&gt;
+&lt;li&gt;其他内存寻址寄存器：&lt;code&gt;SI DI BP&lt;/code&gt;，注意此处的内存寻址以下下搭配是合法的，当包含&lt;code&gt;BP&lt;/code&gt;时，默认段地址是&lt;code&gt;SS&lt;/code&gt;。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;ol start=&#34;0&#34;&gt;
+&lt;li&gt;直接寻址：&lt;code&gt;[idata]&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;寄存器间接寻址：&lt;code&gt;[SI] [DI] [BX] [BP] &lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;寄存器相对寻址：&lt;code&gt;[BX+idata] [BP+idata] [SI+idata] [DI+idata]&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;基址变址寻址：&lt;code&gt;[BX+SI] [BX+DI] [BP+SI] [BP+DI]&lt;/code&gt;&lt;/li&gt;
+&lt;li&gt;相对基址变址寻址&lt;code&gt;[BX+SI+idata] [BX+DI+idata] [BP+SI+idata] [BP+DI+idata]&lt;/code&gt;&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;标志寄存器又称程序状态字：&lt;code&gt;PSW&lt;/code&gt;。该寄存器按位起作用。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/PSW%e7%8a%b6%e6%80%81%e5%ad%97%e5%86%85%e5%ae%b9.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;PSW状态字内容.png&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;ZF：零标志位，记录执行指令后结果是否为0 &lt;br&gt;
+PF：奇偶标志位，记录指令执行后，所有bit位中1的个数是否为偶数 &lt;br&gt;
+SF：符号标志位，记录执行指令后，结果是否为负。对于有符号数计算，可以通过SF判断结果正负；对于无符号数运算没有意义 &lt;br&gt;
+CF：进位标志位，一般来说，对于无符号数运算，记录运算结果的最高有效位向更高位的进位值，或从更高位的借位值 &lt;br&gt;
+OF：溢出标志位，在进行有符号数运算时，如果超出了表示范围称为溢出 &lt;br&gt;
+DF：方向标志位，在串处理指令&lt;code&gt;movsb&lt;/code&gt;、&lt;code&gt;movsw&lt;/code&gt;中，控制每次操作后&lt;code&gt;si&lt;/code&gt;、&lt;code&gt;di&lt;/code&gt;的增减。&lt;code&gt;cld&lt;/code&gt;将&lt;code&gt;df&lt;/code&gt;置位&lt;code&gt;0&lt;/code&gt;，&lt;code&gt;std&lt;/code&gt;将&lt;code&gt;df&lt;/code&gt;位置&lt;code&gt;1&lt;/code&gt; &lt;br&gt;
+TF：单步中断标志位，值为1，则产生单步中断，引发中断过程。  &lt;br&gt;
+IF：中断允许标志位，正对可屏蔽中断，值为1，可处理可屏蔽中断，否则不处理。&lt;code&gt;cli&lt;/code&gt;置0，&lt;code&gt;sti&lt;/code&gt;置1&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;8086中可以处理两种尺寸的数据，byte和word。两种方法指定数据尺寸。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;通过寄存器指明&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;#word操作&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mov ax, &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt;   &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;# (ax)=1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mov bx, ds:&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;#byte操作&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mov al, &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt;   
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mov bl, ds:&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;没有寄存器名的情况下，用操作符&lt;code&gt;X ptr&lt;/code&gt;指明内存单元的长度&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;7
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;#word操作&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mov byte ptr ds:&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;, &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;inc byte ptr &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;bx&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;#byte操作&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;mov word ptr ds:&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;0&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;, &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;inc word ptr &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;[&lt;/span&gt;bx&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;]&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id=&#34;x86-64&#34;&gt;x86-64&lt;/h4&gt;
+&lt;p&gt;x86-64位系统可以表示并处理8~64bit（1~8byte）的数据，数据类型表示如下：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;C声明&lt;/th&gt;
+&lt;th&gt;Inter数据类型&lt;/th&gt;
+&lt;th&gt;汇编代码后缀&lt;/th&gt;
+&lt;th&gt;大小(字节)&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;char&lt;/td&gt;
+&lt;td&gt;字节&lt;/td&gt;
+&lt;td&gt;b（byte）&lt;/td&gt;
+&lt;td&gt;1&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;short&lt;/td&gt;
+&lt;td&gt;字&lt;/td&gt;
+&lt;td&gt;w（word）&lt;/td&gt;
+&lt;td&gt;2&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;int&lt;/td&gt;
+&lt;td&gt;双字&lt;/td&gt;
+&lt;td&gt;l（double words）&lt;/td&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;long&lt;/td&gt;
+&lt;td&gt;四字&lt;/td&gt;
+&lt;td&gt;q（quard words）&lt;/td&gt;
+&lt;td&gt;8&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;char*&lt;/td&gt;
+&lt;td&gt;四字&lt;/td&gt;
+&lt;td&gt;q（quard words）&lt;/td&gt;
+&lt;td&gt;8&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;float&lt;/td&gt;
+&lt;td&gt;单精度&lt;/td&gt;
+&lt;td&gt;s（single float）&lt;/td&gt;
+&lt;td&gt;4&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;double&lt;/td&gt;
+&lt;td&gt;双精度&lt;/td&gt;
+&lt;td&gt;l（double float）&lt;/td&gt;
+&lt;td&gt;8&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;汇编代码中通过增加上述后缀来指明处理数据的长度，如上例中的&lt;code&gt;movq&lt;/code&gt;处理8字节数据。注意：浮点数的表示和计算用完全不同的指令和寄存器。&lt;/p&gt;
+&lt;p&gt;64位整数寄存器有如下16个，均可拆成32、16、8位寄存器使用。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/x86-64%e6%95%b4%e6%95%b0%e5%af%84%e5%ad%98%e5%99%a8.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;x86-64整数寄存器.png&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;对于低字节使用规则：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;生成1字节和2字节数字的指令会保持剩下的字节不变&lt;/li&gt;
+&lt;li&gt;生成4字节数字的指令会把高位4字节置0&lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;在内存寻址上，增加了比例变址寻址。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;比例变址寻址：&lt;code&gt;Imm(rb, ri, s)&lt;/code&gt;：一个立即数偏移Imm，一个机制寄存器rb，一个编制寄存器ri和一个比例因子s（bixushi 1\2\4\8）。有效地址计算为&lt;code&gt;M[Imm+R[rb]+R[ri]*s]&lt;/code&gt;。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;基础指令&#34;&gt;基础指令&lt;/h3&gt;
+&lt;p&gt;指令集中包含有众多指令，下面列举常用指令。&lt;/p&gt;
+&lt;h4 id=&#34;数据传送指令&#34;&gt;数据传送指令&lt;/h4&gt;
+&lt;p&gt;根据操作的数据大小不同，通过增加后缀，指明数据尺寸。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;当有一个操作数为寄存器，另一个为内存或立即数时，mov通常指明目的寄存器对应数据大小&lt;/li&gt;
+&lt;li&gt;当目的和源都是寄存器时，允许进行目的到源的字长扩展，会涉及到有符号和无符号数扩展&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;8
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;# 单个寄存器操作数&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;movb &lt;span style=&#34;color:#008080&#34;&gt;$0&lt;/span&gt;xAA, %dl &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;# %dl=0xAA&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;# 零扩展数据传送指令&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;movzbq %dl, %rax
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;#符号扩展数据传送指令&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;movsbq %dl, %rax
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;需要注意：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;x86-64中，传送指令的两个操作室不能都指向内存位置。&lt;/li&gt;
+&lt;li&gt;当执行强制类型转换既涉及大小变化又涉及符号变化是，操作影响改变大小。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h4 id=&#34;入栈出栈指令&#34;&gt;入栈出栈指令&lt;/h4&gt;
+&lt;p&gt;加后缀指明操作数尺寸，注意尺寸与寄存器大小间的匹配&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-fallback&#34; data-lang=&#34;fallback&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;pushq %rbx
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;popq %rbx
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id=&#34;获取有效地址指令&#34;&gt;获取有效地址指令&lt;/h4&gt;
+&lt;p&gt;加后缀指明操作数尺寸，注意尺寸与寄存器大小间的匹配 &lt;br&gt;
+除了取有效地址外还可以进行一些计算&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;# %rax = %rdi + 4 * %rsi&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;leaq &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;(&lt;/span&gt;%rdi, %rsi, 4&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;)&lt;/span&gt; %rax 
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id=&#34;算数逻辑移位指令&#34;&gt;算数/逻辑/移位指令&lt;/h4&gt;
+&lt;p&gt;列举基础整数算术操作，通过增加后缀指定操作数尺寸&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;一元操作&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;inc D &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;# 加一操作 D = D + 1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;dec D &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;# 减一操作 D = D 1 1&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;neg D &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;# 取负操作 D = -D&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;not D &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;# 取补操作 D = ~D&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;二元操作&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;6
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;add s, d &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;#加 d = s + d&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sub s, d &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;#减 d = s - d&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;imul s, d &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;#承 d = s *+* d&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;xor s, d &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;#异或 d = s ^ d&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;or s, d &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;#或 d = s | d&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;and s, d &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;#与 d = s &amp;amp; d&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;ul&gt;
+&lt;li&gt;移位&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-bash&#34; data-lang=&#34;bash&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sal k, d &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;#左移 d = d &amp;lt;&amp;lt; k&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;shl k, d &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;#左移 等价于 sal&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;sar k, d &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;#算数右移 d = d &amp;gt;&amp;gt;A k&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;shr k, d &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;#逻辑右移 d = d &amp;lt;&amp;lt;L k&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id=&#34;特殊的算术操作&#34;&gt;特殊的算术操作&lt;/h4&gt;
+&lt;p&gt;指两个64位操作数做乘法，结果位128位，称为八字(oct word)。操作类似8086CPU中的乘/除法，使用AX和DX两个寄存器存储操作数和结果。&lt;/p&gt;
+&lt;h2 id=&#34;2-程序的流程控制&#34;&gt;2. 程序的流程控制&lt;/h2&gt;
+&lt;p&gt;程序设计基本结构：顺序、选择和循环。顺序结构是指按照程序指令出现的顺序执行直至结束，称为直线代码行为。选择和循环都涉及到条件判断。&lt;/p&gt;
+&lt;h3 id=&#34;条件码访问及使用&#34;&gt;条件码访问及使用&lt;/h3&gt;
+&lt;h4 id=&#34;条件码&#34;&gt;条件码&lt;/h4&gt;
+&lt;p&gt;&lt;strong&gt;测试数据值&lt;/strong&gt;是实现条件判断常见的方法。同8086一样，x86-64也拥有程序状态寄存器，本书中称&lt;code&gt;CF&lt;/code&gt;（无符号溢出）、&lt;code&gt;ZF&lt;/code&gt;（零）、&lt;code&gt;SF&lt;/code&gt;（负数）、&lt;code&gt;OF&lt;/code&gt;（有符号溢出）为条件码。以下两种方式可修改条件码：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;上面所有的&lt;strong&gt;整数算法操作&lt;/strong&gt;都会修改条件码，同时会改变参与计算的寄存器值；&lt;/li&gt;
+&lt;li&gt;&lt;code&gt;CMP&lt;/code&gt;和&lt;code&gt;TEST&lt;/code&gt;指令，修改条件码，但不改变参与的寄存器值。同过增加后缀操作不同尺寸的数值，如：&lt;code&gt;cmpw&lt;/code&gt;比较字节等；&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;code&gt;CMP S1 S2&lt;/code&gt;，等同于&lt;code&gt;SUB S1 S2&lt;/code&gt;，比较两者大小&lt;code&gt;S2-S1&lt;/code&gt; &lt;br&gt;
+&lt;code&gt;TEST S1 S2&lt;/code&gt;，等同于&lt;code&gt;AND S1 S2&lt;/code&gt;，测试两者值，常见&lt;code&gt;test S S&lt;/code&gt;，判断值S是正数、负数或0；或一个擦作数为掩码，知识哪些位应该被测试。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h4 id=&#34;访问条件码&#34;&gt;访问条件码&lt;/h4&gt;
+&lt;p&gt;x86-64提供了访问条件码的指令。常见使用条件码的三种方法：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;根据条件码，将&lt;strong&gt;单字节&lt;/strong&gt;寄存器或内存置0或1。例如C语言中的三目表达式：&lt;code&gt;int ret = a &amp;gt; b ? 1 : 0&lt;/code&gt;。汇编指令为&lt;code&gt;set D&lt;/code&gt;，添加后缀，代表条件码的组合。根据使用对象不同，可划分为三组后缀：&lt;/li&gt;
+&lt;/ol&gt;
+&lt;blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;a. 有符号/无符号均可使用：&lt;code&gt;e(equal)&lt;/code&gt;、&lt;code&gt;z(zero)&lt;/code&gt;、&lt;code&gt;n(not)&lt;/code&gt;，例如：&lt;code&gt;sete D&lt;/code&gt;判断&lt;code&gt;ZF&lt;/code&gt;是否为0，是，D置1，否置0。同&lt;code&gt;setnz D&lt;/code&gt;。&lt;/li&gt;
+&lt;li&gt;b. 有符号数：&lt;code&gt;s(sign)&lt;/code&gt;、&lt;code&gt;g(greater)&lt;/code&gt;、&lt;code&gt;l(less)&lt;/code&gt;，例如：&lt;code&gt;setng&lt;/code&gt;表示不大于，&lt;code&gt;sets&lt;/code&gt;表示负数。&lt;/li&gt;
+&lt;li&gt;c. 无符号数：&lt;code&gt;a(above)&lt;/code&gt;、&lt;code&gt;b(below)&lt;/code&gt;，例如：&lt;code&gt;setna&lt;/code&gt;表示不大于&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;ol start=&#34;2&#34;&gt;
+&lt;li&gt;根据条件码跳转执行，&lt;code&gt;jmp label&lt;/code&gt;无条件跳转到标号位置处执行。接后缀表示条件判断，后缀使用方法同上。如：&lt;code&gt;jz L1&lt;/code&gt;，相等跳转到L1处。jmp涉及到一个绝对位置和相对位置跳转，标号会被替换成相应的值。&lt;/li&gt;
+&lt;li&gt;可以有条件的传送数据（未介绍）。&lt;/li&gt;
+&lt;/ol&gt;
+&lt;h3 id=&#34;选择结构&#34;&gt;选择结构&lt;/h3&gt;
+&lt;p&gt;在编译过程中，编译器会对代码进行优化处理，形式如C语言描述（汇编语言的直译），常用以&lt;code&gt;!t&lt;/code&gt;判断，也可以判断&lt;code&gt;t&lt;/code&gt;。&lt;/p&gt;
+&lt;h4 id=&#34;if-else&#34;&gt;if-else&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;11
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;12
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;13
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;14
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;15
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// C语言
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;if&lt;/span&gt;(test&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;expr)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    then&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;statement
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;else&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;else&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;statement
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// C语言描述
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;    t&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt;test&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;expr;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;if&lt;/span&gt;(&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;!&lt;/span&gt;t)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;goto&lt;/span&gt; &lt;span style=&#34;color:#0086b3&#34;&gt;false&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    then&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;statement
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;goto&lt;/span&gt; done;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#0086b3&#34;&gt;false&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;else&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;statement
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;done&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id=&#34;if-else-if-else&#34;&gt;if-else if-else&lt;/h4&gt;
+&lt;p&gt;如上多嵌套。&lt;/p&gt;
+&lt;h4 id=&#34;switch&#34;&gt;switch&lt;/h4&gt;
+&lt;p&gt;当分支众多（例如4个以上）时，会构建一个跳转表（数组），在跳转表中记录各个值对应的标号地址进行跳转。好处在于：执行判断语句的时间与判断个数无关。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;switch&lt;/span&gt;(a)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;case&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;&lt;span style=&#34;color:#099&#34;&gt;2&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;    &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// L2标号，代表跳转地址
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;case&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;0&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;    &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// L4
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;case&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;     &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// L5
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;break&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;case&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;3&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;    &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// L6
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;break&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;default&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;:&lt;/span&gt;    &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// L3
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;编译器会将分支映射入跳转表中，当测试值进入后，会计算其执行路径对应的下标值，直接跳转进入。&lt;br&gt;
+注意：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;数组下标从0开，但是测试值是任意整数，编译器会将其做一个偏移，移入0及其以上，所以偏移计算是a+=2；&lt;/li&gt;
+&lt;li&gt;数组下标是连续的，所以对于case中没有提到的值，进入defalut分支。所以数组中值如下：&lt;/li&gt;
+&lt;/ol&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;static&lt;/span&gt; &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;void&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;*&lt;/span&gt; jt[&lt;span style=&#34;color:#099&#34;&gt;6&lt;/span&gt;] &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; {L2, L3, L4, L5, L3, L6};
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;循环结构&#34;&gt;循环结构&lt;/h3&gt;
+&lt;h4 id=&#34;dowhile&#34;&gt;do&amp;hellip;while&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// C语言
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;do&lt;/span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    body&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;statement
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;while&lt;/span&gt;(test&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;expr);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// C语言描述
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;loop&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    body&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;statement
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    t&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt;test&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;expr;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;if&lt;/span&gt;(t)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;goto&lt;/span&gt; loop;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id=&#34;while&#34;&gt;while&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;11
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;12
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;13
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;14
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;15
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;16
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;17
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;18
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;19
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;20
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;21
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;22
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// C语言
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;while&lt;/span&gt;(test&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;expr)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    body&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;statement
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// C语言描述:方式一：跳转到中间(jump to middile)
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;goto&lt;/span&gt; test;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;loop&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    body&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;statement
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;test&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    t&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt;test&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;expr;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;if&lt;/span&gt;(t)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;goto&lt;/span&gt; loop;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// C语言描述:方式二：guarded-do，转成do-while形式
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;    t&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt;test&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;expr;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;if&lt;/span&gt;(&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;!&lt;/span&gt;t)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;goto&lt;/span&gt; done;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;loop&lt;/span&gt;:
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    body&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;statement
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    t&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt;test&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;expr;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;if&lt;/span&gt;(t)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;        &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;goto&lt;/span&gt; loop;
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h4 id=&#34;for&#34;&gt;for&lt;/h4&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;11
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// C语言
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;for&lt;/span&gt;(init&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;expr; test&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;expr; update&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;expr)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    body&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;statement
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// 转成while，其最后的汇编形式同while
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;init&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;expr;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;while&lt;/span&gt;(test&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;expr)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    body&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;statement
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    update&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;-&lt;/span&gt;expr;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;3-过程描述-运行栈&#34;&gt;3. 过程描述-运行栈&lt;/h2&gt;
+&lt;p&gt;函数调用使用了栈提供的先进后出的机制。在内存空间中，栈的增长方向是从高到低。栈指针减少适当的量可以为局部变量在栈上分配内存，栈指针增加，可以用来释放内存。&lt;/p&gt;
+&lt;p&gt;实际上，许多函数不需要栈帧，当所有局部变量都可以保存到寄存器中，而且该函数不会调用其他函数时，就可以这样处理。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e6%a0%88%e5%b8%a7.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;栈帧.png&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;数据传送&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;入参通过寄存器或栈传送。x86-64中，当函数参数个数多于6个时，使用栈传送。用来传送参数的寄存器有：&lt;code&gt;%rdi&lt;/code&gt;、&lt;code&gt;%rsi&lt;/code&gt;、&lt;code&gt;%rdx&lt;/code&gt;、&lt;code&gt;%rcx&lt;/code&gt;、&lt;code&gt;%r8&lt;/code&gt;、&lt;code&gt;%r9&lt;/code&gt;\&lt;/li&gt;
+&lt;li&gt;返回值存放在&lt;code&gt;%rax&lt;/code&gt;中&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
+&lt;li&gt;局部变量&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;寄存器&lt;code&gt;%rbx&lt;/code&gt;、&lt;code&gt;%rbp&lt;/code&gt;、和&lt;code&gt;%r12~%r15&lt;/code&gt;可用来存放局部变量，如果函数栈中使用这些寄存器，那么被使用的寄存器需要保存到栈中，如图被保存的寄存器部分。有些局部变量必须保存到栈中，如：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;寄存器数量不足以存放所有的局部变量；&lt;/li&gt;
+&lt;li&gt;对一个局部变量使用&amp;amp;取地址，由于需要取到地址，所以该局部变量必须在栈中；&lt;/li&gt;
+&lt;li&gt;数组或联合体&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;做如下举例，明确内存中栈帧存放位置。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;9
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;long&lt;/span&gt; &lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;call_proc&lt;/span&gt;()
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;long&lt;/span&gt; x1 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;1&lt;/span&gt;;    &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// 存在栈上，因为需要取地址
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; x2 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;2&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;short&lt;/span&gt; x3 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;3&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;char&lt;/span&gt; x4 &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;=&lt;/span&gt; &lt;span style=&#34;color:#099&#34;&gt;4&lt;/span&gt;;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;proc&lt;/span&gt;(x1, &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;amp;&lt;/span&gt;x1, x2, &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;amp;&lt;/span&gt;x2, x3, &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;amp;&lt;/span&gt;x3, x4, &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;&amp;amp;&lt;/span&gt;x4);   &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// x4和&amp;amp;x4需要存放到栈中
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;return&lt;/span&gt; (x1&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;+&lt;/span&gt;x2)&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;*&lt;/span&gt;(x3&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;+&lt;/span&gt;x4);
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e5%87%bd%e6%95%b0%e6%a0%88%e5%b8%a7%e4%b8%be%e4%be%8b.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;函数栈帧举例.png&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;变长栈帧&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;现在的编译器能够预先确定需要为栈帧分配多少空间，但对于有些函数，需要的局部存储是变长的，此时为了管理变长栈帧，x86-64使用寄存器%rbp作为帧指针。只需要将%rbp作为栈使用寄存器，保存之前的状态值，并设置当前栈顶指针。&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 4
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 5
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 6
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 7
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 8
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt; 9
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;10
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;long&lt;/span&gt; &lt;span style=&#34;color:#900;font-weight:bold&#34;&gt;vframe&lt;/span&gt;(&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;long&lt;/span&gt; n, &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;long&lt;/span&gt; idx, &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;long&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;*&lt;/span&gt;q)
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;{
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;long&lt;/span&gt; i;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;    &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;long&lt;/span&gt; &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;*&lt;/span&gt;p[n]; &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// 变长
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;    &lt;span style=&#34;color:#998;font-style:italic&#34;&gt;//...
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;}
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// 汇编%rbp
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;pushq &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;%&lt;/span&gt;rbp
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;movq &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;%&lt;/span&gt;rsp, &lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;%&lt;/span&gt;rbp
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h2 id=&#34;4-数据结构的表示&#34;&gt;4. 数据结构的表示&lt;/h2&gt;
+&lt;p&gt;局部的数组、结构体和联合体一定放在栈中。&lt;/p&gt;
+&lt;h3 id=&#34;数组&#34;&gt;数组&lt;/h3&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;T A[N];
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;p&gt;数组是在内存中分配一个&lt;code&gt;sizeof(T)*N字&lt;/code&gt;节的连续区域，数组名&lt;code&gt;A&lt;/code&gt;是一个指向数组开头的指针。数组引用&lt;code&gt;A[i]&lt;/code&gt;等同于表达式&lt;code&gt;*(A+i)&lt;/code&gt;。假设数组起始地址为&lt;code&gt;xa&lt;/code&gt;，T为&lt;code&gt;int&lt;/code&gt;，对数组需要有如下认知：&lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th&gt;表达式&lt;/th&gt;
+&lt;th&gt;类型&lt;/th&gt;
+&lt;th&gt;值&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td&gt;A&lt;/td&gt;
+&lt;td&gt;int*&lt;/td&gt;
+&lt;td&gt;xa&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;A[0]&lt;/td&gt;
+&lt;td&gt;int&lt;/td&gt;
+&lt;td&gt;M[xa]&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&amp;amp;A[i]&lt;/td&gt;
+&lt;td&gt;int*&lt;/td&gt;
+&lt;td&gt;xa + 4i&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;A[i]&lt;/td&gt;
+&lt;td&gt;int&lt;/td&gt;
+&lt;td&gt;M[xa + 4i]&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td&gt;&amp;amp;A[i] - A&lt;/td&gt;
+&lt;td&gt;long&lt;/td&gt;
+&lt;td&gt;i&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;多维数组在内存中按照“行优先”的顺序排列。对于多维数组：&lt;/p&gt;
+&lt;div class=&#34;highlight&#34;&gt;&lt;div style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;
+&lt;table style=&#34;border-spacing:0;padding:0;margin:0;border:0;&#34;&gt;&lt;tr&gt;&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;1
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;2
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;3
+&lt;/span&gt;&lt;span style=&#34;white-space:pre;user-select:none;margin-right:0.4em;padding:0 0.4em 0 0.4em;color:#7f7f7f&#34;&gt;4
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;
+&lt;td style=&#34;vertical-align:top;padding:0;margin:0;border:0;;width:100%&#34;&gt;
+&lt;pre tabindex=&#34;0&#34; style=&#34;background-color:#fff;-moz-tab-size:4;-o-tab-size:4;tab-size:4;&#34;&gt;&lt;code class=&#34;language-c&#34; data-lang=&#34;c&#34;&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; A[&lt;span style=&#34;color:#099&#34;&gt;5&lt;/span&gt;][&lt;span style=&#34;color:#099&#34;&gt;3&lt;/span&gt;]
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;// 等价于
+&lt;/span&gt;&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#998;font-style:italic&#34;&gt;&lt;/span&gt;&lt;span style=&#34;color:#000;font-weight:bold&#34;&gt;typedef&lt;/span&gt; &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;int&lt;/span&gt; &lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;row3_t&lt;/span&gt;[&lt;span style=&#34;color:#099&#34;&gt;3&lt;/span&gt;];
+&lt;/span&gt;&lt;/span&gt;&lt;span style=&#34;display:flex;&#34;&gt;&lt;span&gt;&lt;span style=&#34;color:#458;font-weight:bold&#34;&gt;row3_t&lt;/span&gt; A[&lt;span style=&#34;color:#099&#34;&gt;5&lt;/span&gt;];
+&lt;/span&gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;
+&lt;/div&gt;
+&lt;/div&gt;&lt;h3 id=&#34;结构和联合&#34;&gt;结构和联合&lt;/h3&gt;
+&lt;p&gt;两者都是创建一个数据类型，将不同类型的对象居合到一个对象中。用名字来引用各个组成部分。&lt;/p&gt;
+&lt;p&gt;当我们知道一个数据结构中两个不同字段的使用是互斥的，可以将这两个声明为联合的一部分，而不是结构的一部分，这样可以减少分配内存空间的总量。&lt;/p&gt;
+&lt;p&gt;数据对齐。计算机系统对基本数据类型的合法地址做出了一些限制，要求某种类型对象的地址必须是2、4或8的整数倍，这种对齐限制可以简化处理器和内存系统之间接口的硬件设计。否则一个数据可能需要多次访问内存获取数据。&lt;/p&gt;
+&lt;p&gt;对齐原则：任何K字节的基本对象的地址必须是K的倍数。&lt;br&gt;
+有效省内存方式：按照大小降序排列元素。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e5%af%b9%e9%bd%90.png&#34;
+	
+	
+	
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;对齐.png&#34;
+	
+	
+&gt;&lt;/p&gt;
+&lt;h2 id=&#34;5-运行时内存异常&#34;&gt;5. 运行时内存异常&lt;/h2&gt;
+&lt;p&gt;数组引用不进行任何边界检查，当函数调用过程中，数组越界写入导致栈中局部变化、保存的寄存器值甚至返回地址被破坏，导致缓冲区溢出，程序崩溃。&lt;/p&gt;
+&lt;p&gt;库函数&lt;code&gt;gets()&lt;/code&gt;、&lt;code&gt;strcpy()&lt;/code&gt;、&lt;code&gt;strcat()&lt;/code&gt;和&lt;code&gt;sprintf()&lt;/code&gt;都是不安全的函数，不会判断字符串空间是否足够。&lt;/p&gt;
+&lt;p&gt;缓冲区溢出也被黑客用来攻击计算机。常见的保护措施有：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;栈随机化：每次程序运行，栈的位置都有变化。可以将栈起始地址设定在一个范围内，程序每次随机运行在某个地址&lt;/li&gt;
+&lt;li&gt;检测何时栈被破坏，增加栈保护者机制，在栈帧中任何局部缓冲区和栈状态之间存储一个随机产生的特殊的值，哨兵值(guard value)，检测该值是否被某个操作改变，发现改变，异常终止程序&lt;/li&gt;
+&lt;li&gt;限制内存的读、写和可执行权限，限制哪部分内存可存储可执行代码&lt;/li&gt;
+&lt;/ol&gt;
+</description>
+        </item>
+        <item>
         <title>07_链接</title>
         <link>https://frozen531.github.io/post/%E8%AF%BB%E4%B9%A6%E7%AC%94%E8%AE%B0/%E6%B7%B1%E5%85%A5%E7%90%86%E8%A7%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%B3%BB%E7%BB%9F/07_%E9%93%BE%E6%8E%A5/</link>
         <pubDate>Tue, 04 Jul 2023 22:19:20 +0800</pubDate>
@@ -167,13 +963,17 @@
 	
 	
 &gt;&lt;/p&gt;
-&lt;p&gt;GOT(global offset table)，全局偏移量表。&lt;br&gt;
-PLT(procedure linkage table)，过程链接表。&lt;/p&gt;
+&lt;p&gt;为了实现上述目标，采用了&lt;strong&gt;GOT&lt;/strong&gt;(global offset table)，数据段的一部分，全局偏移量表和&lt;strong&gt;PLT&lt;/strong&gt;(procedure linkage table)，过程链接表，代码段的一部分。两者均为数组结构。&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;共享对象内部的函数调用和静态全局变量引用通过相对寻址来编译；&lt;/li&gt;
+&lt;li&gt;共享对象中对全局变量（内部定义和外部定义）的引用，使用GOT表，进行间接引用&lt;/li&gt;
+&lt;li&gt;程序访问共享对象定义的函数，为了提高性能，采用延迟绑定（lazy binding），将过程地址的绑定推迟到第一次调用该过程时。通过PLT表，再增加一次间接调用。即过程调用-&amp;gt;PLT-&amp;gt;GOT-&amp;gt;真正地址。&lt;/li&gt;
+&lt;/ul&gt;
 &lt;h3 id=&#34;显示加载共享库&#34;&gt;显示加载共享库&lt;/h3&gt;
 &lt;p&gt;编译时需要加&lt;code&gt;-ldl&lt;/code&gt;。&lt;/p&gt;
-&lt;p&gt;&lt;code&gt;dlopen()&lt;/code&gt;、&lt;code&gt;dlsym()&lt;/code&gt;、&lt;code&gt;dlclose()&lt;/code&gt;可在程序运行过程中，动态加载与卸载共享库。&lt;/p&gt;
+&lt;p&gt;&lt;code&gt;dlopen()&lt;/code&gt;、&lt;code&gt;dlsym()&lt;/code&gt;、&lt;code&gt;dlclose()&lt;/code&gt;可在程序运行过程中，动态加载与卸载共享库。&lt;code&gt;dlerror()&lt;/code&gt;查看错误信息。&lt;/p&gt;
 &lt;h2 id=&#34;3-库打桩机制&#34;&gt;3. 库打桩机制&lt;/h2&gt;
-&lt;p&gt;所谓打桩，是用自己的代码替换库函数的实现，一般是调试代码，也可完全改变其实现。打桩可以发生在编译时、链接时、运行时。&lt;/p&gt;
+&lt;p&gt;所谓库打桩，就是允许截获对共享库函数的调用，取而代之执行自己的代码。一般可以做调试使用，也可完全改变其实现。打桩可以发生在编译时、链接时、运行时。&lt;/p&gt;
 &lt;ul&gt;
 &lt;li&gt;编译时，通过预处理器打桩&lt;/li&gt;
 &lt;/ul&gt;
@@ -737,12 +1537,36 @@ PLT(procedure linkage table)，过程链接表。&lt;/p&gt;
 &gt;&lt;/p&gt;
 &lt;p&gt;冯.诺依曼体系结构中计算机5大部件：控制器、运算器、存储器、输入设备和输出设备。&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;CPU：中央处理器，主要用来执行存储在主存中的指令。主要包含ALU(算数逻辑单元)、控制器和其他部件（寄存器组等）。PC指针始终指向下一条待执行指令。通过控制总线、地址总线和数据总线，读取指令、读写数据并执行指令。&lt;/li&gt;
+&lt;li&gt;CPU：中央处理器，主要用来执行存储在主存中的指令。主要包含：&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;ol&gt;
+&lt;li&gt;运算器ALU(算数逻辑单元，进行信息处理)；&lt;/li&gt;
+&lt;li&gt;控制器（控制各器件工作）；&lt;/li&gt;
+&lt;li&gt;其他部件（寄存器组（信息存储）等）&lt;/li&gt;
+&lt;/ol&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;PC指针始终指向下一条待执行指令。通过控制总线、地址总线和数据总线，读取指令、读写数据并执行指令。&lt;/p&gt;
+&lt;ul&gt;
 &lt;li&gt;主存储器：一组动态随机存储器（DRAM），物理内存。程序执行时会加载入内存。&lt;/li&gt;
-&lt;li&gt;总线：携带信息在各个组件间传递。包括地址总线（宽度决定了CPU的寻址能力）、控制总线（宽度决定了CPU对其他器件的控制能力）和数据总线（宽度决定了CPU与其他器件一次性传送的数据量）。&lt;/li&gt;
+&lt;li&gt;总线：携带信息在各个组件间传递。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;blockquote&gt;
+&lt;p&gt;根据总线位置划分为：&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;内部总线：CPU内部，用来实现CPU内各器件间信息传递&lt;/li&gt;
+&lt;li&gt;外部总线：相对与内部总线，实现CPU与主板上各器件的信息传递。这些总线从逻辑上讲分为：&lt;/li&gt;
+&lt;/ol&gt;
+&lt;ul&gt;
+&lt;li&gt;地址总线（宽度决定了CPU的寻址能力）&lt;/li&gt;
+&lt;li&gt;控制总线（宽度决定了CPU对其他器件的控制能力）&lt;/li&gt;
+&lt;li&gt;数据总线（宽度决定了CPU与其他器件一次性传送的数据量）。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/blockquote&gt;
+&lt;ul&gt;
 &lt;li&gt;I/O设备：输入设备与输出设备。I/O设备通过控制器或适配器与I/O总线相连。主要区别在于它们的封装方式。每个PC都有一块主板，主板上包含有CPU、存储器、外围芯片组、扩展卡槽等。控制器是位于主板上的芯片组，而适配器是一块插在主板卡槽上的卡，称为接口卡。CPU通过总线想接口卡发送命令，接口卡根据CPU发送的命令控制外设工作。&lt;/li&gt;
 &lt;/ul&gt;
-&lt;p&gt;DMA(直接存储器存取)技术，可以不经过CPU直接将数据从磁盘到达主存，用于数据搬运。其他键盘输入、屏幕输出、指令执行等所有的操作都要在CPU走一遭。&lt;/p&gt;
+&lt;p&gt;DMA(直接存储器存取)技术，可以不经过CPU直接将数据从磁盘到达主存，用于数据搬运。相比于此，其他键盘输入、屏幕输出、指令执行等所有的操作都要在CPU走一遭。&lt;/p&gt;
 &lt;h2 id=&#34;3-存储设备的层次结构&#34;&gt;3. 存储设备的层次结构&lt;/h2&gt;
 &lt;p&gt;&lt;img src=&#34;https://frozen531.github.io/%e6%b7%b1%e5%85%a5%e7%90%86%e8%a7%a3%e8%ae%a1%e7%ae%97%e6%9c%ba%e7%b3%bb%e7%bb%9f/%e5%ad%98%e5%82%a8%e5%99%a8%e5%b1%82%e6%ac%a1%e7%bb%93%e6%9e%84%e7%a4%ba%e6%84%8f%e5%9b%be.png&#34;
 	
@@ -785,7 +1609,10 @@ PLT(procedure linkage table)，过程链接表。&lt;/p&gt;
 并行：用并发是一个系统运行的更快。&lt;/p&gt;
 &lt;p&gt;要想让系统运行的更快、更多，按照系统层次结构由高到低顺序强调三个层次。&lt;/p&gt;
 &lt;ul&gt;
-&lt;li&gt;线程级并发，在一个进程中执行多个控制流。&lt;/li&gt;
+&lt;li&gt;线程级并发
+对于单核处理器，通过快速切换任务“模拟”并发。&lt;br&gt;
+&lt;strong&gt;超线程技术&lt;/strong&gt;，使得一个处理器可同时运行多个控制流，在某些硬件（如：程序计数器、寄存器等）有多个备份，相比上面常规处理器，在极短时间内完成线程间切换。&lt;br&gt;
+&lt;strong&gt;多处理器系统&lt;/strong&gt;，指单操作系统内核控制的多处理器组成的系统，即多个CPU被集成到一个集成电路芯片上，由单个操作系统控制。&lt;/li&gt;
 &lt;li&gt;指令集并行，处理器同时执行多条指令。&lt;/li&gt;
 &lt;li&gt;单指令、多数据并行（SIMD），允许一条指令产生多个可并行执行的操作。主要用来提高处理视频、音频等数据的执行速度。&lt;/li&gt;
 &lt;/ul&gt;
